@@ -1,0 +1,144 @@
+#app-content-wrapper {
+    height: 100%;
+}
+
+.quicknote {
+    min-height: 150px;
+    width: 250px;
+    padding: 6px;
+    border-radius: 3px;
+    box-shadow: 0 4px 6px #c1c1c1;
+}
+
+.quicknote:hover {
+   box-shadow: 0px 0px 6px #808080;
+}
+
+.note-active {
+  z-index: 10;
+  height: 100%;
+  /*width: 100%;*/
+}
+
+.icon-delete-note {
+    float: right;
+    position: absolute;
+    right: 10px;
+    top: 6px;
+}
+
+#div-content .save-button {
+    float: right;
+}
+
+#div-content textarea {
+    border: 0;
+    overflow-y: auto;
+    /*resize: none;*/
+    background: inherit;
+}
+
+/* Grid Note */
+
+#div-content .note-title {
+   height: 28px;
+   width: calc(100% - 20px);
+   font-size: 18px;
+   font-weight: bold;
+   text-overflow: ellipsis;
+   white-space: nowrap;
+   overflow: hidden;
+}
+
+.noselect {
+   -webkit-touch-callout: none; /* iOS Safari */
+   -webkit-user-select: none;   /* Chrome/Safari/Opera */
+   -khtml-user-select: none;    /* Konqueror */
+   -moz-user-select: none;      /* Firefox */
+   -ms-user-select: none;       /* Internet Explorer/Edge */
+   user-select: none;           /* Non-prefixed version, currently
+                                  not supported by any browser */
+}
+
+.note-toolbar {
+   float:left;
+}
+
+.circle-toolbar {
+   display:inline-block;
+   width:20px;
+   height:20px;
+   min-width: 20px;
+   border-radius:10px;
+}
+
+.ciclle-toolbar:hover {
+   color: #ccc;
+   text-decoration:none;
+   background:#333;
+}
+
+/* Isotope Grid */
+
+.notes-grid {
+    margin: 0 auto;
+    padding: 15px;
+}
+.note-grid-item {
+  margin-bottom: 10px;
+}
+
+/* Modal Note */
+
+/* The Modal (background) */
+
+.modal-note {
+    position: fixed; /* Stay in place */
+    z-index: 10000; /* Sit on top */
+    padding-top: 100px; /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+.hide-delete-icon,
+.hide-modal-note {
+    display: none; /* Hidden by default */
+}
+.show-delete-icon,
+.show-modal-note {
+    display: block;
+}
+
+#content-editable {
+    min-height: 20px;
+}
+/* Modal Content */
+
+.modal-content {
+    position: relative;
+    margin: auto;
+    width: 60%;
+    height: auto;
+    min-height: unset;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+    -webkit-animation-name: animatetop;
+    -webkit-animation-duration: 0.4s;
+    animation-name: animatetop;
+    animation-duration: 0.4s
+}
+
+/* Add Animation */
+@-webkit-keyframes animatetop {
+    from {top:-300px; opacity:0} 
+    to {top:0; opacity:1}
+}
+
+@keyframes animatetop {
+    from {top:-300px; opacity:0}
+    to {top:0; opacity:1}
+}
