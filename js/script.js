@@ -236,6 +236,8 @@ View.prototype = {
 
         // Open notes when clicking them.
         $(".quicknote").click(function (event) {
+            event.stopPropagation();
+
             var modalnote = $("#modal-note-editable .quicknote");
             var modalid = modalnote.data('id');
             if (modalid > 0) return;
