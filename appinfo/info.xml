@@ -8,6 +8,10 @@
     <version>0.0.2</version>
     <namespace>QuickNotes</namespace>
     <category>tool</category>
+    <website>https://github.com/matiasdelellis</website>
+    <bugs>https://github.com/matiasdelellis/quicknotes/issues</bugs>
+    <repository type="git">https://github.com/matiasdelellis/quicknotes.git</repository>
+    <ocsid>174716</ocsid>
     <dependencies>
         <owncloud min-version="9.0" max-version="9.1"/>
     </dependencies>
