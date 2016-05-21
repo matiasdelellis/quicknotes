@@ -153,10 +153,10 @@ View.prototype = {
         $('.notes-grid').isotope({ filter: '*'});
     },
     editNote: function (id) {
-        var modal = $('#modal-note-editable');
-        var modaltitle = $('#modal-note-editable #title-editable');
-        var modalcontent = $('#modal-note-editable #content-editable');
-        var modalnote = $("#modal-note-editable .quicknote");
+        var modal = $('#modal-note-div');
+        var modaltitle = $('#modal-note-div #title-editable');
+        var modalcontent = $('#modal-note-div #content-editable');
+        var modalnote = $("#modal-note-div .quicknote");
 
         var note = $('.notes-grid [data-id=' + id + ']').parent();
 
@@ -174,15 +174,24 @@ View.prototype = {
         modalcontent.html(content);
         modalnote.css("background-color", color);
 
+        /* Positioning the modal to the original size */
+        $(".modal-content").css({
+            "position" : "absolute",
+            "left"     : note.offset().left,
+            "top"      : note.offset().top,
+            "width"    : note.width(),
+            "min-height": note.height(),
+            "height:"  : "auto"
+        });
         modal.removeClass("hide-modal-note");
         modal.addClass("show-modal-note");
         modalcontent.focus();
     },
     cancelEdit: function () {
-        var modal = $('#modal-note-editable');
-        var modaltitle = $('#modal-note-editable #title-editable');
-        var modalcontent = $('#modal-note-editable #content-editable');
-        var modalnote = $("#modal-note-editable .quicknote");
+        var modal = $('#modal-note-div');
+        var modaltitle = $('#modal-note-div #title-editable');
+        var modalcontent = $('#modal-note-dive #content-editable');
+        var modalnote = $("#modal-note-div .quicknote");
 
         this._notes.unsetActive();
         this.showAll();
@@ -213,10 +222,10 @@ View.prototype = {
         });
 
         // Handle click event to open note.
-        var modal = $('#modal-note-editable');
-        var modaltitle = $('#modal-note-editable #title-editable');
-        var modalcontent = $('#modal-note-editable #content-editable');
-        var modalnote = $("#modal-note-editable .quicknote");
+        var modal = $('#modal-note-div');
+        var modaltitle = $('#modal-note-div #title-editable');
+        var modalcontent = $('#modal-note-div #content-editable');
+        var modalnote = $("#modal-note-div .quicknote");
 
         // Show delete icon on hover.
         $(".quicknote").hover(function() {
@@ -233,6 +242,11 @@ View.prototype = {
             var id = parseInt($(this).data('id'), 10);
 
             self.editNote(id);
+        });
+
+        // Cancel when click outside the modal.
+        $(".modal-note-background").click(function () {
+            self.cancelEdit();
         });
 
         // Cancel with escape key
@@ -341,16 +355,13 @@ View.prototype = {
             });
         });
 
-        // load a note
+        // show a note
         $('#app-navigation .note > a').click(function () {
             var id = parseInt($(this).parent().data('id'), 10);
             $('.notes-grid').isotope({ filter: function() {
                 var itemId = parseInt($(this).children().data('id'), 10);
                 return id == itemId;
             } });
-            self.editNote(id);
-
-//            self._notes.load(id);
         });
 
         // Handle colors.

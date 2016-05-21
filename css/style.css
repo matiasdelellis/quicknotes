@@ -92,7 +92,7 @@
 
 /* The Modal (background) */
 
-.modal-note {
+.modal-note-background {
     position: fixed; /* Stay in place */
     z-index: 10000; /* Sit on top */
     padding-top: 100px; /* Location of the box */
@@ -117,6 +117,7 @@
 #content-editable {
     min-height: 20px;
 }
+
 /* Modal Content */
 
 .modal-content {
@@ -125,20 +126,4 @@
     width: 60%;
     height: auto;
     min-height: unset;
-    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
-    -webkit-animation-name: animatetop;
-    -webkit-animation-duration: 0.4s;
-    animation-name: animatetop;
-    animation-duration: 0.4s
-}
-
-/* Add Animation */
-@-webkit-keyframes animatetop {
-    from {top:-300px; opacity:0} 
-    to {top:0; opacity:1}
-}
-
-@keyframes animatetop {
-    from {top:-300px; opacity:0}
-    to {top:0; opacity:1}
 }
