@@ -194,7 +194,6 @@ View.prototype = {
         var modalnote = $("#modal-note-div .quicknote");
 
         this._notes.unsetActive();
-        this.showAll();
 
         modal.removeClass("show-modal-note");
         modal.addClass("hide-modal-note");
@@ -261,11 +260,16 @@ View.prototype = {
         // Remove note icon
         var self = this;
         $('#app-content .icon-delete-note').click(function (event) {
+            var note = $(this).parent();
+            var id = parseInt(note.data('id'), 10);
+
             event.stopPropagation();
-            var id = parseInt($(this).parent().data('id'), 10);
+
             self._notes.load(id);
             self._notes.removeActive().done(function () {
-                self.render();
+                $(".notes-grid").isotope('remove', note.parent())
+                                .isotope('layout');
+                self.renderNavigation();
             }).fail(function () {
                 alert('Could not delete note, not found');
             });
