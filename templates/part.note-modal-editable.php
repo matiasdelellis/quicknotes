@@ -2,8 +2,8 @@
 	<div class="modal-content">
 		<div class="quicknote note-active" style="background-color: #F7EB96" data-id="-1">
 			<div contenteditable="true" id='title-editable' class='note-title'></div>
-			<div contenteditable="true" id='content-editable' class='note-content'></div>
-			<div>
+			<div contenteditable="true" id='content-editable' class='note-content' data-placeholder="No content"></div>
+			<div class="note-options">
 				<div class="save-button">
 					<button id='save-button'><?php p($l->t('Save')); ?></button>
 				</div>
