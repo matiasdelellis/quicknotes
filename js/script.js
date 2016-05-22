@@ -350,6 +350,7 @@ View.prototype = {
                                   "<div id='content-editable' class='note-content'>" + note.content + "</div>" +
                                   "</div></div>");
                 $(".notes-grid").prepend( $notehtml )
+                                .isotope({ filter: '*'})
                                 .isotope( 'prepended', $notehtml);
                 self.renderNavigation();
             }).fail(function () {
