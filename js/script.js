@@ -352,6 +352,7 @@ View.prototype = {
                 $(".notes-grid").prepend( $notehtml )
                                 .isotope({ filter: '*'})
                                 .isotope( 'prepended', $notehtml);
+                self._notes.unsetActive();
                 self.renderNavigation();
             }).fail(function () {
                 alert('Could not create note');
