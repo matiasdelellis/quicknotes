@@ -85,7 +85,7 @@ Notes.prototype = {
             contentType: 'application/json',
             data: JSON.stringify(note)
         }).done(function (note) {
-            self._notes.push(note);
+            self._notes.unshift(note);
             self._activeNote = note;
             self.load(note.id);
             deferred.resolve();
@@ -227,26 +227,33 @@ View.prototype = {
         var modalnote = $("#modal-note-div .quicknote");
 
         // Show delete icon on hover.
-        $(".quicknote").hover(function() {
+        $("#app-content").on("mouseenter", ".quicknote", function() {
             $(this).find(".icon-delete").addClass( "show-delete-icon");
-        }, function(){
+        });
+        $("#app-content").on("mouseleave", ".quicknote", function() {
             $(this).find(".icon-delete").removeClass("show-delete-icon");
         });
 
         // Open notes when clicking them.
-        $(".quicknote").click(function (event) {
-            event.stopPropagation();
+        $("#app-content").on("click", ".quicknote", function (event) {
+            event.stopPropagation(); // Not work so need fix on next binding..
 
             var modalnote = $("#modal-note-editable .quicknote");
             var modalid = modalnote.data('id');
             if (modalid > 0) return;
+
             var id = parseInt($(this).data('id'), 10);
 
             self.editNote(id);
         });
 
         // Cancel when click outside the modal.
-        $(".modal-note-background").click(function () {
+        $(".modal-note-background").click(function (event) {
+            /* stopPropagation() not work with .on() binings. */
+            if (!$(event.target).is(".modal-note-background")) {
+                 event.stopPropagation();
+                 return;
+            }
             self.cancelEdit();
         });
 
@@ -259,7 +266,7 @@ View.prototype = {
 
         // Remove note icon
         var self = this;
-        $('#app-content .icon-delete-note').click(function (event) {
+        $('#app-content').on("click", ".icon-delete-note", function (event) {
             var note = $(this).parent();
             var id = parseInt(note.data('id'), 10);
 
@@ -273,7 +280,6 @@ View.prototype = {
             }).fail(function () {
                 alert('Could not delete note, not found');
             });
-
         });
 
         // Handle colors.
@@ -336,8 +342,16 @@ View.prototype = {
             };
 
             self._notes.create(note).done(function() {
-                self.render();
-                $('#div-content .text-note').focus();
+                note = self._notes.getActive();
+                var $notehtml = $("<div class=\"note-grid-item\">" +
+                                  "<div class=\"quicknote noselect\" style=\"background-color:" + note.color + "\" data-id=\"" + note.id + "\">" +
+                                  "<div id='title-editable' class='note-title'>" + note.title + "</div>" +
+                                  "<button class=\"icon-delete hide-delete-icon icon-delete-note\" title=\"Delete\"></button>" +
+                                  "<div id='content-editable' class='note-content'>" + note.content + "</div>" +
+                                  "</div></div>");
+                $(".notes-grid").prepend( $notehtml )
+                                .isotope( 'prepended', $notehtml);
+                self.renderNavigation();
             }).fail(function () {
                 alert('Could not create note');
             });
