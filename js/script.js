@@ -163,6 +163,12 @@ View.prototype = {
         var title = note.find("#title-editable").html();
         var content = note.find("#content-editable").html();
         var color = note.children().css("background-color");
+        var colors = modal[0].getElementsByClassName("circle-toolbar");
+        $.each(colors, function(i, c) {
+            if(color == c.style.backgroundColor) {
+                c.className += " icon-checkmark";
+            }
+        });
 
         var modalid = modalnote.data('id');
 
