@@ -70,6 +70,7 @@
    height:20px;
    min-width: 20px;
    border-radius:10px;
+   border: 1px solid rgba(0, 0, 0, 0.2);
 }
 
 .ciclle-toolbar:hover {
@@ -116,6 +117,20 @@
 
 #content-editable {
     min-height: 20px;
+}
+
+.note-options {
+    position: absolute;
+    bottom: 0;
+    padding: 5px;
+}
+
+/* show placeholder text for empty notes */
+div[data-placeholder]:empty::before {
+  color: grey;
+}
+div[data-placeholder]:not([data-placeholder=""]):empty::before {
+  content: attr(data-placeholder);
 }
 
 /* Modal Content */
