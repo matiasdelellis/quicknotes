@@ -5,7 +5,7 @@
 .quicknote {
     min-height: 150px;
     width: 250px;
-    padding: 6px;
+    padding: 10px;
     border-radius: 3px;
     box-shadow: 0 4px 6px #c1c1c1;
 }
@@ -29,6 +29,8 @@
 
 #div-content .save-button {
     float: right;
+    padding-right: 8px;
+    padding-bottom: 5px;
 }
 
 #div-content textarea {
@@ -62,6 +64,7 @@
 
 .note-toolbar {
    float:left;
+   padding-bottom: 3px;
 }
 
 .circle-toolbar {
@@ -117,6 +120,7 @@
 
 #content-editable {
     min-height: 20px;
+    padding-bottom: 60px;
 }
 
 .note-options {
