@@ -307,8 +307,12 @@ View.prototype = {
             });
         });
 
+        /*
+         * Modal actions.
+         */
+
         // Handle colors.
-        $('#app-content .circle-toolbar').click(function (event) {
+        $('#modal-note-div .circle-toolbar').click(function (event) {
             event.stopPropagation();
 
             var oldColorTool = $('.circle-toolbar.icon-checkmark');
@@ -320,12 +324,13 @@ View.prototype = {
             modalnote.css("background-color", color);
         });
 
-        // handle cancel and saves note.
-        $('#app-content #cancel-button').click(function (event) {
+        // handle cancel editing notes.
+        $('#modal-note-div #cancel-button').click(function (event) {
            self.cancelEdit();
         });
 
-        $('#app-content #save-button').click(function (event) {
+        // Handle save note
+        $('#modal-note-div #save-button').click(function (event) {
             event.stopPropagation();
 
             var id = modalnote.data('id');
