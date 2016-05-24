@@ -20,6 +20,10 @@
   /*width: 100%;*/
 }
 
+.note-active #content-editable {
+    margin-bottom: 60px;
+}
+
 .icon-delete-note {
     float: right;
     position: absolute;
@@ -119,8 +123,8 @@
 }
 
 #content-editable {
-    min-height: 20px;
-    padding-bottom: 60px;
+    min-height: 50px;
+    word-wrap: break-word;
 }
 
 .note-options {
