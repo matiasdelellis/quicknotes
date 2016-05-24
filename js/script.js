@@ -198,6 +198,11 @@ View.prototype = {
         var modaltitle = $('#modal-note-div #title-editable');
         var modalcontent = $('#modal-note-dive #content-editable');
         var modalnote = $("#modal-note-div .quicknote");
+        //remove checkmark icons from temp selected color
+        var modalcolortools = $("#modal-note-div .circle-toolbar");
+        $.each(modalcolortools, function(i, colortool) {
+            $(colortool).removeClass('icon-checkmark');
+        });
 
         this._notes.unsetActive();
 
@@ -306,6 +311,11 @@ View.prototype = {
         $('#app-content .circle-toolbar').click(function (event) {
             event.stopPropagation();
 
+            var oldColorTool = $('.circle-toolbar.icon-checkmark');
+            $.each(oldColorTool, function(i, oct) {
+               $(oct).removeClass('icon-checkmark'); 
+            });
+            $(this).addClass('icon-checkmark');
             var color = $(this).css("background-color");
             modalnote.css("background-color", color);
         });
