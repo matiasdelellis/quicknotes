@@ -5,10 +5,8 @@
 			<div contenteditable="true" id='content-editable' class='note-content' data-placeholder="No content"></div>
 			<div class="note-options">
 				<div class="save-button">
-					<button id='save-button'><?php p($l->t('Save')); ?></button>
-				</div>
-				<div class="save-button">
 					<button id='cancel-button'><?php p($l->t('Cancel')); ?></button>
+					<button id='save-button'><?php p($l->t('Save')); ?></button>
 				</div>
 				<div class="note-toolbar">
 					<a href="#" class="circle-toolbar" style="background-color: #F7EB96"></a>
