@@ -36,6 +36,33 @@
 				<notnull>true</notnull>
 			</field>
 			<field>
+				<name>timestamp</name>
+				<type>integer</type>
+				<default>0</default>
+				<notnull>true</notnull>
+				<length>4</length>
+			</field>
+			<field>
+				<name>color_id</name>
+				<type>integer</type>
+				<notnull>true</notnull>
+				<length>8</length>
+			</field>
+		</declaration>
+	</table>
+	<table>
+		<name>*dbprefix*quicknotes_colors</name>
+		<declaration>
+			<field>
+				<name>id</name>
+				<type>integer</type>
+				<notnull>true</notnull>
+				<autoincrement>true</autoincrement>
+				<unsigned>true</unsigned>
+				<primary>true</primary>
+				<length>8</length>
+			</field>
+			<field>
 				<name>color</name>
 				<type>text</type>
 			</field>

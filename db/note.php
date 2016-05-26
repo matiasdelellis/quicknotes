@@ -9,14 +9,23 @@ class Note extends Entity implements JsonSerializable {
 
 	protected $title;
 	protected $content;
-	protected $color;
+	protected $timestamp;
+	protected $colorId;
 	protected $userId;
+
+	protected $color;
+
+	public function setColor($color) {
+		$this->color = $color;
+	}
 
 	public function jsonSerialize() {
 		return [
 			'id' => $this->id,
 			'title' => $this->title,
 			'content' => $this->content,
+			'timestamp' => $this->timestamp,
+			'colorid' => $this->colorId,
 			'color' => $this->color
 		];
 	}

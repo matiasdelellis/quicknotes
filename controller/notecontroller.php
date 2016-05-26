@@ -17,17 +17,20 @@ use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\Controller;
 
 use OCA\QuickNotes\Db\Note;
+use OCA\QuickNotes\Db\Color;
 use OCA\QuickNotes\Db\NoteMapper;
-use OCA\QuickNotes\Db\TaskMapper;
+use OCA\QuickNotes\Db\ColorMapper;
 
-class NoteController extends Controller	{
+class NoteController extends Controller {
 
-	private $mapper;
+	private $notemapper;
+	private $colormapper;
 	private $userId;
 
-	public function __construct($AppName, IRequest $request, NoteMapper $mapper, $UserId) {
+	public function __construct($AppName, IRequest $request, NoteMapper $notemapper, ColorMapper $colormapper, $UserId) {
 		parent::__construct($AppName, $request);
-		$this->mapper = $mapper;
+		$this->notemapper = $notemapper;
+		$this->colormapper = $colormapper;
 		$this->userId = $UserId;
 	}
 
@@ -35,7 +38,12 @@ class NoteController extends Controller	{
 	 * @NoAdminRequired
 	 */
 	 public function index() {
-		return new DataResponse($this->mapper->findAll($this->userId));
+		$notes = $this->notemapper->findAll($this->userId);
+		// Insert true color to response
+		foreach ($notes as $note) {
+			$note->setColor($this->colormapper->find($note->getColorId())->getColor());
+		}
+		return new DataResponse($notes);
 	}
 
 	/**
@@ -44,8 +52,9 @@ class NoteController extends Controller	{
 	 * @param int $id
 	 */
 	public function show($id) {
+		// TODO: Implement.
 		try {
-			return new DataResponse($this->mapper->find($id, $this->userId));
+			return new DataResponse($this->notemapper->find($id, $this->userId));
 		} catch(Exception $e) {
 			return new DataResponse([], Http::STATUS_NOT_FOUND);
 		}
@@ -58,12 +67,27 @@ class NoteController extends Controller	{
 	 * @param string $content
 	 */
 	public function create($title, $content, $color = "#F7EB96") {
+		// Get color or append it
+		if ($this->colormapper->colorExists($color)) {
+			$hcolor = $this->colormapper->findByColor($color);
+		} else {
+			$hcolor = new Color();
+			$hcolor->setColor($color);
+			$hcolor = $this->colormapper->insert($hcolor);
+		}
+
+		// Create note and insert it
 		$note = new Note();
 		$note->setTitle($title);
 		$note->setContent($content);
-		$note->setColor($color);
+		$note->setTimestamp(time());
+		$note->setColorId($hcolor->id);
 		$note->setUserId($this->userId);
-		return new DataResponse($this->mapper->insert($note));
+
+		// Insert true color to response
+		$note->setColor($hcolor->getColor());
+
+		return new DataResponse($this->notemapper->insert($note));
 	}
 
 	/**
@@ -72,17 +96,37 @@ class NoteController extends Controller	{
 	 * @param int $id
 	 * @param string $title
 	 * @param string $content
+	 * @param string $color
 	 */
 	public function update($id, $title, $content, $color = "#F7EB96") {
+		// Get Note
 		try {
-			$note = $this->mapper->find($id, $this->userId);
+			$note = $this->notemapper->find($id, $this->userId);
 		} catch(Exception $e) {
 			return new DataResponse([], Http::STATUS_NOT_FOUND);
 		}
+
+		// Get color or append it
+		if ($this->colormapper->colorExists($color)) {
+			$hcolor = $this->colormapper->findByColor($color);
+		} else {
+			$hcolor = new Color();
+			$hcolor->setColor($color);
+			$hcolor = $this->colormapper->insert($hcolor);
+		}
+
+		// TODO: Remove old color if necessary
+
+		/* Update note */
 		$note->setTitle($title);
 		$note->setContent($content);
-		$note->setColor($color);
-		return new DataResponse($this->mapper->update($note));
+		$note->setTimestamp(time());
+		$note->setColorId($hcolor->id);
+
+		// Insert true color to response
+		$note->setColor($hcolor->getColor());
+
+		return new DataResponse($this->notemapper->update($note));
 	}
 
 	/**
@@ -92,17 +136,12 @@ class NoteController extends Controller	{
 	 */
 	public function destroy($id) {
 		try {
-			$note = $this->mapper->find($id, $this->userId);
+			$note = $this->notemapper->find($id, $this->userId);
 		} catch(Exception $e) {
 			return new DataResponse([], Http::STATUS_NOT_FOUND);
 		}
 
-		/*$taskmapper = new TaskMapper($this->mapper->db);
-		$tasks = $taskmapper->findAll($note);
-		foreach ($tasks as $task) {
-			$taskmapper->delete($task->id);
-		}*/
-		$this->mapper->delete($note);
+		// TODO: Remove old color if necessary.
 
 		return new DataResponse($note);
 	}
