@@ -301,6 +301,7 @@ View.prototype = {
             self._notes.removeActive().done(function () {
                 $(".notes-grid").isotope('remove', note.parent())
                                 .isotope('layout');
+                self.showAll();
                 self.renderNavigation();
             }).fail(function () {
                 alert('Could not delete note, not found');
