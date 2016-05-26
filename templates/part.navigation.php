@@ -10,7 +10,7 @@
 		<a href="#" class="icon-search svg">Colors</a>
 		<ul>
 			<li style="display: flex; justify-content: center;">
-				<button class="circle-toolbar" style="background: transparent none; border: 1px solid;"></button>
+				<button class="circle-toolbar icon-checkmark any-color"></button>
 				{{#each colors}}
 					<button class="circle-toolbar" style="background-color: {{color}} "></button>
 				{{/each}}

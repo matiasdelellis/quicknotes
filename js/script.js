@@ -315,9 +315,9 @@ View.prototype = {
         $('#modal-note-div .circle-toolbar').click(function (event) {
             event.stopPropagation();
 
-            var oldColorTool = $('.circle-toolbar.icon-checkmark');
+            var oldColorTool = $('#modal-note-div .circle-toolbar.icon-checkmark');
             $.each(oldColorTool, function(i, oct) {
-               $(oct).removeClass('icon-checkmark'); 
+               $(oct).removeClass('icon-checkmark');
             });
             $(this).addClass('icon-checkmark');
             var color = $(this).css("background-color");
@@ -365,6 +365,12 @@ View.prototype = {
         $('#all-notes').click(function () {
             self._notes.unsetActive();
             $('.notes-grid').isotope({ filter: '*'});
+
+            var oldColorTool = $('#app-navigation .circle-toolbar.icon-checkmark');
+            $.each(oldColorTool, function(i, oct) {
+               $(oct).removeClass('icon-checkmark');
+            });
+            $('#app-navigation .any-color').addClass('icon-checkmark');
         });
 
         // create a new note
@@ -423,10 +429,14 @@ View.prototype = {
 
         // Handle colors.
         $('#app-navigation .circle-toolbar').click(function (event) {
-            event.stopPropagation();
+            var oldColorTool = $('#app-navigation .circle-toolbar.icon-checkmark');
+            $.each(oldColorTool, function(i, oct) {
+                 $(oct).removeClass('icon-checkmark');
+            });
+            $(this).addClass('icon-checkmark');
 
-            var color = $(this).css("background-color");
-            if (color != 'transparent') {
+            if (!$(this).hasClass("any-color")) {
+                var color = $(this).css("background-color");
                 $('.notes-grid').isotope({ filter: function() {
                     var itemColor = $(this).children().css("background-color");
                     return color == itemColor;
