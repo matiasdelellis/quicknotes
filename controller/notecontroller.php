@@ -99,14 +99,15 @@ class NoteController extends Controller {
 	 * @param string $color
 	 */
 	public function update($id, $title, $content, $color = "#F7EB96") {
-		// Get Note
+		// Get current Note and Color.
 		try {
 			$note = $this->notemapper->find($id, $this->userId);
 		} catch(Exception $e) {
 			return new DataResponse([], Http::STATUS_NOT_FOUND);
 		}
+		$oldcolorid = $note->getColorId();
 
-		// Get color or append it
+		// Get new Color or append it.
 		if ($this->colormapper->colorExists($color)) {
 			$hcolor = $this->colormapper->findByColor($color);
 		} else {
@@ -115,18 +116,25 @@ class NoteController extends Controller {
 			$hcolor = $this->colormapper->insert($hcolor);
 		}
 
-		// TODO: Remove old color if necessary
-
-		/* Update note */
+		// Set new info on Note
 		$note->setTitle($title);
 		$note->setContent($content);
 		$note->setTimestamp(time());
 		$note->setColorId($hcolor->id);
-
 		// Insert true color to response
 		$note->setColor($hcolor->getColor());
 
-		return new DataResponse($this->notemapper->update($note));
+		// Update note.
+		$newnote = $this->notemapper->update($note);
+
+		//  Remove old color if necessary
+		if (($oldcolorid != $hcolor->getId()) &&
+		    (!$this->notemapper->colorIdCount($oldcolorid))) {
+			$oldcolor = $this->colormapper->find($oldcolorid);
+			$this->colormapper->delete($oldcolor);
+		}
+
+		return new DataResponse($newnote);
 	}
 
 	/**
@@ -135,14 +143,23 @@ class NoteController extends Controller {
 	 * @param int $id
 	 */
 	public function destroy($id) {
+		// Get Note and Color
 		try {
 			$note = $this->notemapper->find($id, $this->userId);
 		} catch(Exception $e) {
 			return new DataResponse([], Http::STATUS_NOT_FOUND);
 		}
+		$oldcolorid = $note->getColorId();
 
-		// TODO: Remove old color if necessary.
+		// Delete note.
+		$this->notemapper->delete($note);
+
+		// Delete Color if necessary
+		if (!$this->notemapper->colorIdCount($oldcolorid)) {
+			$oldcolor = $this->colormapper->find($oldcolorid);
+			$this->colormapper->delete($oldcolor);
+		}
 
 		return new DataResponse($note);
 	}
- }
+}

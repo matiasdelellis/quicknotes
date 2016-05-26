@@ -22,7 +22,7 @@ class NoteMapper extends Mapper {
 	}
 
 	public function colorIdCount($colorid) {
-		$sql = 'SELECT COUNT(*) as `count` FROM *PREFIX*quicknotes WHERE color_id = ?';
+		$sql = 'SELECT COUNT(*) as `count` FROM *PREFIX*quicknotes_notes WHERE color_id = ?';
 		$result = $this->execute($sql, [$colorid]);
 		$row = $result->fetch();
 		$result->closeCursor();
