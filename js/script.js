@@ -299,10 +299,14 @@ View.prototype = {
 
             self._notes.load(id);
             self._notes.removeActive().done(function () {
-                $(".notes-grid").isotope('remove', note.parent())
-                                .isotope('layout');
-                self.showAll();
-                self.renderNavigation();
+                if (self._notes.length == 0) {
+                    $(".notes-grid").isotope('remove', note.parent())
+                                    .isotope('layout');
+                    self.showAll();
+                    self.renderNavigation();
+                } else {
+                    self.render();
+                }
             }).fail(function () {
                 alert('Could not delete note, not found');
             });
@@ -384,18 +388,23 @@ View.prototype = {
             };
 
             self._notes.create(note).done(function() {
-                note = self._notes.getActive();
-                var $notehtml = $("<div class=\"note-grid-item\">" +
-                                  "<div class=\"quicknote noselect\" style=\"background-color:" + note.color + "\" data-id=\"" + note.id + "\">" +
-                                  "<div id='title-editable' class='note-title'>" + note.title + "</div>" +
-                                  "<button class=\"icon-delete hide-delete-icon icon-delete-note\" title=\"Delete\"></button>" +
-                                  "<div id='content-editable' class='note-content'>" + note.content + "</div>" +
-                                  "</div></div>");
-                $(".notes-grid").prepend( $notehtml )
-                                .isotope({ filter: '*'})
-                                .isotope( 'prepended', $notehtml);
-                self._notes.unsetActive();
-                self.renderNavigation();
+                if (self._notes.length > 1) {
+                    note = self._notes.getActive();
+                    var $notehtml = $("<div class=\"note-grid-item\">" +
+                                      "<div class=\"quicknote noselect\" style=\"background-color:" + note.color + "\" data-id=\"" + note.id + "\">" +
+                                      "<div id='title-editable' class='note-title'>" + note.title + "</div>" +
+                                      "<button class=\"icon-delete hide-delete-icon icon-delete-note\" title=\"Delete\"></button>" +
+                                      "<div id='content-editable' class='note-content'>" + note.content + "</div>" +
+                                      "</div></div>");
+                    $(".notes-grid").prepend( $notehtml )
+                                    .isotope({ filter: '*'})
+                                    .isotope( 'prepended', $notehtml);
+                    self._notes.unsetActive();
+                    self.renderNavigation();
+                } else {
+                    self._notes.unsetActive();
+                    self.render();
+                }
             }).fail(function () {
                 alert('Could not create note');
             });
