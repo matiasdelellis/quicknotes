@@ -305,7 +305,7 @@ View.prototype = {
 
             self._notes.load(id);
             self._notes.removeActive().done(function () {
-                if (self._notes.length() > 1) {
+                if (self._notes.length() > 0) {
                     $(".notes-grid").isotope('remove', note.parent())
                                     .isotope('layout');
                     self.renderNavigation();
