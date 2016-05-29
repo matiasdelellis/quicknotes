@@ -2,8 +2,8 @@
 <div style="display:none" id="new-note-string"><?php p($l->t('New note')); ?></div>
 
 <script id="navigation-tpl" type="text/x-handlebars-template">
-	<li id="all-notes"><a href="#" class="icon-home svg"><?php p($l->t('All notes')); ?></a></li>
 	<li id="new-note"><a href="#" class="icon-add svg"><?php p($l->t('Add note')); ?></a></li>
+	<li id="all-notes"><a href="#" class="icon-home svg"><?php p($l->t('All notes')); ?></a></li>
 
 	<li class="collapsible open">
 		<button class="collapse"></button>

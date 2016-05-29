@@ -308,6 +308,7 @@ View.prototype = {
                 if (self._notes.length() > 0) {
                     $(".notes-grid").isotope('remove', note.parent())
                                     .isotope('layout');
+                    self.showAll();
                     self.renderNavigation();
                 } else {
                     self.render();
