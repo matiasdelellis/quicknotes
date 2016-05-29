@@ -76,6 +76,9 @@ Notes.prototype = {
         }
         return deferred.promise();
     },
+    length: function () {
+        return this._notes.length;
+    },
     create: function (note) {
         var deferred = $.Deferred();
         var self = this;
@@ -189,6 +192,9 @@ View.prototype = {
             "min-height": note.height(),
             "height:"  : "auto"
         });
+
+        // TODO: Animate to center.
+
         modal.removeClass("hide-modal-note");
         modal.addClass("show-modal-note");
         modalcontent.focus();
@@ -299,10 +305,9 @@ View.prototype = {
 
             self._notes.load(id);
             self._notes.removeActive().done(function () {
-                if (self._notes.length == 0) {
+                if (self._notes.length() > 1) {
                     $(".notes-grid").isotope('remove', note.parent())
                                     .isotope('layout');
-                    self.showAll();
                     self.renderNavigation();
                 } else {
                     self.render();
@@ -388,7 +393,7 @@ View.prototype = {
             };
 
             self._notes.create(note).done(function() {
-                if (self._notes.length > 1) {
+                if (self._notes.length() > 1) {
                     note = self._notes.getActive();
                     var $notehtml = $("<div class=\"note-grid-item\">" +
                                       "<div class=\"quicknote noselect\" style=\"background-color:" + note.color + "\" data-id=\"" + note.id + "\">" +
