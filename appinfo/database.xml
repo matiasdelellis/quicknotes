@@ -124,7 +124,6 @@
 				<name>note_id</name>
 				<type>integer</type>
 				<notnull>true</notnull>
-				<autoincrement>true</autoincrement>
 				<unsigned>true</unsigned>
 				<length>8</length>
 			</field>
