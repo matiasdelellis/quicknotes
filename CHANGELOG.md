@@ -1,5 +1,10 @@
 **Quicknotes**
 
+V0.1.0:
+* Implement search on notes.
+* Rename 'Add note' item to 'New note' and put first on navigation.
+* D'Oh!. Fix animation when append or remove notes.
+
 V0.0.8:
 * Fix database schema migration.
 
