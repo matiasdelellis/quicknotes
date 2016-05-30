@@ -470,6 +470,42 @@ View.prototype = {
     }
 };
 
+var timeoutID = null;
+function filter (query) {
+    window.clearTimeout(timeoutID);
+    timeoutID = window.setTimeout(function() {
+        if (query) {
+            query = query.toLowerCase();
+            $('.notes-grid').isotope({ filter: function() {
+                var title = $(this).find("#title-editable").html().toLowerCase();
+                if (title.search(query) >= 0)
+                    return true;
+                var content = $(this).find("#content-editable").html().toLowerCase();
+                if (content.search(query) >= 0)
+                    return true;
+                return false;
+             }});
+         } else {
+             $('.notes-grid').isotope({ filter: '*'});
+         }
+    }, 500);
+};
+
+var SearchProxy = {
+    attach: function(search) {
+        search.setFilter('quicknotes', this.filterProxy);
+    },
+    filterProxy: function(query) {
+        filter(query);
+    },
+    setFilter: function(newFilter) {
+        filter = newFilter;
+    }
+};
+
+SearchProxy.setFilter(filter);
+OC.Plugins.register('OCA.Search', SearchProxy);
+
 var notes = new Notes(OC.generateUrl('/apps/quicknotes/notes'));
 var view = new View(notes);
 notes.loadAll().done(function () {
