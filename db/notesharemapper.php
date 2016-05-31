@@ -25,4 +25,9 @@ class NoteShareMapper extends Mapper {
 		$sql = 'SELECT * FROM *PREFIX*quicknotes_shares WHERE shared_group = ?';
 		return $this->findEntities($sql, [$groupId]);
 	}
+
+	public function deleteByNoteId($noteId) {
+		$sql = 'DELETE FROM *PREFIX*quicknotes_shares WHERE note_id = ?';
+		$this->execute($sql, [$noteId]);
+	}
 }

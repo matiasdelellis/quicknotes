@@ -167,6 +167,8 @@ class NoteController extends Controller {
 		}
 		$oldcolorid = $note->getColorId();
 
+		$this->notesharemapper->deleteByNoteId($note->getId());
+
 		// Delete note.
 		$this->notemapper->delete($note);
 
