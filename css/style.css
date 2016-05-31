@@ -54,10 +54,14 @@
    overflow: hidden;
 }
 
-#div-content .shared-title {
+#div-content .shared-title, #div-content .shared-title-owner {
    float: right;
    margin: 2px;
    opacity: 0.5;
+}
+
+#div-content .shared-title-owner {
+   margin-right: 25px;
 }
 
 .noselect {

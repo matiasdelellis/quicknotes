@@ -4,6 +4,9 @@
 		<div class='icon-share shared-title' title="shared with you by {{ userid }}"></div><div id='title' class='note-title'>{{{ title }}}</div>
 		<div id='content' class='note-content'>{{{ content }}}</div>
 		{{else}}
+			{{#if sharedwith}}
+			<div class='icon-share shared-title-owner' title="shared with {{ sharedwith }}"></div>
+			{{/if}}
 		<div id='title-editable' class='note-title'>{{{ title }}}</div>
 		<button class="icon-delete hide-delete-icon icon-delete-note" title="Delete"></button>
 		<div id='content-editable' class='note-content'>{{{ content }}}</div>

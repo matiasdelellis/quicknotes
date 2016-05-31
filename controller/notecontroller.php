@@ -44,7 +44,17 @@ class NoteController extends Controller {
 	 public function index() {
 		$notes = $this->notemapper->findAll($this->userId);
 		foreach($notes as $note) {
-		    $note->setIsShared(false);
+			$note->setIsShared(false);
+			$sharedWith = $this->notesharemapper->getSharesForNote($note->getId());
+			if(count($sharedWith) > 0) {
+				$shareList = array();
+				foreach($sharedWith as $share) {
+					$shareList[] = $share->getSharedUser();
+				}
+				$note->setSharedWith(implode(", ", $shareList));
+			} else {
+				$note->setSharedWith(null);
+			}
 		}
 		$shareEntries = $this->notesharemapper->findForUser($this->userId);
 		$shares = array();

@@ -12,6 +12,7 @@ class Note extends Entity implements JsonSerializable {
 	protected $timestamp;
 	protected $colorId;
 	protected $userId;
+	protected $sharedWith;
 	protected $isShared;
 
 	protected $color;
@@ -29,6 +30,7 @@ class Note extends Entity implements JsonSerializable {
 			'colorid' => $this->colorId,
 			'color' => $this->color,
 			'userid' => $this->userId,
+			'sharedwith' => $this->sharedWith,
 			'isshared' => $this->isShared
 		];
 	}
