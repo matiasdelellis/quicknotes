@@ -5,10 +5,10 @@ use OCP\IDb;
 use OCP\AppFramework\Db\Mapper;
 use OCP\AppFramework\Db\DoesNotExistException;
 
-class ShareMapper extends Mapper {
+class NoteShareMapper extends Mapper {
 
 	public function __construct(IDb $db) {
-		parent::__construct($db, 'quicknotes_notes', '\OCA\QuickNotes\Db\Share');
+		parent::__construct($db, 'quicknotes_notes', '\OCA\QuickNotes\Db\NoteShare');
 	}
 
 	/*public function find($id, $userId) {

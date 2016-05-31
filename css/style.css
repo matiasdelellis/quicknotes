@@ -47,13 +47,17 @@
 /* Grid Note */
 
 #div-content .note-title {
-   height: 28px;
-   width: calc(100% - 20px);
    font-size: 18px;
    font-weight: bold;
    text-overflow: ellipsis;
    white-space: nowrap;
    overflow: hidden;
+}
+
+#div-content .shared-title {
+   float: right;
+   margin: 2px;
+   opacity: 0.5;
 }
 
 .noselect {

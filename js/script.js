@@ -269,6 +269,7 @@ View.prototype = {
         $("#app-content").on("click", ".quicknote", function (event) {
             event.stopPropagation(); // Not work so need fix on next binding..
 
+            if($(this).hasClass('shared')) return; //shares don't allow editing
             var modalnote = $("#modal-note-editable .quicknote");
             var modalid = modalnote.data('id');
             if (modalid > 0) return;

@@ -18,19 +18,23 @@ use OCP\AppFramework\Controller;
 
 use OCA\QuickNotes\Db\Note;
 use OCA\QuickNotes\Db\Color;
+use OCA\QuickNotes\Db\NoteShare;
 use OCA\QuickNotes\Db\NoteMapper;
 use OCA\QuickNotes\Db\ColorMapper;
+use OCA\QuickNotes\Db\NoteShareMapper;
 
 class NoteController extends Controller {
 
 	private $notemapper;
 	private $colormapper;
+	private $notesharemapper;
 	private $userId;
 
-	public function __construct($AppName, IRequest $request, NoteMapper $notemapper, ColorMapper $colormapper, $UserId) {
+	public function __construct($AppName, IRequest $request, NoteMapper $notemapper, NoteShareMapper $notesharemapper, ColorMapper $colormapper, $UserId) {
 		parent::__construct($AppName, $request);
 		$this->notemapper = $notemapper;
 		$this->colormapper = $colormapper;
+		$this->notesharemapper = $notesharemapper;
 		$this->userId = $UserId;
 	}
 
@@ -39,6 +43,18 @@ class NoteController extends Controller {
 	 */
 	 public function index() {
 		$notes = $this->notemapper->findAll($this->userId);
+		foreach($notes as $note) {
+		    $note->setIsShared(false);
+		}
+		$shareEntries = $this->notesharemapper->findForUser($this->userId);
+		$shares = array();
+		foreach($shareEntries as $entry) {
+		    $share = $this->notemapper->findById($entry->getNoteId());
+		    $share->setIsShared(true);
+			$shares[] = $share;
+			
+		}
+		$notes = array_merge($notes, $shares);
 		// Insert true color to response
 		foreach ($notes as $note) {
 			$note->setColor($this->colormapper->find($note->getColorId())->getColor());

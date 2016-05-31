@@ -16,6 +16,11 @@ class NoteMapper extends Mapper {
 		return $this->findEntity($sql, [$id, $userId]);
 	}
 
+	public function findById($id) {
+		$sql = 'SELECT * FROM *PREFIX*quicknotes_notes WHERE id = ?';
+		return $this->findEntity($sql, [$id]);
+	}
+
 	public function findAll($userId) {
 		$sql = 'SELECT * FROM *PREFIX*quicknotes_notes WHERE user_id = ?';
 		return $this->findEntities($sql, [$userId]);

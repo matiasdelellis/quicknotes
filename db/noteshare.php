@@ -5,7 +5,7 @@ use JsonSerializable;
 
 use OCP\AppFramework\Db\Entity;
 
-class Share extends Entity implements JsonSerializable {
+class NoteShare extends Entity implements JsonSerializable {
 
 	protected $noteId;
 	protected $sharedUser;
@@ -14,9 +14,9 @@ class Share extends Entity implements JsonSerializable {
 	public function jsonSerialize() {
 		return [
 			'id' => $this->id,
-			'note' => $this->noteId,
-			'user' => $this->sharedUser,
-			'group' => $this->sharedGroup
+			'noteid' => $this->noteId,
+			'shareduser' => $this->sharedUser,
+			'sharedgroup' => $this->sharedGroup
 		];
 	}
 }
