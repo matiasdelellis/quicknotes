@@ -385,6 +385,18 @@ View.prototype = {
             $('#app-navigation .any-color').addClass('icon-checkmark');
         });
 
+        $('#shared-with-you').click(function () {
+            $('.notes-grid').isotope({ filter: function() {
+                return $(this).children().hasClass('shared');
+            } });
+        });
+
+        $('#shared-by-you').click(function () {
+            $('.notes-grid').isotope({ filter: function() {
+                return $(this).children().hasClass('shareowner');
+            } });
+        });
+
         // create a new note
         var self = this;
         $('#new-note').click(function () {

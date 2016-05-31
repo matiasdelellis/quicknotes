@@ -1,5 +1,5 @@
 <div class="note-grid-item">
-	<div class="quicknote noselect {{#if active}}note-active{{/if}} {{#if isshared}}shared{{/if}}" style="background-color: {{color}}" data-id="{{ id }}" data-timestamp="{{ timestamp }}" >
+	<div class="quicknote noselect {{#if active}}note-active{{/if}} {{#if isshared}}shared{{/if}} {{#if sharedwith}}shareowner{{/if}}" style="background-color: {{color}}" data-id="{{ id }}" data-timestamp="{{ timestamp }}" >
 		{{#if isshared}}
 		<div class='icon-share shared-title' title="shared with you by {{ userid }}"></div><div id='title' class='note-title'>{{{ title }}}</div>
 		<div id='content' class='note-content'>{{{ content }}}</div>
