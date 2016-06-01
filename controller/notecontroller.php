@@ -14,6 +14,7 @@ namespace OCA\QuickNotes\Controller;
 use OCP\IRequest;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\DataResponse;
+use OCP\AppFramework\Http\JSONResponse;
 use OCP\AppFramework\Controller;
 
 use OCA\QuickNotes\Db\Note;
@@ -189,5 +190,25 @@ class NoteController extends Controller {
 		}
 
 		return new DataResponse($note);
+	}
+
+	/**
+	 * @NoAdminRequired
+	 */
+	public function getUserGroupsAndUsers() {
+		$userMgr = \OC::$server->getUserManager();
+		$grpMgr = \OC::$server->getGroupManager();
+		$igroups = $grpMgr->getUserGroups($userMgr->get($this->userId));
+		$users = array();
+		$groups = array();
+		foreach($igroups as $g) {
+			$iusers = $g->getUsers();
+			foreach($iusers as $u) {
+				$users[] = $u->getUID();
+			}
+			$groups[] = $g->getGID();
+		}
+		$params = array('groups' => $groups, 'users' => array_unique($users));
+		return new JSONResponse($params);
 	}
 }

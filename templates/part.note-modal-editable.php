@@ -5,6 +5,7 @@
 			<div contenteditable="true" id='content-editable' class='note-content' data-placeholder="No content"></div>
 			<div class="note-options">
 				<div class="save-button">
+					<button id='unshare-button'><?php p($l->t('Unshare'));?></button>
 					<button id='share-button'><?php p($l->t('Share'));?></button>
 					<button id='cancel-button'><?php p($l->t('Cancel')); ?></button>
 					<button id='save-button'><?php p($l->t('Save')); ?></button>
@@ -20,6 +21,9 @@
 					<a href="#" class="circle-toolbar" style="background-color: #F2F1EF"></a>
 					<a href="#" class="circle-toolbar" style="background-color: #C1D756"></a>
 					<a href="#" class="circle-toolbar" style="background-color: #CECECE"></a>
+				</div>
+				<div id="note-share-options">
+					
 				</div>
 			</div>
 		</div>

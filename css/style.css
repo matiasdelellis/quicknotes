@@ -31,6 +31,10 @@
     top: 6px;
 }
 
+.save-button #unshare-button {
+    display: none;
+}
+
 #div-content .save-button {
     float: right;
     padding-right: 8px;

@@ -162,6 +162,13 @@ View.prototype = {
         var modalnote = $("#modal-note-div .quicknote");
 
         var note = $('.notes-grid [data-id=' + id + ']').parent();
+        if($('.notes-grid [data-id=' + id + ']').hasClass('shareowner')) {
+            $('.save-button #unshare-button').show();
+            $('.save-button #share-button').hide();
+        } else {
+            $('.save-button #unshare-button').hide();
+            $('.save-button #share-button').show();
+        }
 
         var title = note.find("#title-editable").html();
         var content = note.find("#content-editable").html();
@@ -334,6 +341,16 @@ View.prototype = {
             $(this).addClass('icon-checkmark');
             var color = $(this).css("background-color");
             modalnote.css("background-color", color);
+        });
+
+        // handle share editing notes.
+        $('#modal-note-div #share-button').click(function (event) {
+           $.get(OC.generateUrl('/apps/quicknotes/api/0.1/getusergroups'), function(data) {
+                var groups = data.groups;
+                var users = data.users;
+                alert('groups: ' + groups.toSource());
+                alert('users: ' + users.toSource());
+           });
         });
 
         // handle cancel editing notes.
