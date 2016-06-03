@@ -200,7 +200,7 @@ class NoteController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 */
-	public function getUserGroupsAndUsers() {
+	public function getUserGroupsAndUsersWithShare($noteId) {
 		$userMgr = \OC::$server->getUserManager();
 		$grpMgr = \OC::$server->getGroupManager();
 		$users = array();
@@ -224,11 +224,30 @@ class NoteController extends Controller {
 				$groups[] = $g->getGID();
 			}
 		}
+
 		$users = array_unique($users);
 		if(($i = array_search($this->userId, $users)) !== false) {
 			unset($users[$i]);
 		}
-		$params = array('groups' => $groups, 'users' => $users);
+		$pos_users = array();
+		$pos_groups = array();
+		$shares = $this->notesharemapper->getSharesForNote($noteId);
+		foreach($shares as $s) {
+			$shareType = $s->getSharedUser();
+			if(strlen($shareType) != 0) {
+				if(($i = array_search($shareType, $users)) !== false) {
+					unset($users[$i]);
+					$pos_users[] = $shareType;
+				}
+			} else {
+				$shareType = $s->getSharedGroup();
+				if(($i = array_search($shareType, $groups)) !== false) {
+					unset($groups[$i]);
+					$pos_groups[] = $shareType;
+				}
+			}
+		}
+		$params = array('groups' => $groups, 'users' => $users, 'posGroups' => $pos_groups, 'posUsers' => $pos_users);
 		return new JSONResponse($params);
 	}
 

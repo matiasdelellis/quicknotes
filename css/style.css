@@ -158,7 +158,7 @@ div[data-placeholder]:not([data-placeholder=""]):empty::before {
     padding-bottom: 5px;
 }
 
-.selected-share:hover, .unselected-share:hover, .unselected-share span:hover {
+.selected-share:hover, .unselected-share:hover, .selected-share span:hover, .unselected-share span:hover {
     cursor: pointer;
 }
 

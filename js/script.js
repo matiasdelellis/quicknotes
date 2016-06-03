@@ -221,13 +221,6 @@ View.prototype = {
         var modalnote = $("#modal-note-div .quicknote");
 
         var note = $('.notes-grid [data-id=' + id + ']').parent();
-        if($('.notes-grid [data-id=' + id + ']').hasClass('shareowner')) {
-            $('.save-button #unshare-button').show();
-            $('.save-button #share-button').hide();
-        } else {
-            $('.save-button #unshare-button').hide();
-            $('.save-button #share-button').show();
-        }
 
         var title = note.find("#title-editable").html();
         var content = note.find("#content-editable").html();
@@ -404,10 +397,16 @@ View.prototype = {
 
         // handle share editing notes.
         $('#modal-note-div #share-button').click(function (event) {
-           $.get(OC.generateUrl('/apps/quicknotes/api/0.1/getusergroups'), function(data) {
+           var id = $('.note-active').data('id');
+           var formData = {
+                noteId: id
+           }
+           $.post(OC.generateUrl('/apps/quicknotes/api/0.1/getusergroups'), formData, function(data) {
                 var shareOptions = $('#note-share-options');
                 var groups = data.groups;
                 var users = data.users;
+                var pos_groups = data.posGroups;
+                var pos_users = data.posUsers;
                 var neg = $('#share-neg');
                 var pos = $('#share-pos');
                 var sear = $('#share-search');
@@ -427,6 +426,21 @@ View.prototype = {
                     li.className = "unselected-share";
                     $(li).hide();
                     neg[0].appendChild(li);
+                }
+                for(var i=0; i<pos_groups.length; i++) {
+                    var li = document.createElement('li');
+                    li.appendChild(document.createTextNode(pos_groups[i]));
+                    var sp = document.createElement('span');
+                    sp.appendChild(document.createTextNode('(group)'));
+                    li.className = "selected-share";
+                    li.appendChild(sp);
+                    pos[0].appendChild(li);
+                }
+                for(var i=0; i<pos_users.length; i++) {
+                    var li = document.createElement('li');
+                    li.appendChild(document.createTextNode(pos_users[i]));
+                    li.className = "selected-share";
+                    pos[0].appendChild(li);
                 }
 
                 $('.unselected-share').click(moveToSelectedShare);
