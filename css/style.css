@@ -155,10 +155,15 @@ div[data-placeholder]:not([data-placeholder=""]):empty::before {
 
 #note-share-options {
     display: none;
+    padding-bottom: 5px;
 }
 
-.selected-share:hover, .unselected-share:hover {
+.selected-share:hover, .unselected-share:hover, .unselected-share span:hover {
     cursor: pointer;
+}
+
+.selected-share, .unselected-share {
+    padding-left: 5px;
 }
 
 /* Modal Content */

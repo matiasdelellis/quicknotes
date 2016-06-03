@@ -10,6 +10,7 @@
 					<button id='cancel-button'><?php p($l->t('Cancel')); ?></button>
 					<button id='save-button'><?php p($l->t('Save')); ?></button>
 				</div>
+				<div style="clear: both;"></div>
 				<div id="note-share-options">
 					<ul id="share-pos">
 					</ul>

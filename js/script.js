@@ -434,7 +434,8 @@ View.prototype = {
 
                 shareOptions.show();
                 var modalNote = $('.note-active');
-                modalNote.outerHeight(modalNote.outerHeight(true) + shareOptions.outerHeight(true));
+                var startHeight = modalNote.outerHeight(true);
+                modalNote.outerHeight(startHeight + shareOptions.outerHeight(true));
                 sear.on('input', function() {
                     var val = $(this).val().toLowerCase().trim();
                     var lis = neg.children();
@@ -449,6 +450,7 @@ View.prototype = {
                             }
                         }
                     }
+                    modalNote.outerHeight(startHeight + shareOptions.outerHeight(true));
                 });
            });
         });
