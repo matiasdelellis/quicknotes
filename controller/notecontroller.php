@@ -224,7 +224,11 @@ class NoteController extends Controller {
 				$groups[] = $g->getGID();
 			}
 		}
-		$params = array('groups' => $groups, 'users' => array_unique($users));
+		$users = array_unique($users);
+		if(($i = array_search($this->userId, $users)) !== false) {
+			unset($users[$i]);
+		}
+		$params = array('groups' => $groups, 'users' => $users);
 		return new JSONResponse($params);
 	}
 
