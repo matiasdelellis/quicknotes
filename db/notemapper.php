@@ -11,6 +11,13 @@ class NoteMapper extends Mapper {
 		parent::__construct($db, 'quicknotes_notes', '\OCA\QuickNotes\Db\Note');
 	}
 
+	/**
+	 * @param int $id
+	 * @param string $userId
+	 * @throws \OCP\AppFramework\Db\DoesNotExistException if not found
+	 * @throws \OCP\AppFramework\Db\MultipleObjectsReturnedException if more than one result
+	 * @return Note
+	 */
 	public function find($id, $userId) {
 		$sql = 'SELECT * FROM *PREFIX*quicknotes_notes WHERE id = ? AND user_id = ?';
 		return $this->findEntity($sql, [$id, $userId]);

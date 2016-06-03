@@ -60,10 +60,15 @@ class NoteController extends Controller {
 		$shareEntries = $this->notesharemapper->findForUser($this->userId);
 		$shares = array();
 		foreach($shareEntries as $entry) {
-		    $share = $this->notemapper->findById($entry->getNoteId());
-		    $share->setIsShared(true);
-			$shares[] = $share;
-			
+			try {
+				//find is only to check if current user is owner
+				$this->notemapper->find($entry->getNoteId(), $this->userId);
+				//user is owner, nothing to do
+			} catch(\OCP\AppFramework\Db\DoesNotExistException $e) {
+				$share = $this->notemapper->findById($entry->getNoteId());
+				$share->setIsShared(true);
+				$shares[] = $share;
+			}
 		}
 		$notes = array_merge($notes, $shares);
 		// Insert true color to response
