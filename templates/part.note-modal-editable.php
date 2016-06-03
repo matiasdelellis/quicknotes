@@ -10,6 +10,13 @@
 					<button id='cancel-button'><?php p($l->t('Cancel')); ?></button>
 					<button id='save-button'><?php p($l->t('Save')); ?></button>
 				</div>
+				<div id="note-share-options">
+					<ul id="share-pos">
+					</ul>
+					<input type="text" id="share-search" />
+					<ul id="share-neg">
+					</ul>
+				</div>
 				<div class="note-toolbar">
 					<a href="#" class="circle-toolbar" style="background-color: #F7EB96"></a>
 					<a href="#" class="circle-toolbar" style="background-color: #88B7E3"></a>
@@ -21,9 +28,6 @@
 					<a href="#" class="circle-toolbar" style="background-color: #F2F1EF"></a>
 					<a href="#" class="circle-toolbar" style="background-color: #C1D756"></a>
 					<a href="#" class="circle-toolbar" style="background-color: #CECECE"></a>
-				</div>
-				<div id="note-share-options">
-					
 				</div>
 			</div>
 		</div>

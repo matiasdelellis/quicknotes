@@ -8,7 +8,7 @@ use OCP\AppFramework\Db\DoesNotExistException;
 class NoteShareMapper extends Mapper {
 
 	public function __construct(IDb $db) {
-		parent::__construct($db, 'quicknotes_notes', '\OCA\QuickNotes\Db\NoteShare');
+		parent::__construct($db, 'quicknotes_shares', '\OCA\QuickNotes\Db\NoteShare');
 	}
 
 	/*public function find($id, $userId) {
@@ -24,6 +24,16 @@ class NoteShareMapper extends Mapper {
 	public function findForGroup($groupId) {
 		$sql = 'SELECT * FROM *PREFIX*quicknotes_shares WHERE shared_group = ?';
 		return $this->findEntities($sql, [$groupId]);
+	}
+
+	public function findByNoteAndUser($noteId, $userId) {
+		$sql = 'SELECT * FROM *PREFIX*quicknotes_shares WHERE shared_user = ? AND note_id = ?';
+		return $this->findEntity($sql, [$userId, $noteId]);
+	}
+
+	public function findByNoteAndGroup($noteId, $groupId) {
+		$sql = 'SELECT * FROM *PREFIX*quicknotes_shares WHERE shared_group = ? AND note_id = ?';
+		return $this->findEntity($sql, [$groupId, $noteId]);
 	}
 
 	public function getSharesForNote($noteId) {

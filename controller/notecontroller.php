@@ -198,17 +198,64 @@ class NoteController extends Controller {
 	public function getUserGroupsAndUsers() {
 		$userMgr = \OC::$server->getUserManager();
 		$grpMgr = \OC::$server->getGroupManager();
-		$igroups = $grpMgr->getUserGroups($userMgr->get($this->userId));
 		$users = array();
 		$groups = array();
-		foreach($igroups as $g) {
-			$iusers = $g->getUsers();
+		if($grpMgr->isAdmin($this->userId)) {
+			$igroups = $grpMgr->search("");
+			$iusers = $userMgr->search("");
+			foreach($igroups as $g) {
+				$groups[] = $g->getGID();
+			}
 			foreach($iusers as $u) {
 				$users[] = $u->getUID();
 			}
-			$groups[] = $g->getGID();
+		} else {
+			$igroups = $grpMgr->getUserGroups($userMgr->get($this->userId));
+			foreach($igroups as $g) {
+				$iusers = $g->getUsers();
+				foreach($iusers as $u) {
+					$users[] = $u->getUID();
+				}
+				$groups[] = $g->getGID();
+			}
 		}
 		$params = array('groups' => $groups, 'users' => array_unique($users));
 		return new JSONResponse($params);
+	}
+
+	/**
+	 * @NoAdminRequired
+	 */
+	public function addGroupShare($groupId, $noteId) {
+	    $share = new NoteShare();
+	    $share->setSharedGroup($groupId);
+	    $share->setNoteId($noteId);
+	    $this->notesharemapper->insert($share);
+	}
+
+	/**
+	 * @NoAdminRequired
+	 */
+	public function removeGroupShare($groupId, $noteId) {
+		$share = $this->notesharemapper->findByNoteAndGroup($noteId, $groupId);
+		$this->notesharemapper->delete($share);
+	}
+
+	/**
+	 * @NoAdminRequired
+	 */
+	public function addUserShare($userId, $noteId) {
+		$share = new NoteShare();
+		$share->setSharedUser($userId);
+		$share->setNoteId($noteId);
+		$this->notesharemapper->insert($share);
+	}
+
+	/**
+	 * @NoAdminRequired
+	 */
+	public function removeUserShare($userId, $noteId) {
+		$share = $this->notesharemapper->findByNoteAndUser($noteId, $userId);
+		$this->notesharemapper->delete($share);
 	}
 }

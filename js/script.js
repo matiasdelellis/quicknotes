@@ -24,6 +24,65 @@ var Notes = function (baseUrl) {
     this._activeNote = undefined;
 };
 
+var moveToUnselectedShare = function() {
+    var curr = $(this).clone();
+    var groupIndex = curr.html().indexOf('<span>(group)</span>');
+    var id = $('.note-active').data('id');
+    if(groupIndex >= 0) {
+        var groupId = curr.html().substring(0, groupIndex);
+        var formData = {
+            groupId : groupId,
+            noteId : id
+        };
+        $.post(OC.generateUrl('/apps/quicknotes/api/0.1/groups/removeshare'), formData, function(data){
+        });
+    } else {
+        var userId = curr.html();
+        var formData = {
+            userId : userId,
+            noteId : id
+        };
+        $.post(OC.generateUrl('/apps/quicknotes/api/0.1/users/removeshare'), formData, function(data){
+        });
+    }
+    curr.switchClass('selected-share', 'unselected-share', 0);
+    curr.hide();
+    curr.click(moveToSelectedShare);
+    $(curr).appendTo($('#share-neg'));
+    $(this).remove();
+    var pos = $('#share-pos');
+    if(pos.children().length == 0) pos.hide();
+}
+
+var moveToSelectedShare = function() {
+    var curr = $(this).clone();
+    var groupIndex = curr.html().indexOf('<span>(group)</span>');
+    var id = $('.note-active').data('id');
+    if(groupIndex >= 0) {
+        var groupId = curr.html().substring(0, groupIndex);
+        var formData = {
+            groupId : groupId,
+            noteId : id
+        };
+        $.post(OC.generateUrl('/apps/quicknotes/api/0.1/groups/addshare'), formData, function(data){
+        });
+    } else {
+        var userId = curr.html();
+        var formData = {
+            userId : userId,
+            noteId : id
+        };
+        $.post(OC.generateUrl('/apps/quicknotes/api/0.1/users/addshare'), formData, function(data){
+        });
+    }
+    curr.switchClass('unselected-share', 'selected-share', 0);
+    curr.click(moveToUnselectedShare);
+    $(curr).appendTo($('#share-pos'));
+    $(this).remove();
+    $('#share-pos').show();
+    $('#share-search').val('');
+}
+
 Notes.prototype = {
     load: function (id) {
         var self = this;
@@ -346,10 +405,51 @@ View.prototype = {
         // handle share editing notes.
         $('#modal-note-div #share-button').click(function (event) {
            $.get(OC.generateUrl('/apps/quicknotes/api/0.1/getusergroups'), function(data) {
+                var shareOptions = $('#note-share-options');
                 var groups = data.groups;
                 var users = data.users;
-                alert('groups: ' + groups.toSource());
-                alert('users: ' + users.toSource());
+                var neg = $('#share-neg');
+                var pos = $('#share-pos');
+                var sear = $('#share-search');
+                for(var i=0; i<groups.length; i++) {
+                    var li = document.createElement('li');
+                    li.appendChild(document.createTextNode(groups[i]));
+                    var sp = document.createElement('span');
+                    sp.appendChild(document.createTextNode('(group)'));
+                    li.className = "unselected-share";
+                    li.appendChild(sp);
+                    $(li).hide();
+                    neg[0].appendChild(li);
+                }
+                for(var i=0; i<users.length; i++) {
+                    var li = document.createElement('li');
+                    li.appendChild(document.createTextNode(users[i]));
+                    li.className = "unselected-share";
+                    $(li).hide();
+                    neg[0].appendChild(li);
+                }
+
+                $('.unselected-share').click(moveToSelectedShare);
+                $('.selected-share').click(moveToUnselectedShare);
+
+                shareOptions.show();
+                var modalNote = $('.note-active');
+                modalNote.outerHeight(modalNote.outerHeight(true) + shareOptions.outerHeight(true));
+                sear.on('input', function() {
+                    var val = $(this).val().toLowerCase().trim();
+                    var lis = neg.children();
+                    if(val.length == 0) {
+                        lis.hide();
+                    } else {
+                        for(var i=0; i<lis.length; i++) {
+                            if(lis[i].innerHTML.toLowerCase().indexOf(val) >= 0) {
+                                $(lis[i]).show();
+                            } else {
+                                $(lis[i]).hide();
+                            }
+                        }
+                    }
+                });
            });
         });
 

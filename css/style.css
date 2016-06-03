@@ -153,6 +153,14 @@ div[data-placeholder]:not([data-placeholder=""]):empty::before {
   content: attr(data-placeholder);
 }
 
+#note-share-options {
+    display: none;
+}
+
+.selected-share:hover, .unselected-share:hover {
+    cursor: pointer;
+}
+
 /* Modal Content */
 
 .modal-content {
