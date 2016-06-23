@@ -31,6 +31,10 @@
     top: 6px;
 }
 
+.save-button #unshare-button {
+    display: none;
+}
+
 #div-content .save-button {
     float: right;
     padding-right: 8px;
@@ -47,13 +51,21 @@
 /* Grid Note */
 
 #div-content .note-title {
-   height: 28px;
-   width: calc(100% - 20px);
    font-size: 18px;
    font-weight: bold;
    text-overflow: ellipsis;
    white-space: nowrap;
    overflow: hidden;
+}
+
+#div-content .shared-title, #div-content .shared-title-owner {
+   float: right;
+   margin: 2px;
+   opacity: 0.5;
+}
+
+#div-content .shared-title-owner {
+   margin-right: 25px;
 }
 
 .noselect {
@@ -139,6 +151,19 @@ div[data-placeholder]:empty::before {
 }
 div[data-placeholder]:not([data-placeholder=""]):empty::before {
   content: attr(data-placeholder);
+}
+
+#note-share-options {
+    display: none;
+    padding-bottom: 5px;
+}
+
+.selected-share:hover, .unselected-share:hover, .selected-share span:hover, .unselected-share span:hover {
+    cursor: pointer;
+}
+
+.selected-share, .unselected-share {
+    padding-left: 5px;
 }
 
 /* Modal Content */

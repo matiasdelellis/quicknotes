@@ -4,6 +4,8 @@
 <script id="navigation-tpl" type="text/x-handlebars-template">
 	<li id="new-note"><a href="#" class="icon-add svg"><?php p($l->t('New note')); ?></a></li>
 	<li id="all-notes"><a href="#" class="icon-home svg"><?php p($l->t('All notes')); ?></a></li>
+	<li id="shared-with-you"><a href="#" class="icon-share svg"><?php p($l->t('Shared with you')); ?></a></li>
+	<li id="shared-by-you"><a href="#" class="icon-share svg"><?php p($l->t('Shared by you')); ?></a></li>
 
 	<li class="collapsible open">
 		<button class="collapse"></button>
