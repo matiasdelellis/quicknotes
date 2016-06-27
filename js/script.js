@@ -623,10 +623,10 @@ function filter (query) {
         if (query) {
             query = query.toLowerCase();
             $('.notes-grid').isotope({ filter: function() {
-                var title = $(this).find("#title-editable").html().toLowerCase();
+                var title = $(this).find(".note-title").html().toLowerCase();
                 if (title.search(query) >= 0)
                     return true;
-                var content = $(this).find("#content-editable").html().toLowerCase();
+                var content = $(this).find(".note-content").html().toLowerCase();
                 if (content.search(query) >= 0)
                     return true;
                 return false;
