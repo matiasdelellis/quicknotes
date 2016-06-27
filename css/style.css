@@ -24,13 +24,6 @@
     margin-bottom: 60px;
 }
 
-.icon-delete-note {
-    float: right;
-    position: absolute;
-    right: 10px;
-    top: 6px;
-}
-
 .save-button #unshare-button {
     display: none;
 }
@@ -58,14 +51,12 @@
    overflow: hidden;
 }
 
-#div-content .shared-title, #div-content .shared-title-owner {
+#div-content .shared-title,
+#div-content .shared-title-owner,
+#div-content .icon-delete-note {
    float: right;
    margin: 2px;
    opacity: 0.5;
-}
-
-#div-content .shared-title-owner {
-   margin-right: 25px;
 }
 
 .noselect {
