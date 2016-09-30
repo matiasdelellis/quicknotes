@@ -2,6 +2,22 @@
     height: 100%;
 }
 
+#new-note {
+    width: 100%;
+    padding: 10px;
+    padding-left: 34px;
+    background-position: 10px center;
+    text-align: left;
+    margin: 0;
+}
+
+#new-note-fixed {
+    z-index: 111; /* navigation menu is 110 ;-) */
+    background-color: rgba(255, 255, 255, .75);
+    padding: 10px;
+    position: relative;
+}
+
 .quicknote {
     min-height: 150px;
     width: 250px;

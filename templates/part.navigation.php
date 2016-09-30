@@ -2,7 +2,9 @@
 <div style="display:none" id="new-note-string"><?php p($l->t('New note')); ?></div>
 
 <script id="navigation-tpl" type="text/x-handlebars-template">
-	<li id="new-note"><a href="#" class="icon-add svg"><?php p($l->t('New note')); ?></a></li>
+	<div id="new-note-fixed">
+		<div><button type="button" id="new-note" class="icon-add"><?php p($l->t('New note'));?></button></div>
+	</div>
 	<li id="all-notes"><a href="#" class="icon-home svg"><?php p($l->t('All notes')); ?></a></li>
 	<li id="shared-with-you"><a href="#" class="icon-share svg"><?php p($l->t('Shared with you')); ?></a></li>
 	<li id="shared-by-you"><a href="#" class="icon-share svg"><?php p($l->t('Shared with others')); ?></a></li>
