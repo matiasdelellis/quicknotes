@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <info>
     <id>quicknotes</id>
-    <name>Quick Notes</name>
+    <name>Quick notes</name>
     <description>Quick notes with text, check lists and pictures</description>
     <licence>AGPL</licence>
     <author>Matias De lellis</author>

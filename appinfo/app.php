@@ -38,6 +38,6 @@ $container->query('OCP\INavigationManager')->add(function () use ($container) {
 
 		// the title of your application. This will be used in the
 		// navigation or on the settings page of your app
-		'name' => $l10n->t('Quick Notes'),
+		'name' => $l10n->t('Quick notes'),
 	];
 });
