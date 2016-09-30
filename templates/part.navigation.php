@@ -9,7 +9,7 @@
 
 	<li class="collapsible open">
 		<button class="collapse"></button>
-		<a href="#" class="icon-search svg">Colors</a>
+		<a href="#" class="icon-search svg"><?php p($l->t('Colors')); ?></a>
 		<ul>
 			<li style="display: flex; justify-content: center;">
 				<button class="circle-toolbar icon-checkmark any-color"></button>
@@ -22,7 +22,7 @@
 
 	<li class="collapsible open">
 		<button class="collapse"></button>
-		<a href="#" class="icon-folder svg">Notes</a>
+		<a href="#" class="icon-folder svg"><?php p($l->t('Notes')); ?></a>
 		<ul>
 			{{#each notes}}
 				<li class="note with-menu {{#if active}}active{{/if}}"  data-id="{{ id }}">
