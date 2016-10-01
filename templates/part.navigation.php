@@ -8,8 +8,7 @@
 	<li id="all-notes"><a href="#" class="icon-home svg"><?php p($l->t('All notes')); ?></a></li>
 	<li id="shared-with-you"><a href="#" class="icon-share svg"><?php p($l->t('Shared with you')); ?></a></li>
 	<li id="shared-by-you"><a href="#" class="icon-share svg"><?php p($l->t('Shared with others')); ?></a></li>
-
-	<li class="collapsible open">
+	<li id="colors-folder" class="collapsible open">
 		<button class="collapse"></button>
 		<a href="#" class="icon-search svg"><?php p($l->t('Colors')); ?></a>
 		<ul>
@@ -21,8 +20,7 @@
 			</li>
 		</ul>
 	</li>
-
-	<li class="collapsible open">
+	<li id="notes-folder" class="collapsible open">
 		<button class="collapse"></button>
 		<a href="#" class="icon-folder svg"><?php p($l->t('Notes')); ?></a>
 		<ul>

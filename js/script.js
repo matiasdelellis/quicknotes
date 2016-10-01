@@ -562,6 +562,14 @@ View.prototype = {
             });
         });
 
+        $('#colors-folder').click(function () {
+            $(this).toggleClass("open");
+        });
+
+        $('#notes-folder').click(function () {
+            $(this).toggleClass("open");
+        });
+
         // show app menu
         $('#app-navigation .app-navigation-entry-utils-menu-button').click(function () {
             var entry = $(this).closest('.note');
