@@ -589,7 +589,8 @@ View.prototype = {
         });
 
         // show a note
-        $('#app-navigation .note > a').click(function () {
+        $('#app-navigation .note > a').click(function (event) {
+            event.stopPropagation();
             var id = parseInt($(this).parent().data('id'), 10);
             $('.notes-grid').isotope({ filter: function() {
                 var itemId = parseInt($(this).children().data('id'), 10);
@@ -599,6 +600,7 @@ View.prototype = {
 
         // Handle colors.
         $('#app-navigation .circle-toolbar').click(function (event) {
+            event.stopPropagation();
             var oldColorTool = $('#app-navigation .circle-toolbar.icon-checkmark');
             $.each(oldColorTool, function(i, oct) {
                  $(oct).removeClass('icon-checkmark');
