@@ -1,6 +1,12 @@
 <?php
 vendor_script('quicknotes', 'handlebars');
 vendor_script('quicknotes', 'isotope.pkgd');
+vendor_script('core', 'select2/select2');
+vendor_style('core', 'select2/select2');
+vendor_script('quicknotes', 'medium-editor');
+vendor_style('quicknotes', 'medium-editor');
+vendor_style('quicknotes', 'beagle');
+vendor_script('quicknotes', 'autolist');
 script('quicknotes', 'script');
 style('quicknotes', 'style');
 ?>

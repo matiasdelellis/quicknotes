@@ -30,6 +30,15 @@
    box-shadow: 0px 0px 6px #808080;
 }
 
+.quicknote ul {
+    list-style: initial;
+    margin-left: 20px;
+}
+
+.quicknote ol {
+    margin-left: 20px;
+}
+
 .note-active {
   z-index: 10;
   height: 100%;
@@ -37,7 +46,7 @@
 }
 
 .note-active #content-editable {
-    margin-bottom: 60px;
+/*    margin-bottom: 60px;*/
 }
 
 .save-button #unshare-button {
@@ -86,7 +95,7 @@
 }
 
 .note-toolbar {
-   float:left;
+   /*float:left;*/
    padding-bottom: 3px;
 }
 
@@ -121,7 +130,7 @@
 
 .modal-note-background {
     position: fixed; /* Stay in place */
-    z-index: 10000; /* Sit on top */
+    z-index: 200; /* Sit on top */
     padding-top: 100px; /* Location of the box */
     left: 0;
     top: 0;
@@ -147,7 +156,7 @@
 }
 
 .note-options {
-    position: absolute;
+/*    position: absolute;*/
     bottom: 0;
     padding: 5px;
 }
