@@ -39,6 +39,12 @@
     margin-left: 20px;
 }
 
+.quicknote blockquote {
+    margin: 0px 0px 0px 10px;
+    border-left: 1px dotted;
+    padding-left: 1ex;
+}
+
 .note-active {
   z-index: 10;
   height: 100%;
