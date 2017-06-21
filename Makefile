@@ -112,6 +112,7 @@ depsmin:
 	wget https://github.com/yabwe/medium-editor/archive/master.zip -O medium-editor.zip
 	wget https://github.com/varun-raj/medium-editor-autolist/raw/master/dist/autolist.min.js
 	mkdir -p vendor
+	unzip medium-editor.zip
 	mv handlebars-v4.0.5.js vendor/handlebars.js
 	mv isotope.pkgd.min.js vendor/isotope.pkgd.js
 	mv autolist.min.js vendor/autolist.js
