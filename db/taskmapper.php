@@ -1,12 +1,12 @@
 <?php
 namespace OCA\QuickNotes\Db;
 
-use OCP\IDb;
+use OCP\IDBConnection;
 use OCP\AppFramework\Db\Mapper;
 
 class TaskMapper extends Mapper {
 
-	public function __construct(IDb $db) {
+	public function __construct(IDBConnection $db) {
 		parent::__construct($db, 'quicknotes_tasks', '\OCA\QuickNotes\Db\Tasks');
 	}
 

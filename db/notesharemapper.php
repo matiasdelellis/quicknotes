@@ -1,13 +1,13 @@
 <?php
 namespace OCA\QuickNotes\Db;
 
-use OCP\IDb;
+use OCP\IDBConnection;
 use OCP\AppFramework\Db\Mapper;
 use OCP\AppFramework\Db\DoesNotExistException;
 
 class NoteShareMapper extends Mapper {
 
-	public function __construct(IDb $db) {
+	public function __construct(IDBConnection $db) {
 		parent::__construct($db, 'quicknotes_shares', '\OCA\QuickNotes\Db\NoteShare');
 	}
 
