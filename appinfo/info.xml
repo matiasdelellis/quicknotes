@@ -5,7 +5,7 @@
     <description>Quick notes with text, check lists and pictures</description>
     <licence>AGPL</licence>
     <author>Matias De lellis</author>
-    <version>0.1.1</version>
+    <version>0.1.2</version>
     <namespace>QuickNotes</namespace>
     <category>tool</category>
     <website>https://github.com/matiasdelellis</website>
@@ -14,6 +14,6 @@
     <ocsid>174716</ocsid>
     <dependencies>
         <owncloud min-version="8.0" max-version="9.1"/>
-        <nextcloud min-version="9" max-version="12" />
+        <nextcloud min-version="9" max-version="13" />
     </dependencies>
 </info>

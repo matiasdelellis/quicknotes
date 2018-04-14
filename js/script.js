@@ -1,11 +1,11 @@
 /**
- * ownCloud - quicknotes
+ * NextCloud/ownCloud - quicknotes
  *
  * This file is licensed under the Affero General Public License version 3 or
  * later. See the COPYING file.
  *
  * @author Matias De lellis <mati86dl@gmail.com>
- * @copyright Matias De lellis 2016-2017
+ * @copyright Matias De lellis 2016-2018
  */
 
 (function (OC, window, $, undefined) {
@@ -248,19 +248,11 @@ View.prototype = {
                 buttons: [
                     'bold',
                     'italic',
-                    {
-                        name: 'h1',
-                        action: 'append-h2',
-                        aria: 'header type 1',
-                        tagNames: ['h2'],
-                        contentDefault: '<h2>H</h2>',
-                        attrs: {
-                            'data-custom-attr': 'attr-value-h1'
-                        }
-                    },
-                    'justifyLeft', 'justifyCenter', 'justifyRight',
+                    'underline',
+                    'strikethrough',
                     'unorderedlist','orderedlist',
-                    'quote'
+                    'quote',
+                    'removeFormat'
                ]
             },
             autoLink: true,

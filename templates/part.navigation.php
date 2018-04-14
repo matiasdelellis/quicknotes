@@ -6,8 +6,10 @@
 		<div><button type="button" id="new-note" class="icon-add"><?php p($l->t('New note'));?></button></div>
 	</div>
 	<li id="all-notes"><a href="#" class="icon-home svg"><?php p($l->t('All notes')); ?></a></li>
+	<!--
 	<li id="shared-with-you"><a href="#" class="icon-share svg"><?php p($l->t('Shared with you')); ?></a></li>
 	<li id="shared-by-you"><a href="#" class="icon-share svg"><?php p($l->t('Shared with others')); ?></a></li>
+	-->
 	<li id="colors-folder" class="collapsible open">
 		<button class="collapse"></button>
 		<a href="#" class="icon-search svg"><?php p($l->t('Colors')); ?></a>
@@ -27,6 +29,7 @@
 			{{#each notes}}
 				<li class="note with-menu {{#if active}}active{{/if}}"  data-id="{{ id }}">
 					<a href="#">{{{ title }}}</a>
+					<!--
 					<div class="app-navigation-entry-utils">
 						<ul>
 							<li class="app-navigation-entry-utils-menu-button svg"><button></button></li>
@@ -37,6 +40,7 @@
 							<li><button class="delete icon-delete svg" title="delete"></button></li>
 						</ul>
 					</div>
+					-->
 				</li>
 			{{/each}}
 		</ul>

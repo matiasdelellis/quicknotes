@@ -5,11 +5,14 @@
 			<div contenteditable="true" id='content-editable' class='note-content' data-placeholder="No content"></div>
 			<div class="note-options">
 				<div class="save-button">
+					<!--
 					<button id='share-button'><?php p($l->t('Share'));?></button>
+					-->
 					<button id='cancel-button'><?php p($l->t('Cancel')); ?></button>
 					<button id='save-button'><?php p($l->t('Save')); ?></button>
 				</div>
 				<div style="clear: both;"></div>
+				<!--
 				<div id="note-share-options">
 					<ul id="share-pos">
 					</ul>
@@ -17,6 +20,7 @@
 					<ul id="share-neg">
 					</ul>
 				</div>
+				-->
 				<div class="note-toolbar">
 					<a href="#" class="circle-toolbar" style="background-color: #F7EB96"></a>
 					<a href="#" class="circle-toolbar" style="background-color: #88B7E3"></a>

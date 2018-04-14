@@ -51,10 +51,6 @@
   /*width: 100%;*/
 }
 
-.note-active #content-editable {
-/*    margin-bottom: 60px;*/
-}
-
 .save-button #unshare-button {
     display: none;
 }
@@ -74,12 +70,21 @@
 
 /* Grid Note */
 
+#div-content {
+    width: 100%;
+}
+
 #div-content .note-title {
    font-size: 18px;
    font-weight: bold;
    text-overflow: ellipsis;
    white-space: nowrap;
    overflow: hidden;
+}
+
+
+.note-content {
+    margin: 4px;
 }
 
 #div-content .shared-title,
@@ -110,6 +115,8 @@
    width:20px;
    height:20px;
    min-width: 20px;
+   min-height: 16px;
+   padding: unset;
    border-radius:10px;
    border: 1px solid rgba(0, 0, 0, 0.2);
 }
@@ -157,8 +164,17 @@
 }
 
 #content-editable {
+    width: 100%;
     min-height: 50px;
     word-wrap: break-word;
+    background: none;
+    border: none;
+}
+
+#title-editable {
+    width: 100%;
+    background: none;
+    border: none;
 }
 
 .note-options {
