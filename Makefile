@@ -91,36 +91,46 @@ else
 endif
 
 deps:
-	wget http://builds.handlebarsjs.com.s3.amazonaws.com/handlebars-v4.0.5.js
-	wget https://unpkg.com/isotope-layout@3/dist/isotope.pkgd.js
-	wget https://github.com/yabwe/medium-editor/archive/master.zip -O medium-editor.zip
-	wget https://github.com/varun-raj/medium-editor-autolist/raw/master/dist/autolist.js
 	mkdir -p vendor
-	unzip medium-editor.zip
+	rm vendor/*
+
+	wget http://builds.handlebarsjs.com.s3.amazonaws.com/handlebars-v4.0.5.js
 	mv handlebars-v4.0.5.js vendor/handlebars.js
+
+	wget https://unpkg.com/isotope-layout@3/dist/isotope.pkgd.js
 	mv isotope.pkgd.js vendor/
-	mv autolist.js vendor/
+
+	wget https://github.com/yabwe/medium-editor/archive/master.zip -O medium-editor.zip
+	unzip medium-editor.zip
 	mv medium-editor-master/dist/js/medium-editor.js vendor/
 	mv medium-editor-master/dist/css/medium-editor.css vendor/
 	mv medium-editor-master/dist/css/themes/beagle.css vendor/
-	rm medium-editor.zip
 	rm -R medium-editor-master
+	rm medium-editor.zip
+
+	wget https://github.com/varun-raj/medium-editor-autolist/raw/master/dist/autolist.js
+	mv autolist.js vendor/
 
 depsmin:
-	wget http://builds.handlebarsjs.com.s3.amazonaws.com/handlebars-v4.0.5.js
-	wget https://unpkg.com/isotope-layout@3/dist/isotope.pkgd.min.js
-	wget https://github.com/yabwe/medium-editor/archive/master.zip -O medium-editor.zip
-	wget https://github.com/varun-raj/medium-editor-autolist/raw/master/dist/autolist.min.js
 	mkdir -p vendor
-	unzip medium-editor.zip
+	rm vendor/*
+
+	wget http://builds.handlebarsjs.com.s3.amazonaws.com/handlebars-v4.0.5.js
 	mv handlebars-v4.0.5.js vendor/handlebars.js
+
+	wget https://unpkg.com/isotope-layout@3/dist/isotope.pkgd.min.js
 	mv isotope.pkgd.min.js vendor/isotope.pkgd.js
-	mv autolist.min.js vendor/autolist.js
+
+	wget https://github.com/yabwe/medium-editor/archive/master.zip -O medium-editor.zip
+	unzip medium-editor.zip
 	mv medium-editor-master/dist/js/medium-editor.min.js vendor/medium-editor.js
 	mv medium-editor-master/dist/css/medium-editor.min.css vendor/medium-editor.css
 	mv medium-editor-master/dist/css/themes/beagle.min.css vendor/beagle.css
-	rm medium-editor.zip
 	rm -R medium-editor-master
+	rm medium-editor.zip
+
+	wget https://github.com/varun-raj/medium-editor-autolist/raw/master/dist/autolist.min.js
+	mv autolist.min.js vendor/autolist.js
 
 # Removes the appstore build
 .PHONY: clean
