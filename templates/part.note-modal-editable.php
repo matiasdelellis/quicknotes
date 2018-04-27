@@ -1,25 +1,13 @@
 <div id="modal-note-div" class="hide-modal-note modal-note-background">
 	<div class="modal-content">
 		<div class="quicknote note-active" style="background-color: #F7EB96" data-id="-1">
-			<div contenteditable="true" id='title-editable' class='note-title'></div>
-			<div contenteditable="true" id='content-editable' class='note-content' data-placeholder="No content"></div>
+			<div>
+				<div contenteditable="true" id='title-editable' class='note-title'></div>
+			</div>
+			<div contenteditable="true" id='content-editable' class='note-content'></div>
 			<div class="note-options">
-				<div class="save-button">
-					<!--
-					<button id='share-button'><?php p($l->t('Share'));?></button>
-					-->
-					<button id='cancel-button'><?php p($l->t('Cancel')); ?></button>
-					<button id='save-button'><?php p($l->t('Save')); ?></button>
-				</div>
-				<div style="clear: both;"></div>
 				<!--
-				<div id="note-share-options">
-					<ul id="share-pos">
-					</ul>
-					<input type="text" id="share-search" />
-					<ul id="share-neg">
-					</ul>
-				</div>
+				<select class="note-share-select" name="users[]" multiple="multiple"></select>
 				-->
 				<div class="note-toolbar">
 					<a href="#" class="circle-toolbar" style="background-color: #F7EB96"></a>
@@ -33,6 +21,14 @@
 					<a href="#" class="circle-toolbar" style="background-color: #C1D756"></a>
 					<a href="#" class="circle-toolbar" style="background-color: #CECECE"></a>
 				</div>
+				<div class="save-button">
+					<!--
+					<button id='share-button'><?php p($l->t('Share'));?></button>
+					-->
+					<button id='cancel-button'><?php p($l->t('Cancel')); ?></button>
+					<button id='save-button'><?php p($l->t('Save')); ?></button>
+				</div>
+				<div style="clear: both;"></div>
 			</div>
 		</div>
 	</div>

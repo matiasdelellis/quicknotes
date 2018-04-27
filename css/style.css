@@ -156,11 +156,21 @@
 
 .hide-delete-icon,
 .hide-modal-note {
-    display: none; /* Hidden by default */
+    display: none;
 }
 .show-delete-icon,
 .show-modal-note {
     display: block;
+}
+
+div[contenteditable="true"] {
+   margin: 0px;
+   padding: 0px;
+}
+
+#title-editable:active, #title-editable:hover, #title-editable:focus,
+#content-editable:active, #content-editable:hover, #content-editable:focus {
+  background-color: transparent !important;
 }
 
 #content-editable {
@@ -168,27 +178,20 @@
     min-height: 50px;
     word-wrap: break-word;
     background: none;
+    color: unset;
     border: none;
 }
 
 #title-editable {
     width: 100%;
     background: none;
+    color: unset;
     border: none;
 }
 
 .note-options {
-/*    position: absolute;*/
     bottom: 0;
     padding: 5px;
-}
-
-/* show placeholder text for empty notes */
-div[data-placeholder]:empty::before {
-  color: grey;
-}
-div[data-placeholder]:not([data-placeholder=""]):empty::before {
-  content: attr(data-placeholder);
 }
 
 #note-share-options {
@@ -202,6 +205,11 @@ div[data-placeholder]:not([data-placeholder=""]):empty::before {
 
 .selected-share, .unselected-share {
     padding-left: 5px;
+}
+
+.note-share-select {
+    width: 100%;
+    opacity: 0.5;
 }
 
 /* Modal Content */

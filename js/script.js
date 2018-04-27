@@ -24,65 +24,6 @@ var Notes = function (baseUrl) {
     this._activeNote = undefined;
 };
 
-var moveToUnselectedShare = function() {
-    var curr = $(this).clone();
-    var groupIndex = curr.html().indexOf('<span>(group)</span>');
-    var id = $('.note-active').data('id');
-    if(groupIndex >= 0) {
-        var groupId = curr.html().substring(0, groupIndex);
-        var formData = {
-            groupId : groupId,
-            noteId : id
-        };
-        $.post(OC.generateUrl('/apps/quicknotes/api/0.1/groups/removeshare'), formData, function(data){
-        });
-    } else {
-        var userId = curr.html();
-        var formData = {
-            userId : userId,
-            noteId : id
-        };
-        $.post(OC.generateUrl('/apps/quicknotes/api/0.1/users/removeshare'), formData, function(data){
-        });
-    }
-    curr.switchClass('selected-share', 'unselected-share', 0);
-    curr.hide();
-    curr.click(moveToSelectedShare);
-    $(curr).appendTo($('#share-neg'));
-    $(this).remove();
-    var pos = $('#share-pos');
-    if(pos.children().length == 0) pos.hide();
-}
-
-var moveToSelectedShare = function() {
-    var curr = $(this).clone();
-    var groupIndex = curr.html().indexOf('<span>(group)</span>');
-    var id = $('.note-active').data('id');
-    if(groupIndex >= 0) {
-        var groupId = curr.html().substring(0, groupIndex);
-        var formData = {
-            groupId : groupId,
-            noteId : id
-        };
-        $.post(OC.generateUrl('/apps/quicknotes/api/0.1/groups/addshare'), formData, function(data){
-        });
-    } else {
-        var userId = curr.html();
-        var formData = {
-            userId : userId,
-            noteId : id
-        };
-        $.post(OC.generateUrl('/apps/quicknotes/api/0.1/users/addshare'), formData, function(data){
-        });
-    }
-    curr.switchClass('unselected-share', 'selected-share', 0);
-    curr.click(moveToUnselectedShare);
-    $(curr).appendTo($('#share-pos'));
-    $(this).remove();
-    $('#share-pos').show();
-    $('#share-search').val('');
-}
-
 Notes.prototype = {
     load: function (id) {
         var self = this;
@@ -222,8 +163,8 @@ View.prototype = {
 
         var note = $('.notes-grid [data-id=' + id + ']').parent();
 
-        var title = note.find("#title-editable").html();
-        var content = note.find("#content-editable").html();
+        var title = note.find(".note-title").html();
+        var content = note.find(".note-content").html();
         var color = note.children().css("background-color");
         var colors = modal[0].getElementsByClassName("circle-toolbar");
         $.each(colors, function(i, c) {
@@ -264,6 +205,33 @@ View.prototype = {
                 'autolist': autolist
             }
         });
+        /*
+        var shareSelect = $('.note-share-select');
+        shareSelect.select2({
+            placeholder: "Share with users or groups",
+            allowClear: true,
+        });
+
+        var formData = {
+            noteId: id
+        }
+        $.post(OC.generateUrl('/apps/quicknotes/api/0.1/getusergroups'), formData, function(data) {
+            $.each(data.users, function(i, user) {
+                var newOption = new Option(user, user , false, false);
+                shareSelect.append(newOption);
+            });
+            shareSelect.trigger('change');
+
+            var sUsers = []
+            $.each(data.posUsers, function(i, user) {
+                var newOption = new Option(user, user , false, false);
+                shareSelect.append(newOption);
+                sUsers.push(user);
+            });
+            shareSelect.val(sUsers);
+            shareSelect.trigger('change');
+        });
+        */
 
         /* Positioning the modal to the original size */
         $(".modal-content").css({
@@ -291,6 +259,12 @@ View.prototype = {
         $.each(modalcolortools, function(i, colortool) {
             $(colortool).removeClass('icon-checkmark');
         });
+
+        /*
+        var shareSelect = $('.note-share-select');
+        shareSelect.val(null).trigger('change');
+        shareSelect.select2('destroy');
+        */
 
         this._notes.unsetActive();
 
@@ -381,7 +355,7 @@ View.prototype = {
         // Remove note icon
         var self = this;
         $('#app-content').on("click", ".icon-delete-note", function (event) {
-            var note = $(this).parent();
+            var note = $(this).parent().parent();
             var id = parseInt(note.data('id'), 10);
 
             event.stopPropagation();
@@ -506,6 +480,19 @@ View.prototype = {
             var content = modalcontent.html();
             var color = self.colorToHex(modalnote.css("background-color"));
 
+            /*
+            var shareSelect = $('.note-share-select');
+            var shares = shareSelect.select2('data');
+            for (var i = 0; i < shares.length; i++) {
+                var user = shares[i].id;
+                var formData = {
+                    userId : user,
+                    noteId : id
+                };
+                $.post(OC.generateUrl('/apps/quicknotes/api/0.1/users/addshare'), formData, function(data){});
+            }
+            */
+
             self._notes.updateId(id, title, content, color).done(function () {
                 self._notes.unsetActive();
 
@@ -566,11 +553,14 @@ View.prototype = {
                 if (self._notes.length() > 1) {
                     note = self._notes.getActive();
                     var $notehtml = $("<div class=\"note-grid-item\">" +
-                                      "<div class=\"quicknote noselect\" style=\"background-color:" + note.color + "\" data-id=\"" + note.id + "\">" +
-                                      "<div id='title-editable' class='note-title'>" + note.title + "</div>" +
-                                      "<button class=\"icon-delete hide-delete-icon icon-delete-note\" title=\"Delete\"></button>" +
-                                      "<div id='content-editable' class='note-content'>" + note.content + "</div>" +
-                                      "</div></div>");
+                                      "  <div class=\"quicknote noselect\" style=\"background-color: " + note.color + "\" data-id=\"" + note.id + "\">" +
+                                      "    <div>" +
+                                      "      <div class=\"icon-delete hide-delete-icon icon-delete-note\" title=\"Delete\"></div>" +
+                                      "      <div class=\"note-title\">" + note.title + "</div>" +
+                                      "    </div>" +
+                                      "    <div class=\"note-content\">" + note.content + "</div>" +
+                                      "  </div>" +
+                                      "</div>");
                     $(".notes-grid").prepend( $notehtml )
                                     .isotope({ filter: '*'})
                                     .isotope( 'prepended', $notehtml);
