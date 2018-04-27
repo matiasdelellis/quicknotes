@@ -57,8 +57,8 @@
 
 #div-content .save-button {
     float: right;
-    padding-right: 8px;
-    padding-bottom: 5px;
+    /*padding-right: 8px;*/
+    /*padding-bottom: 5px;*/
 }
 
 #div-content textarea {
@@ -107,7 +107,7 @@
 
 .note-toolbar {
    /*float:left;*/
-   padding-bottom: 3px;
+   padding-top: 6px;
 }
 
 .circle-toolbar {
@@ -166,6 +166,7 @@
 div[contenteditable="true"] {
    margin: 0px;
    padding: 0px;
+   min-height: auto;
 }
 
 #title-editable:active, #title-editable:hover, #title-editable:focus,
@@ -175,6 +176,7 @@ div[contenteditable="true"] {
 
 #content-editable {
     width: 100%;
+    padding: 4px;
     min-height: 50px;
     word-wrap: break-word;
     background: none;
@@ -191,7 +193,7 @@ div[contenteditable="true"] {
 
 .note-options {
     bottom: 0;
-    padding: 5px;
+    /*padding: 5px;*/
 }
 
 #note-share-options {
