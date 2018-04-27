@@ -1,3 +1,7 @@
+## [0.1.3]: 2018-04-26
+### Added
+- Some styles fixed.
+
 ## [0.1.2]: 2018-04-17
 ### Added
 - Initial Nextcloud release.
