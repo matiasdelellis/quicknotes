@@ -85,6 +85,7 @@
 
 .note-content {
     margin: 4px;
+    overflow-wrap: break-word;
 }
 
 #div-content .shared-title,
