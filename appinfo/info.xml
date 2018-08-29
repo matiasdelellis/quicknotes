@@ -5,8 +5,9 @@
     <description>Quick notes with a basic rich text</description>
     <licence>AGPL</licence>
     <author>Matias De lellis</author>
-    <version>0.1.3</version>
+    <version>0.1.4</version>
     <namespace>QuickNotes</namespace>
+    <category>office</category>
     <category>tools</category>
     <website>https://github.com/matiasdelellis/quicknotes</website>
     <bugs>https://github.com/matiasdelellis/quicknotes/issues</bugs>
