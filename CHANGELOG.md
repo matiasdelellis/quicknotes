@@ -1,3 +1,7 @@
+## [0.1.4]: 2018-10-13
+### Added
+- Initial Nextcloud 14 release.
+
 ## [0.1.4]: 2018-08-29
 ### Added
 - Some styles fixed.

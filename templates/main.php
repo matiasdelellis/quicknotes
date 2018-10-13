@@ -9,7 +9,6 @@ script('quicknotes', 'script');
 style('quicknotes', 'style');
 ?>
 
-<div id="app">
 	<div id="app-navigation">
 		<?php print_unescaped($this->inc('part.navigation')); ?>
 		<?php print_unescaped($this->inc('part.settings')); ?>
@@ -20,4 +19,3 @@ style('quicknotes', 'style');
 			<?php print_unescaped($this->inc('part.content')); ?>
 		</div>
 	</div>
-</div>
