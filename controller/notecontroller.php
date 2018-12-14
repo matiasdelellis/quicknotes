@@ -160,7 +160,7 @@ class NoteController extends Controller {
 		$newnote = $this->notemapper->update($note);
 
 		//  Remove old color if necessary
-		if (($oldcolorid != $hcolor->getId()) &&
+		if (($oldcolorid !== $hcolor->getId()) &&
 		    (!$this->notemapper->colorIdCount($oldcolorid))) {
 			$oldcolor = $this->colormapper->find($oldcolorid);
 			$this->colormapper->delete($oldcolor);
@@ -234,7 +234,7 @@ class NoteController extends Controller {
 		$shares = $this->notesharemapper->getSharesForNote($noteId);
 		foreach($shares as $s) {
 			$shareType = $s->getSharedUser();
-			if(strlen($shareType) != 0) {
+			if(strlen($shareType) !== 0) {
 				if(($i = array_search($shareType, $users)) !== false) {
 					unset($users[$i]);
 					$pos_users[] = $shareType;

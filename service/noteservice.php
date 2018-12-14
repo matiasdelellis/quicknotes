@@ -58,7 +58,7 @@ class NoteService {
 			$note = $this->mapper->find($id, $userId);
 			$note->setTitle($title);
 			$note->setContent($content);
-			$note->setColor($color)
+			$note->setColor($color);
 			return $this->mapper->update($note);
 		} catch(Exception $e) {
 			$this->handleException($e);

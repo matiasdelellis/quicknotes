@@ -1,11 +1,13 @@
 <?xml version="1.0"?>
-<info>
+<info xmlns:xsi= "http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
     <id>quicknotes</id>
     <name>Quick notes</name>
+    <summary>Quick notes with a basic rich text</summary>
     <description>Quick notes with a basic rich text</description>
-    <licence>AGPL</licence>
-    <author>Matias De lellis</author>
     <version>0.1.5</version>
+    <licence>agpl</licence>
+    <author>Matias De lellis</author>
     <namespace>QuickNotes</namespace>
     <category>office</category>
     <category>tools</category>
@@ -14,7 +16,6 @@
     <repository type="git">https://github.com/matiasdelellis/quicknotes.git</repository>
     <screenshot small-thumbnail="https://user-images.githubusercontent.com/733715/38871311-dac5a80a-4226-11e8-961d-63b276380b6b.png">https://user-images.githubusercontent.com/733715/38871311-dac5a80a-4226-11e8-961d-63b276380b6b.png</screenshot>
     <screenshot>https://user-images.githubusercontent.com/733715/38871255-b07a7d5a-4226-11e8-8403-650cbea50be0.png</screenshot>
-    <ocsid>174716</ocsid>
     <dependencies>
         <nextcloud min-version="14" max-version="14" />
     </dependencies>
