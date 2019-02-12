@@ -74,9 +74,19 @@
 		</div>
 	</div>
 </div>
+{{else if loaded}}
+<div class="emptycontent">
+	<div class="icon-edit svg"></div>
+	<h2>
+		{{ emptyMsg }}
+	</h2>
+</div>
 {{else}}
 <div class="emptycontent">
-	<div class="icon-folder"></div>
-		{{ emptyMsg }}
-	</div>
+	<div class="icon-edit svg"></div>
+	<h2>
+		{{loadingMsg}}
+	</h2>
+	<img class="loadingimport" src="{{loadingIcon}}"/>
+</div>
 {{/if}}

@@ -5,7 +5,7 @@
  * later. See the COPYING file.
  *
  * @author Matias De lellis <mati86dl@gmail.com>
- * @copyright Matias De lellis 2016-2018
+ * @copyright Matias De lellis 2016-2019
  */
 
 (function (OC, window, $, undefined) {
@@ -18,6 +18,7 @@ var Notes = function (baseUrl) {
     this._baseUrl = baseUrl;
     this._notes = [];
     this._activeNote = undefined;
+    this._loaded = false;
 };
 
 Notes.prototype = {
@@ -115,11 +116,15 @@ Notes.prototype = {
         $.get(this._baseUrl).done(function (notes) {
             self._activeNote = undefined;
             self._notes = notes.reverse();
+            self._loaded = true;
             deferred.resolve();
         }).fail(function () {
             deferred.reject();
         });
         return deferred.promise();
+    },
+    isLoaded: function () {
+        return this._loaded;
     },
     updateActive: function (title, content, color) {
         var note = this.getActive();
@@ -286,11 +291,18 @@ View.prototype = {
         return digits[1] + '#' + rgb.toString(16).toUpperCase();
     },
     renderContent: function () {
+        // Remove all event handlers to prevent double events.
+        $("#app-content").off();
+
         var html = Handlebars.templates['notes']({
+            loaded: this._notes.isLoaded(),
             notes: this._notes.getAll(),
             cancelTxt: t('quicknotes', 'Cancel'),
             saveTxt: t('quicknotes', 'Save'),
-            emptyTxt: t('quicknotes', 'Nothing here. Take your quick notes.'),
+            loadingMsg: t('quicknotes', 'Looking for your notes'),
+            loadingIcon: OC.imagePath('core', 'loading.gif'),
+            emptyMsg: t('quicknotes', 'Nothing here. Take your first quick notes'),
+            emptyIcon: OC.imagePath('quicknotes', 'app'),
         });
         $('#div-content').html(html);
 
@@ -321,7 +333,7 @@ View.prototype = {
 
         // Open notes when clicking them.
         $("#app-content").on("click", ".quicknote", function (event) {
-            event.stopPropagation(); // Not work so need fix on next binding..
+            event.stopPropagation();
 
             if($(this).hasClass('shared')) return; //shares don't allow editing
             var modalnote = $("#modal-note-editable .quicknote");
@@ -334,12 +346,8 @@ View.prototype = {
         });
 
         // Cancel when click outside the modal.
-        $(".modal-note-background").click(function (event) {
-            /* stopPropagation() not work with .on() binings. */
-            if (!$(event.target).is(".modal-note-background")) {
-                 event.stopPropagation();
-                 return;
-            }
+        $('#app-content').on('click', '.modal-note-background', function (event) {
+            event.stopPropagation();
             self.cancelEdit();
         });
 
@@ -353,10 +361,10 @@ View.prototype = {
         // Remove note icon
         var self = this;
         $('#app-content').on("click", ".icon-delete-note", function (event) {
+            event.stopPropagation();
+
             var note = $(this).parent().parent();
             var id = parseInt(note.data('id'), 10);
-
-            event.stopPropagation();
 
             self._notes.load(id);
             OC.dialogs.confirm(
@@ -475,7 +483,8 @@ View.prototype = {
 
         // handle cancel editing notes.
         $('#modal-note-div #cancel-button').click(function (event) {
-           self.cancelEdit();
+            event.stopPropagation();
+            self.cancelEdit();
         });
 
         // Handle save note
@@ -594,32 +603,6 @@ View.prototype = {
             $(this).toggleClass("open");
         });
 
-        // show app menu
-        $('#app-navigation .app-navigation-entry-utils-menu-button').click(function () {
-            var entry = $(this).closest('.note');
-            entry.find('.app-navigation-entry-menu').toggleClass('open');
-        });
-
-        // delete a note
-        $('#app-navigation .note .delete').click(function () {
-            var entry = $(this).closest('.note');
-            entry.find('.app-navigation-entry-menu').removeClass('open');
-            OC.dialogs.confirm(
-                t('quicknotes', 'Are you sure you want to delete the note?'),
-                t('quicknotes', 'Delete note'),
-                function(result) {
-                    if (result) {
-                        self._notes.removeActive().done(function () {
-                            self.render();
-                        }).fail(function () {
-                            alert('Could not delete note, not found');
-                        });
-                    }
-                },
-                true
-            );
-        });
-
         // show a note
         $('#app-navigation .note > a').click(function (event) {
             event.stopPropagation();
@@ -683,8 +666,21 @@ new OCA.Search(search, function() {
     search('');
 });
 
+
+/*
+ * Create modules
+ */
 var notes = new Notes(OC.generateUrl('/apps/quicknotes/notes'));
 var view = new View(notes);
+
+/*
+ * Render loading view
+ */
+view.renderContent();
+
+/*
+ * Loading notes and render view.
+ */
 notes.loadAll().done(function () {
     view.render();
 }).fail(function () {
