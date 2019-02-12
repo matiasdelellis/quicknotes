@@ -290,10 +290,12 @@ View.prototype = {
         return digits[1] + '#' + rgb.toString(16).toUpperCase();
     },
     renderContent: function () {
-        var source = $('#content-tpl').html();
-        var template = Handlebars.compile(source);
-        var html = template({notes: this._notes.getAll()});
-
+        var html = Handlebars.templates['notes']({
+            notes: this._notes.getAll(),
+            cancelTxt: t('quicknotes', 'Cancel'),
+            saveTxt: t('quicknotes', 'Save'),
+            emptyTxt: t('quicknotes', 'Nothing here. Take your quick notes.'),
+        });
         $('#div-content').html(html);
 
         // Init masonty grid to notes.
@@ -510,9 +512,14 @@ View.prototype = {
         });
     },
     renderNavigation: function () {
-        var source = $('#navigation-tpl').html();
-        var template = Handlebars.compile(source);
-        var html = template({colors: this._notes.getColors(), notes: this._notes.getAll()});
+        var html = Handlebars.templates['navigation']({
+            colors: this._notes.getColors(),
+            notes: this._notes.getAll(),
+            newNoteTxt: t('quicknotes', 'New note'),
+            allNotesTxt: t('quicknotes', 'All notes'),
+            colorsTxt: t('quicknotes', 'Colors'),
+            notesTxt: t('quicknotes', 'Notes'),
+        });
 
         $('#app-navigation ul').html(html);
 

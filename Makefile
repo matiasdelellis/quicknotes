@@ -72,6 +72,9 @@ depsmin:
 	wget https://github.com/varun-raj/medium-editor-autolist/raw/master/dist/autolist.min.js
 	mv autolist.min.js vendor/autolist.js
 
+js-templates:
+	handlebars js/templates -f js/templates.js
+
 clean:
 	rm -rf $(build_dir)
 
