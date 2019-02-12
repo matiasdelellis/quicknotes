@@ -658,41 +658,30 @@ View.prototype = {
     }
 };
 
-var timeoutID = null;
-function filter (query) {
-    window.clearTimeout(timeoutID);
-    timeoutID = window.setTimeout(function() {
-        if (query) {
-            query = query.toLowerCase();
-            $('.notes-grid').isotope({ filter: function() {
+function search (query) {
+    if (query) {
+        query = query.toLowerCase();
+        $('.notes-grid').isotope({
+            filter: function() {
                 var title = $(this).find(".note-title").html().toLowerCase();
                 if (title.search(query) >= 0)
                     return true;
+
                 var content = $(this).find(".note-content").html().toLowerCase();
                 if (content.search(query) >= 0)
                     return true;
-                return false;
-             }});
-         } else {
-             $('.notes-grid').isotope({ filter: '*'});
-         }
-    }, 500);
-};
 
-var SearchProxy = {
-    attach: function(search) {
-        search.setFilter('quicknotes', this.filterProxy);
-    },
-    filterProxy: function(query) {
-        filter(query);
-    },
-    setFilter: function(newFilter) {
-        filter = newFilter;
+                return false;
+            }
+        });
+    } else {
+        $('.notes-grid').isotope({ filter: '*'});
     }
 };
 
-SearchProxy.setFilter(filter);
-OC.Plugins.register('OCA.Search', SearchProxy);
+new OCA.Search(search, function() {
+    search('');
+});
 
 var notes = new Notes(OC.generateUrl('/apps/quicknotes/notes'));
 var view = new View(notes);
