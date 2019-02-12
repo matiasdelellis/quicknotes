@@ -13,10 +13,6 @@
 
 $(document).ready(function () {
 
-var translations = {
-    newNote: $('#new-note-string').text()
-};
-
 // this notes object holds all our notes
 var Notes = function (baseUrl) {
     this._baseUrl = baseUrl;
@@ -551,7 +547,7 @@ View.prototype = {
         var self = this;
         $('#new-note').click(function () {
             var note = {
-                title: translations.newNote,
+                title: t('quicknotes', 'New note'),
                 content: '',
                 color: '#F7EB96'
             };
