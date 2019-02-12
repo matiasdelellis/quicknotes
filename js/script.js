@@ -551,22 +551,21 @@ View.prototype = {
                 content: '',
                 color: '#F7EB96'
             };
-
             self._notes.create(note).done(function() {
                 if (self._notes.length() > 1) {
                     note = self._notes.getActive();
-                    var $notehtml = $("<div class=\"note-grid-item\">" +
-                                      "  <div class=\"quicknote noselect\" style=\"background-color: " + note.color + "\" data-id=\"" + note.id + "\">" +
-                                      "    <div>" +
-                                      "      <div class=\"icon-delete hide-delete-icon icon-delete-note\" title=\"Delete\"></div>" +
-                                      "      <div class=\"note-title\">" + note.title + "</div>" +
-                                      "    </div>" +
-                                      "    <div class=\"note-content\">" + note.content + "</div>" +
-                                      "  </div>" +
-                                      "</div>");
-                    $(".notes-grid").prepend( $notehtml )
+                    var $notehtml = $(Handlebars.templates['note-item']({
+                        color: note.color,
+                        id: note.id,
+                        title: note.title,
+                        content: note.content,
+                        timestamp: note.timestamp,
+                    }));
+
+                    $(".notes-grid").prepend($notehtml)
+                                    .isotope('prepended', $notehtml)
                                     .isotope({ filter: '*'})
-                                    .isotope( 'prepended', $notehtml);
+                                    .isotope('layout');
                     self._notes.unsetActive();
                     self.renderNavigation();
                 } else {
