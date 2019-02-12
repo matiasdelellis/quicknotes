@@ -359,18 +359,27 @@ View.prototype = {
             event.stopPropagation();
 
             self._notes.load(id);
-            self._notes.removeActive().done(function () {
-                if (self._notes.length() > 0) {
-                    $(".notes-grid").isotope('remove', note.parent())
-                                    .isotope('layout');
-                    self.showAll();
-                    self.renderNavigation();
-                } else {
-                    self.render();
-                }
-            }).fail(function () {
-                alert('Could not delete note, not found');
-            });
+            OC.dialogs.confirm(
+                t('quicknotes', 'Are you sure you want to delete the note?'),
+                t('quicknotes', 'Delete note'),
+                function(result) {
+                    if (result) {
+                        self._notes.removeActive().done(function () {
+                            if (self._notes.length() > 0) {
+                                $(".notes-grid").isotope('remove', note.parent())
+                                                .isotope('layout');
+                                self.showAll();
+                                self.renderNavigation();
+                            } else {
+                                self.render();
+                            }
+                        }).fail(function () {
+                            alert('Could not delete note, not found');
+                        });
+                    }
+                },
+                true
+            );
         });
 
         /*
@@ -595,12 +604,20 @@ View.prototype = {
         $('#app-navigation .note .delete').click(function () {
             var entry = $(this).closest('.note');
             entry.find('.app-navigation-entry-menu').removeClass('open');
-
-            self._notes.removeActive().done(function () {
-                self.render();
-            }).fail(function () {
-                alert('Could not delete note, not found');
-            });
+            OC.dialogs.confirm(
+                t('quicknotes', 'Are you sure you want to delete the note?'),
+                t('quicknotes', 'Delete note'),
+                function(result) {
+                    if (result) {
+                        self._notes.removeActive().done(function () {
+                            self.render();
+                        }).fail(function () {
+                            alert('Could not delete note, not found');
+                        });
+                    }
+                },
+                true
+            );
         });
 
         // show a note
