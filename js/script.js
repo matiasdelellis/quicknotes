@@ -599,6 +599,10 @@ View.prototype = {
             $(this).toggleClass("open");
         });
 
+        $('#colors-folder > ul').click(function (event) {
+            event.stopPropagation();
+        });
+
         $('#notes-folder').click(function () {
             $(this).toggleClass("open");
         });
