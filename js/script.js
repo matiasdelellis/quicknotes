@@ -5,7 +5,7 @@
  * later. See the COPYING file.
  *
  * @author Matias De lellis <mati86dl@gmail.com>
- * @copyright Matias De lellis 2016-2018
+ * @copyright Matias De lellis 2016-2019
  */
 
 (function (OC, window, $, undefined) {
@@ -13,15 +13,12 @@
 
 $(document).ready(function () {
 
-var translations = {
-    newNote: $('#new-note-string').text()
-};
-
 // this notes object holds all our notes
 var Notes = function (baseUrl) {
     this._baseUrl = baseUrl;
     this._notes = [];
     this._activeNote = undefined;
+    this._loaded = false;
 };
 
 Notes.prototype = {
@@ -119,11 +116,15 @@ Notes.prototype = {
         $.get(this._baseUrl).done(function (notes) {
             self._activeNote = undefined;
             self._notes = notes.reverse();
+            self._loaded = true;
             deferred.resolve();
         }).fail(function () {
             deferred.reject();
         });
         return deferred.promise();
+    },
+    isLoaded: function () {
+        return this._loaded;
     },
     updateActive: function (title, content, color) {
         var note = this.getActive();
@@ -290,10 +291,19 @@ View.prototype = {
         return digits[1] + '#' + rgb.toString(16).toUpperCase();
     },
     renderContent: function () {
-        var source = $('#content-tpl').html();
-        var template = Handlebars.compile(source);
-        var html = template({notes: this._notes.getAll()});
+        // Remove all event handlers to prevent double events.
+        $("#app-content").off();
 
+        var html = Handlebars.templates['notes']({
+            loaded: this._notes.isLoaded(),
+            notes: this._notes.getAll(),
+            cancelTxt: t('quicknotes', 'Cancel'),
+            saveTxt: t('quicknotes', 'Save'),
+            loadingMsg: t('quicknotes', 'Looking for your notes'),
+            loadingIcon: OC.imagePath('core', 'loading.gif'),
+            emptyMsg: t('quicknotes', 'Nothing here. Take your first quick notes'),
+            emptyIcon: OC.imagePath('quicknotes', 'app'),
+        });
         $('#div-content').html(html);
 
         // Init masonty grid to notes.
@@ -323,7 +333,7 @@ View.prototype = {
 
         // Open notes when clicking them.
         $("#app-content").on("click", ".quicknote", function (event) {
-            event.stopPropagation(); // Not work so need fix on next binding..
+            event.stopPropagation();
 
             if($(this).hasClass('shared')) return; //shares don't allow editing
             var modalnote = $("#modal-note-editable .quicknote");
@@ -336,12 +346,8 @@ View.prototype = {
         });
 
         // Cancel when click outside the modal.
-        $(".modal-note-background").click(function (event) {
-            /* stopPropagation() not work with .on() binings. */
-            if (!$(event.target).is(".modal-note-background")) {
-                 event.stopPropagation();
-                 return;
-            }
+        $('#app-content').on('click', '.modal-note-background', function (event) {
+            event.stopPropagation();
             self.cancelEdit();
         });
 
@@ -355,24 +361,33 @@ View.prototype = {
         // Remove note icon
         var self = this;
         $('#app-content').on("click", ".icon-delete-note", function (event) {
+            event.stopPropagation();
+
             var note = $(this).parent().parent();
             var id = parseInt(note.data('id'), 10);
 
-            event.stopPropagation();
-
             self._notes.load(id);
-            self._notes.removeActive().done(function () {
-                if (self._notes.length() > 0) {
-                    $(".notes-grid").isotope('remove', note.parent())
-                                    .isotope('layout');
-                    self.showAll();
-                    self.renderNavigation();
-                } else {
-                    self.render();
-                }
-            }).fail(function () {
-                alert('Could not delete note, not found');
-            });
+            OC.dialogs.confirm(
+                t('quicknotes', 'Are you sure you want to delete the note?'),
+                t('quicknotes', 'Delete note'),
+                function(result) {
+                    if (result) {
+                        self._notes.removeActive().done(function () {
+                            if (self._notes.length() > 0) {
+                                $(".notes-grid").isotope('remove', note.parent())
+                                                .isotope('layout');
+                                self.showAll();
+                                self.renderNavigation();
+                            } else {
+                                self.render();
+                            }
+                        }).fail(function () {
+                            alert('Could not delete note, not found');
+                        });
+                    }
+                },
+                true
+            );
         });
 
         /*
@@ -468,7 +483,8 @@ View.prototype = {
 
         // handle cancel editing notes.
         $('#modal-note-div #cancel-button').click(function (event) {
-           self.cancelEdit();
+            event.stopPropagation();
+            self.cancelEdit();
         });
 
         // Handle save note
@@ -510,9 +526,14 @@ View.prototype = {
         });
     },
     renderNavigation: function () {
-        var source = $('#navigation-tpl').html();
-        var template = Handlebars.compile(source);
-        var html = template({colors: this._notes.getColors(), notes: this._notes.getAll()});
+        var html = Handlebars.templates['navigation']({
+            colors: this._notes.getColors(),
+            notes: this._notes.getAll(),
+            newNoteTxt: t('quicknotes', 'New note'),
+            allNotesTxt: t('quicknotes', 'All notes'),
+            colorsTxt: t('quicknotes', 'Colors'),
+            notesTxt: t('quicknotes', 'Notes'),
+        });
 
         $('#app-navigation ul').html(html);
 
@@ -544,26 +565,25 @@ View.prototype = {
         var self = this;
         $('#new-note').click(function () {
             var note = {
-                title: translations.newNote,
+                title: t('quicknotes', 'New note'),
                 content: '',
                 color: '#F7EB96'
             };
-
             self._notes.create(note).done(function() {
                 if (self._notes.length() > 1) {
                     note = self._notes.getActive();
-                    var $notehtml = $("<div class=\"note-grid-item\">" +
-                                      "  <div class=\"quicknote noselect\" style=\"background-color: " + note.color + "\" data-id=\"" + note.id + "\">" +
-                                      "    <div>" +
-                                      "      <div class=\"icon-delete hide-delete-icon icon-delete-note\" title=\"Delete\"></div>" +
-                                      "      <div class=\"note-title\">" + note.title + "</div>" +
-                                      "    </div>" +
-                                      "    <div class=\"note-content\">" + note.content + "</div>" +
-                                      "  </div>" +
-                                      "</div>");
-                    $(".notes-grid").prepend( $notehtml )
+                    var $notehtml = $(Handlebars.templates['note-item']({
+                        color: note.color,
+                        id: note.id,
+                        title: note.title,
+                        content: note.content,
+                        timestamp: note.timestamp,
+                    }));
+
+                    $(".notes-grid").prepend($notehtml)
+                                    .isotope('prepended', $notehtml)
                                     .isotope({ filter: '*'})
-                                    .isotope( 'prepended', $notehtml);
+                                    .isotope('layout');
                     self._notes.unsetActive();
                     self.renderNavigation();
                 } else {
@@ -579,26 +599,12 @@ View.prototype = {
             $(this).toggleClass("open");
         });
 
+        $('#colors-folder > ul').click(function (event) {
+            event.stopPropagation();
+        });
+
         $('#notes-folder').click(function () {
             $(this).toggleClass("open");
-        });
-
-        // show app menu
-        $('#app-navigation .app-navigation-entry-utils-menu-button').click(function () {
-            var entry = $(this).closest('.note');
-            entry.find('.app-navigation-entry-menu').toggleClass('open');
-        });
-
-        // delete a note
-        $('#app-navigation .note .delete').click(function () {
-            var entry = $(this).closest('.note');
-            entry.find('.app-navigation-entry-menu').removeClass('open');
-
-            self._notes.removeActive().done(function () {
-                self.render();
-            }).fail(function () {
-                alert('Could not delete note, not found');
-            });
         });
 
         // show a note
@@ -639,44 +645,46 @@ View.prototype = {
     }
 };
 
-var timeoutID = null;
-function filter (query) {
-    window.clearTimeout(timeoutID);
-    timeoutID = window.setTimeout(function() {
-        if (query) {
-            query = query.toLowerCase();
-            $('.notes-grid').isotope({ filter: function() {
+function search (query) {
+    if (query) {
+        query = query.toLowerCase();
+        $('.notes-grid').isotope({
+            filter: function() {
                 var title = $(this).find(".note-title").html().toLowerCase();
                 if (title.search(query) >= 0)
                     return true;
+
                 var content = $(this).find(".note-content").html().toLowerCase();
                 if (content.search(query) >= 0)
                     return true;
-                return false;
-             }});
-         } else {
-             $('.notes-grid').isotope({ filter: '*'});
-         }
-    }, 500);
-};
 
-var SearchProxy = {
-    attach: function(search) {
-        search.setFilter('quicknotes', this.filterProxy);
-    },
-    filterProxy: function(query) {
-        filter(query);
-    },
-    setFilter: function(newFilter) {
-        filter = newFilter;
+                return false;
+            }
+        });
+    } else {
+        $('.notes-grid').isotope({ filter: '*'});
     }
 };
 
-SearchProxy.setFilter(filter);
-OC.Plugins.register('OCA.Search', SearchProxy);
+new OCA.Search(search, function() {
+    search('');
+});
 
+
+/*
+ * Create modules
+ */
 var notes = new Notes(OC.generateUrl('/apps/quicknotes/notes'));
 var view = new View(notes);
+
+/*
+ * Render loading view
+ */
+view.renderContent();
+
+/*
+ * Loading notes and render view.
+ */
 notes.loadAll().done(function () {
     view.render();
 }).fail(function () {

@@ -1,3 +1,38 @@
+{{#if notes}}
+<div class="notes-grid">
+	{{#each notes}}
+	<div class="note-grid-item">
+		<div class="quicknote noselect {{#if active}}note-active{{/if}} {{#if isshared}}shared{{/if}} {{#if sharedwith}}shareowner{{/if}}" style="background-color: {{color}}" data-id="{{ id }}" data-timestamp="{{ timestamp }}" >
+			{{#if isshared}}
+			<div>
+				<div class='icon-share shared-title' title="Shared by {{ userid }}"></div>
+				<div class='note-title'>
+					{{{ title }}}
+				</div>
+			</div>
+			<div id='content' class='note-content'>
+				{{{ content }}}
+			</div>
+			{{else}}
+			<div>
+				<div class="icon-delete hide-delete-icon icon-delete-note" title="Delete"></div>
+				<!--
+				{{#if sharedwith}}
+				<div class='icon-share shared-title-owner' title="Shared with {{ sharedwith }}"></div>
+				{{/if}}
+				-->
+				<div class='note-title'>
+					{{{ title }}}
+				</div>
+			</div>
+			<div class='note-content'>
+				{{{ content }}}
+			</div>
+			{{/if}}
+		</div>
+	</div>
+	{{/each}}
+</div>
 <div id="modal-note-div" class="hide-modal-note modal-note-background">
 	<div class="modal-content">
 		<div class="quicknote note-active" style="background-color: #F7EB96" data-id="-1">
@@ -25,11 +60,33 @@
 					<!--
 					<button id='share-button'><?php p($l->t('Share'));?></button>
 					-->
-					<button id='cancel-button'><?php p($l->t('Cancel')); ?></button>
-					<button id='save-button'><?php p($l->t('Save')); ?></button>
+					<button id='cancel-button'>
+						{{ cancelTxt }}
+					</button>
+					<button id='save-button'>
+						{{ saveTxt }}
+					</button>
+					</div>
+						<div style="clear: both;"></div>
+					</div>
 				</div>
-				<div style="clear: both;"></div>
 			</div>
 		</div>
 	</div>
 </div>
+{{else if loaded}}
+<div class="emptycontent">
+	<div class="icon-edit svg"></div>
+	<h2>
+		{{ emptyMsg }}
+	</h2>
+</div>
+{{else}}
+<div class="emptycontent">
+	<div class="icon-edit svg"></div>
+	<h2>
+		{{loadingMsg}}
+	</h2>
+	<img class="loadingimport" src="{{loadingIcon}}"/>
+</div>
+{{/if}}

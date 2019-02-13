@@ -1,5 +1,6 @@
 <?php
 vendor_script('quicknotes', 'handlebars');
+script('quicknotes', 'templates');
 vendor_script('quicknotes', 'isotope.pkgd');
 vendor_script('quicknotes', 'medium-editor');
 vendor_style('quicknotes', 'medium-editor');
