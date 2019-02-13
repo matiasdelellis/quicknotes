@@ -1,4 +1,13 @@
-## [0.1.4]: 2018-10-13
+## [0.1.6]: 2019-02-12
+### Added
+- Initial Nextcloud 15 release
+- Show an spinner while loading notes
+- Add a confirmation before deleting a note
+- Do happy to NC app:check
+- Fix title on new notes.
+- Don't collapse color menu when click on empty area
+
+## [0.1.5]: 2018-10-13
 ### Added
 - Initial Nextcloud 14 release.
 
