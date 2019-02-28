@@ -2,6 +2,7 @@
 <div class="notes-grid">
 	{{#each notes}}
 	<div class="note-grid-item">
+	    <div class="note-item-content">
 		<div class="quicknote noselect {{#if active}}note-active{{/if}} {{#if isshared}}shared{{/if}} {{#if sharedwith}}shareowner{{/if}}" style="background-color: {{color}}" data-id="{{ id }}" data-timestamp="{{ timestamp }}" >
 			{{#if isshared}}
 			<div>
@@ -30,6 +31,7 @@
 			</div>
 			{{/if}}
 		</div>
+	    </div>
 	</div>
 	{{/each}}
 </div>

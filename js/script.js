@@ -153,8 +153,10 @@ var View = function (notes) {
 View.prototype = {
 
     showAll: function () {
-        //self._notes.unsetActive();
-        $('.notes-grid').isotope({ filter: '*'});
+        self._notes.unsetActive();
+        $('.notes-grid').filter(function(){
+            return true;
+        });
     },
     editNote: function (id) {
         var modal = $('#modal-note-div');
@@ -307,7 +309,7 @@ View.prototype = {
         $('#div-content').html(html);
 
         // Init masonty grid to notes.
-        $('.notes-grid').isotope({
+        /*$('.notes-grid').isotope({
             itemSelector: '.note-grid-item',
             layoutMode: 'masonry',
             masonry: {
@@ -315,7 +317,13 @@ View.prototype = {
                 fitWidth: true,
                 gutter: 10,
             }
-        });
+        });*/
+        if (this._notes.isLoaded()) {
+            var grid = new Muuri('.notes-grid', {
+                items: '.note-grid-item',
+                dragEnabled: true,
+            });
+        }
 
         // Handle click event to open note.
         var modal = $('#modal-note-div');
@@ -332,15 +340,19 @@ View.prototype = {
         });
 
         // Open notes when clicking them.
-        $("#app-content").on("click", ".quicknote", function (event) {
+        $("#app-content").on("click", ".note-item-content", function (event) {
             event.stopPropagation();
+
+            if ($(this).closest(".muuri-item-dragging")) {
+                console.log("FORRO!");
+            }
 
             if($(this).hasClass('shared')) return; //shares don't allow editing
             var modalnote = $("#modal-note-editable .quicknote");
             var modalid = modalnote.data('id');
             if (modalid > 0) return;
 
-            var id = parseInt($(this).data('id'), 10);
+            var id = parseInt($(this).children().data('id'), 10);
 
             self.editNote(id);
         });
@@ -374,8 +386,8 @@ View.prototype = {
                     if (result) {
                         self._notes.removeActive().done(function () {
                             if (self._notes.length() > 0) {
-                                $(".notes-grid").isotope('remove', note.parent())
-                                                .isotope('layout');
+                                //$(".notes-grid").isotope('remove', note.parent())
+                                //                .isotope('layout');
                                 self.showAll();
                                 self.renderNavigation();
                             } else {
@@ -540,7 +552,9 @@ View.prototype = {
         // show all notes
         $('#all-notes').click(function () {
             self._notes.unsetActive();
-            $('.notes-grid').isotope({ filter: '*'});
+            $('.notes-grid').filter(function() {
+                return true;
+            });
 
             var oldColorTool = $('#app-navigation .circle-toolbar.icon-checkmark');
             $.each(oldColorTool, function(i, oct) {
@@ -550,15 +564,15 @@ View.prototype = {
         });
 
         $('#shared-with-you').click(function () {
-            $('.notes-grid').isotope({ filter: function() {
-                return $(this).children().hasClass('shared');
-            } });
+            //$('.notes-grid').isotope({ filter: function() {
+            //    return $(this).children().hasClass('shared');
+            //} });
         });
 
         $('#shared-by-you').click(function () {
-            $('.notes-grid').isotope({ filter: function() {
-                return $(this).children().hasClass('shareowner');
-            } });
+            //$('.notes-grid').isotope({ filter: function() {
+            //    return $(this).children().hasClass('shareowner');
+            //} });
         });
 
         // create a new note
@@ -580,10 +594,10 @@ View.prototype = {
                         timestamp: note.timestamp,
                     }));
 
-                    $(".notes-grid").prepend($notehtml)
-                                    .isotope('prepended', $notehtml)
-                                    .isotope({ filter: '*'})
-                                    .isotope('layout');
+                    //$(".notes-grid").prepend($notehtml)
+                    //                .isotope('prepended', $notehtml)
+                    //                .isotope({ filter: '*'})
+                    //                .isotope('layout');
                     self._notes.unsetActive();
                     self.renderNavigation();
                 } else {
@@ -611,10 +625,12 @@ View.prototype = {
         $('#app-navigation .note > a').click(function (event) {
             event.stopPropagation();
             var id = parseInt($(this).parent().data('id'), 10);
-            $('.notes-grid').isotope({ filter: function() {
-                var itemId = parseInt($(this).children().data('id'), 10);
+            $('.notes-grid').filter(function(item) {
+                var itemId = parseInt($(this).children().children().children().data('id'), 10);
+                 console.log(item);
+                 console.log($(this));
                 return id == itemId;
-            } });
+            });
         });
 
         // Handle colors.
@@ -628,10 +644,10 @@ View.prototype = {
 
             if (!$(this).hasClass("any-color")) {
                 var color = $(this).css("background-color");
-                $('.notes-grid').isotope({ filter: function() {
-                    var itemColor = $(this).children().css("background-color");
-                    return color == itemColor;
-                }});
+                //$('.notes-grid').isotope({ filter: function() {
+                //    var itemColor = $(this).children().css("background-color");
+                //    return color == itemColor;
+                //}});
             }
             else {
                 self.showAll();
@@ -648,7 +664,7 @@ View.prototype = {
 function search (query) {
     if (query) {
         query = query.toLowerCase();
-        $('.notes-grid').isotope({
+        /*$('.notes-grid').isotope({
             filter: function() {
                 var title = $(this).find(".note-title").html().toLowerCase();
                 if (title.search(query) >= 0)
@@ -660,9 +676,9 @@ function search (query) {
 
                 return false;
             }
-        });
+        });*/
     } else {
-        $('.notes-grid').isotope({ filter: '*'});
+        //$('.notes-grid').isotope({ filter: '*'});
     }
 };
 

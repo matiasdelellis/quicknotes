@@ -131,11 +131,21 @@
 /* Isotope Grid */
 
 .notes-grid {
-    margin: 0 auto;
-    padding: 15px;
+    /*margin: 0 auto;*/
+    margin: 10px;
 }
+
 .note-grid-item {
-  margin-bottom: 10px;
+  display: block;
+  position: absolute;
+  width: 250px;
+  margin: 8px;
+}
+
+.note-item-content {
+  position: relative;
+  width: 100%;
+  height: 100%;
 }
 
 /* Modal Note */
