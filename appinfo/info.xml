@@ -5,7 +5,7 @@
     <name>Quick notes</name>
     <summary>Quick notes with a basic rich text</summary>
     <description>Quick notes with a basic rich text</description>
-    <version>0.1.6</version>
+    <version>0.1.6.1</version>
     <licence>agpl</licence>
     <author>Matias De lellis</author>
     <namespace>QuickNotes</namespace>
@@ -17,6 +17,6 @@
     <screenshot small-thumbnail="https://user-images.githubusercontent.com/733715/38871311-dac5a80a-4226-11e8-961d-63b276380b6b.png">https://user-images.githubusercontent.com/733715/38871311-dac5a80a-4226-11e8-961d-63b276380b6b.png</screenshot>
     <screenshot>https://user-images.githubusercontent.com/733715/38871255-b07a7d5a-4226-11e8-8403-650cbea50be0.png</screenshot>
     <dependencies>
-        <nextcloud min-version="14" max-version="15"/>
+        <nextcloud min-version="14" max-version="16"/>
     </dependencies>
 </info>

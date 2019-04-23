@@ -1,3 +1,7 @@
+## [0.1.6]: 2019-04-23
+### Added
+- Initial Nextcloud 16 release
+
 ## [0.1.6]: 2019-02-12
 ### Added
 - Initial Nextcloud 15 release
