@@ -1,4 +1,8 @@
-## [0.1.6]: 2019-04-23
+## [0.1.7]: 2019-04-23
+### Added
+- Just bump versio to fix NC pattern
+
+## [0.1.6.1]: 2019-04-23
 ### Added
 - Initial Nextcloud 16 release
 
