@@ -614,7 +614,11 @@ View.prototype = {
             $('.notes-grid').isotope({ filter: function() {
                 var itemId = parseInt($(this).children().data('id'), 10);
                 return id == itemId;
-            } });
+            }});
+            var oldColorTool = $('#app-navigation .circle-toolbar.icon-checkmark');
+            $.each(oldColorTool, function(i, oct) {
+               $(oct).removeClass('icon-checkmark');
+            });
         });
 
         // Handle colors.
