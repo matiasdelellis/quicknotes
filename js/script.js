@@ -220,6 +220,7 @@ View.prototype = {
                 'autolist': autolist
             }
         });
+
         /*
         var shareSelect = $('.note-share-select');
         shareSelect.select2({
@@ -249,6 +250,7 @@ View.prototype = {
         */
 
         /* Positioning the modal to the original size */
+
         $(".modal-content").css({
             "position" : "absolute",
             "left"     : note.offset().left,
@@ -259,8 +261,12 @@ View.prototype = {
         });
 
         /* Animate to center */
+
         modal.removeClass("hide-modal-note");
         modal.addClass("show-modal-note");
+
+        note.css({"opacity": "0.1"});
+
         $(".modal-content").animate (
             {
                left: ($(window).width() / 2 - note.width()),
@@ -269,6 +275,7 @@ View.prototype = {
             },
             250,
             function () {
+                MediumEditor.selection.clearSelection(document, false);
                 modalcontent.focus();
             }
         );
@@ -323,6 +330,9 @@ View.prototype = {
         var modaltitle = $('#modal-note-div #title-editable');
         var modalcontent = $('#modal-note-dive #content-editable');
         var modalnote = $("#modal-note-div .quicknote");
+
+        var id = $("#modal-note-div .quicknote").data('id');
+
         //remove checkmark icons from temp selected color
         var modalcolortools = $("#modal-note-div .circle-toolbar");
         $.each(modalcolortools, function(i, colortool) {
@@ -343,6 +353,9 @@ View.prototype = {
         modalnote.data('id', -1);
         modaltitle.html("");
         modalcontent.html("");
+
+        var note = $('.notes-grid [data-id=' + id + ']').parent();
+        note.css({"opacity": ""});
     },
     renderContent: function () {
         // Remove all event handlers to prevent double events.
@@ -408,9 +421,11 @@ View.prototype = {
         // Handle hotkeys
         $(document).keyup(function(event) {
             if (event.keyCode == 27) {
+                event.stopPropagation();
                 self.cancelEdit();
             }
             else if (event.keyCode == 13 && event.altKey) {
+                event.stopPropagation();
                 self.saveNote();
             }
         });
