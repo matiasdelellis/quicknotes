@@ -48,7 +48,7 @@
 .note-active {
   z-index: 10;
   height: 100%;
-  /*width: 100%;*/
+  width: 100%;
 }
 
 .save-button #unshare-button {
@@ -107,8 +107,8 @@
 }
 
 .note-toolbar {
-   /*float:left;*/
-   padding-top: 6px;
+   float:left;
+   padding-top: 12px;
 }
 
 .circle-toolbar {

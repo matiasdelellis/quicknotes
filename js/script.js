@@ -156,6 +156,20 @@ View.prototype = {
         //self._notes.unsetActive();
         $('.notes-grid').isotope({ filter: '*'});
     },
+    colorToHex: function(color) {
+        if (color.substr(0, 1) === '#') {
+            return color.toUpperCase();;
+        }
+        var digits = /(.*?)rgb\((\d+), (\d+), (\d+)\)/.exec(color);
+
+        var red = parseInt(digits[2]);
+        var green = parseInt(digits[3]);
+        var blue = parseInt(digits[4]);
+
+        var rgb = blue | (green << 8) | (red << 16);
+
+        return digits[1] + '#' + rgb.toString(16).toUpperCase();
+    },
     editNote: function (id) {
         var modal = $('#modal-note-div');
         var modaltitle = $('#modal-note-div #title-editable');
@@ -244,11 +258,65 @@ View.prototype = {
             "height:"  : "auto"
         });
 
-        // TODO: Animate to center.
-
+        /* Animate to center */
         modal.removeClass("hide-modal-note");
         modal.addClass("show-modal-note");
-        modalcontent.focus();
+        $(".modal-content").animate (
+            {
+               left: ($(window).width() / 2 - note.width()),
+               width: note.width()*2,
+               top: 150,
+            },
+            250,
+            function () {
+                modalcontent.focus();
+            }
+        );
+
+    },
+    saveNote: function () {
+        var id = $("#modal-note-div .quicknote").data('id');
+
+        if (id === -1)
+            return;
+
+        var title = $('#modal-note-div #title-editable').html();
+        var content = $('#modal-note-div #content-editable').html();
+        var color = this.colorToHex($("#modal-note-div .quicknote").css("background-color"));
+
+        /*
+        var shareSelect = $('.note-share-select');
+        var shares = shareSelect.select2('data');
+        for (var i = 0; i < shares.length; i++) {
+            var user = shares[i].id;
+            var formData = {
+                userId : user,
+                noteId : id
+            };
+            $.post(OC.generateUrl('/apps/quicknotes/api/0.1/users/addshare'), formData, function(data){});
+        }
+        */
+
+        var self = this;
+        this._notes.updateId(id, title, content, color).done(function () {
+            var modal = $('#modal-note-div');
+            var modalnote = $("#modal-note-div .quicknote");
+            var modaltitle = $('#modal-note-div #title-editable');
+            var modalcontent = $('#modal-note-div #content-editable');
+
+            self._notes.unsetActive();
+
+            modal.removeClass("show-modal-note");
+            modal.addClass("hide-modal-note");
+
+            modalnote.data('id', -1);
+            modaltitle.html("");
+            modalcontent.html("");
+
+            self.render();
+        }).fail(function () {
+            alert('DOh!. Could not update note!.');
+        });
     },
     cancelEdit: function () {
         var modal = $('#modal-note-div');
@@ -275,20 +343,6 @@ View.prototype = {
         modalnote.data('id', -1);
         modaltitle.html("");
         modalcontent.html("");
-    },
-    colorToHex: function(color) {
-        if (color.substr(0, 1) === '#') {
-            return color.toUpperCase();;
-        }
-        var digits = /(.*?)rgb\((\d+), (\d+), (\d+)\)/.exec(color);
-
-        var red = parseInt(digits[2]);
-        var green = parseInt(digits[3]);
-        var blue = parseInt(digits[4]);
-
-        var rgb = blue | (green << 8) | (red << 16);
-
-        return digits[1] + '#' + rgb.toString(16).toUpperCase();
     },
     renderContent: function () {
         // Remove all event handlers to prevent double events.
@@ -351,10 +405,13 @@ View.prototype = {
             self.cancelEdit();
         });
 
-        // Cancel with escape key
+        // Handle hotkeys
         $(document).keyup(function(event) {
             if (event.keyCode == 27) {
                 self.cancelEdit();
+            }
+            else if (event.keyCode == 13 && event.altKey) {
+                self.saveNote();
             }
         });
 
@@ -490,39 +547,7 @@ View.prototype = {
         // Handle save note
         $('#modal-note-div #save-button').click(function (event) {
             event.stopPropagation();
-
-            var id = modalnote.data('id');
-            var title = modaltitle.html();
-            var content = modalcontent.html();
-            var color = self.colorToHex(modalnote.css("background-color"));
-
-            /*
-            var shareSelect = $('.note-share-select');
-            var shares = shareSelect.select2('data');
-            for (var i = 0; i < shares.length; i++) {
-                var user = shares[i].id;
-                var formData = {
-                    userId : user,
-                    noteId : id
-                };
-                $.post(OC.generateUrl('/apps/quicknotes/api/0.1/users/addshare'), formData, function(data){});
-            }
-            */
-
-            self._notes.updateId(id, title, content, color).done(function () {
-                self._notes.unsetActive();
-
-                modal.removeClass("show-modal-note");
-                modal.addClass("hide-modal-note");
-
-                modalnote.data('id', -1);
-                modaltitle.html("");
-                modalcontent.html("");
-
-                self.render();
-            }).fail(function () {
-                alert('DOh!. Could not update note!.');
-            });
+            self.saveNote();
         });
     },
     renderNavigation: function () {
