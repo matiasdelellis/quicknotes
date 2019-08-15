@@ -275,7 +275,6 @@ View.prototype = {
             },
             250,
             function () {
-                MediumEditor.selection.clearSelection(document, false);
                 modalcontent.focus();
             }
         );
@@ -287,8 +286,8 @@ View.prototype = {
         if (id === -1)
             return;
 
-        var title = $('#modal-note-div #title-editable').html();
-        var content = $('#modal-note-div #content-editable').html();
+        var title = $('#modal-note-div #title-editable').html().trim();
+        var content = $('#modal-note-div #content-editable').html().trim();
         var color = this.colorToHex($("#modal-note-div .quicknote").css("background-color"));
 
         /*
