@@ -1,3 +1,10 @@
+#Changelog
+
+## [0.1.8]: 2019-08-15
+### Added
+- Add Alt+Return as keyboard shortcut to save note. Issue #21
+- Show an animation when show the modal to editing notes.
+
 ## [0.1.7]: 2019-04-23
 ### Added
 - Just bump versio to fix NC pattern
