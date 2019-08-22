@@ -5,7 +5,7 @@
     <name>Quick notes</name>
     <summary>Quick notes with a basic rich text</summary>
     <description>Quick notes with a basic rich text</description>
-    <version>0.1.8</version>
+    <version>0.1.9</version>
     <licence>agpl</licence>
     <author>Matias De lellis</author>
     <namespace>QuickNotes</namespace>
@@ -14,9 +14,10 @@
     <website>https://github.com/matiasdelellis/quicknotes</website>
     <bugs>https://github.com/matiasdelellis/quicknotes/issues</bugs>
     <repository type="git">https://github.com/matiasdelellis/quicknotes.git</repository>
-    <screenshot small-thumbnail="https://user-images.githubusercontent.com/733715/38871311-dac5a80a-4226-11e8-961d-63b276380b6b.png">https://user-images.githubusercontent.com/733715/38871311-dac5a80a-4226-11e8-961d-63b276380b6b.png</screenshot>
-    <screenshot>https://user-images.githubusercontent.com/733715/38871255-b07a7d5a-4226-11e8-8403-650cbea50be0.png</screenshot>
+    <screenshot small-thumbnail="https://raw.githubusercontent.com/matiasdelellis/quicknotes/master/doc/quicknotes-grid-view-small.png">https://raw.githubusercontent.com/matiasdelellis/quicknotes/master/doc/quicknotes-grid-view.png</screenshot>
+    <screenshot>https://raw.githubusercontent.com/matiasdelellis/quicknotes/master/doc/quicknotes-note-edit.png</screenshot>
+    <screenshot>https://raw.githubusercontent.com/matiasdelellis/quicknotes/master/doc/quicknotes-rich-text.png</screenshot>
     <dependencies>
-        <nextcloud min-version="14" max-version="16"/>
+        <nextcloud min-version="14" max-version="17"/>
     </dependencies>
 </info>

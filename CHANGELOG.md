@@ -1,5 +1,10 @@
 #Changelog
 
+## [0.1.9]: 2019-08-21
+### Added
+- Indicate support for NC 17.
+- Update app screenshots.
+
 ## [0.1.8]: 2019-08-15
 ### Added
 - Add Alt+Return as keyboard shortcut to save note. Issue #21
