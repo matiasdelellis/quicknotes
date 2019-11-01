@@ -335,15 +335,10 @@ View.prototype = {
         var modal = $('#modal-note-div');
         var modaltitle = $('#modal-note-div #title-editable');
         var modalcontent = $('#modal-note-dive #content-editable');
+        var modalcolortools = $("#modal-note-div .circle-toolbar");
         var modalnote = $("#modal-note-div .quicknote");
 
         var id = $("#modal-note-div .quicknote").data('id');
-
-        //remove checkmark icons from temp selected color
-        var modalcolortools = $("#modal-note-div .circle-toolbar");
-        $.each(modalcolortools, function(i, colortool) {
-            $(colortool).removeClass('icon-checkmark');
-        });
 
         /*
         var shareSelect = $('.note-share-select');
@@ -353,15 +348,25 @@ View.prototype = {
 
         this._notes.unsetActive();
 
-        modal.removeClass("show-modal-note");
-        modal.addClass("hide-modal-note");
-
-        modalnote.data('id', -1);
-        modaltitle.html("");
-        modalcontent.html("");
-
         var note = $('.notes-grid [data-id=' + id + ']').parent();
-        note.css({"opacity": ""});
+        modal.fadeOut(
+            250,
+            function() {
+                modal.css({"display": ""});
+                modal.removeClass("show-modal-note");
+                modal.addClass("hide-modal-note");
+                note.css({"opacity": ""});
+
+                // Reset modal
+                modalnote.data('id', -1);
+                modaltitle.html("");
+                modalcontent.html("");
+
+                $.each(modalcolortools, function(i, colortool) {
+                    $(colortool).removeClass('icon-checkmark');
+                });
+            }
+        );
     },
     renderContent: function () {
         // Remove all event handlers to prevent double events.
