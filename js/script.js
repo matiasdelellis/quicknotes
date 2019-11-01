@@ -267,11 +267,18 @@ View.prototype = {
 
         note.css({"opacity": "0.1"});
 
+        var windowWidth = $(window).width();
+        var modalWidth = note.width()*2;
+        var modalTop = 150;
+        if (windowWidth < modalWidth) {
+            modalWidth = windowWidth;
+            modalTop = 50;
+        }
         $(".modal-content").animate (
             {
-               left: ($(window).width() / 2 - note.width()),
-               width: note.width()*2,
-               top: 150,
+               left: (windowWidth / 2 - modalWidth / 2),
+               width: modalWidth,
+               top: modalTop,
             },
             250,
             function () {
