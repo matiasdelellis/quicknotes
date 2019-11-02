@@ -33,47 +33,27 @@ build: deps
 deps:
 	mkdir -p vendor
 	rm -rf vendor/*
-
-	wget http://builds.handlebarsjs.com.s3.amazonaws.com/handlebars-v4.0.5.js
-	mv handlebars-v4.0.5.js vendor/handlebars.js
-
-	wget https://unpkg.com/isotope-layout@3/dist/isotope.pkgd.js
-	mv isotope.pkgd.js vendor/
-
-	wget https://github.com/yabwe/medium-editor/archive/master.zip -O medium-editor.zip
-	unzip medium-editor.zip
-	mv medium-editor-master/dist/js/medium-editor.js vendor/
-	mv medium-editor-master/dist/css/medium-editor.css vendor/
-	mv medium-editor-master/dist/css/themes/beagle.css vendor/
-	rm -R medium-editor-master
-	rm medium-editor.zip
-
-	wget https://github.com/varun-raj/medium-editor-autolist/raw/master/dist/autolist.js
-	mv autolist.js vendor/
+	npm i
+	cp node_modules/handlebars/dist/handlebars.js vendor/
+	cp node_modules/isotope-layout/dist/isotope.pkgd.js vendor/
+	cp node_modules/medium-editor/dist/js/medium-editor.js vendor/
+	cp node_modules/medium-editor/dist/css/medium-editor.css vendor/
+	cp node_modules/medium-editor/dist/css/themes/beagle.css vendor/
+	cp node_modules/medium-editor-autolist/dist/autolist.js vendor/
 
 depsmin:
 	mkdir -p vendor
 	rm -rf vendor/*
-
-	wget http://builds.handlebarsjs.com.s3.amazonaws.com/handlebars-v4.0.5.js
-	mv handlebars-v4.0.5.js vendor/handlebars.js
-
-	wget https://unpkg.com/isotope-layout@3/dist/isotope.pkgd.min.js
-	mv isotope.pkgd.min.js vendor/isotope.pkgd.js
-
-	wget https://github.com/yabwe/medium-editor/archive/master.zip -O medium-editor.zip
-	unzip medium-editor.zip
-	mv medium-editor-master/dist/js/medium-editor.min.js vendor/medium-editor.js
-	mv medium-editor-master/dist/css/medium-editor.min.css vendor/medium-editor.css
-	mv medium-editor-master/dist/css/themes/beagle.min.css vendor/beagle.css
-	rm -R medium-editor-master
-	rm medium-editor.zip
-
-	wget https://github.com/varun-raj/medium-editor-autolist/raw/master/dist/autolist.min.js
-	mv autolist.min.js vendor/autolist.js
+	npm i
+	cp node_modules/handlebars/dist/handlebars.min.js vendor/
+	cp node_modules/isotope-layout/dist/isotope.pkgd.min.js vendor/
+	cp node_modules/medium-editor/dist/js/medium-editor.min.js vendor/
+	cp node_modules/medium-editor/dist/css/medium-editor.min.css vendor/
+	cp node_modules/medium-editor/dist/css/themes/beagle.min.css vendor/
+	cp node_modules/medium-editor-autolist/dist/autolist.min.js vendor/
 
 js-templates:
-	handlebars js/templates -f js/templates.js
+	node_modules/handlebars/bin/handlebars js/templates -f js/templates.js
 
 clean:
 	rm -rf $(build_dir)

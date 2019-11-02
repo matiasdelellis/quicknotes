@@ -1,0 +1,29 @@
+{
+  "name": "quicknotes",
+  "version": "0.1.9",
+  "description": "Quick notes with a basic rich text",
+  "main": "script.js",
+  "directories": {
+    "doc": "doc",
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/matiasdelellis/quicknotes.git"
+  },
+  "author": "Matias De lellis <mati86dl@gmail.com>",
+  "license": "AGPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/matiasdelellis/quicknotes/issues"
+  },
+  "homepage": "https://github.com/matiasdelellis/quicknotes#readme",
+  "dependencies": {
+    "handlebars": "^4.5.1",
+    "isotope-layout": "^3.0.6",
+    "medium-editor": "^5.23.3",
+    "medium-editor-autolist": "^1.0.1"
+  }
+}
