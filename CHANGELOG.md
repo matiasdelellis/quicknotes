@@ -1,5 +1,13 @@
 #Changelog
 
+## [0.1.10]: 2019-11-02
+### Added
+- Add Italian translation. Thanks to @albanobattistella
+- Use fullscreen modal on small screen. Issue #23
+- Add an small fade animation when hide the modal note.
+- Install libs using npm to ensure versions of handlebars.
+- Use transifex to translations. Please, help to it.
+
 ## [0.1.9]: 2019-08-21
 ### Added
 - Indicate support for NC 17.
