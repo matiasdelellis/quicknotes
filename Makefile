@@ -29,6 +29,31 @@ cert_dir=$(HOME)/.nextcloud/certificates
 all: build
 build: deps
 
+# L10N Rules
+
+l10n-update-pot:
+	php translationtool.phar create-pot-files
+
+l10n-transifex-pull:
+	tx pull -s -a
+
+l10n-transifex-push:
+	tx push -s -t
+
+l10n-transifex-apply:
+	php translationtool.phar convert-po-files
+
+l10n-clean:
+	rm -rf translationfiles
+	rm -f translationtool.phar
+
+l10n-deps:
+	@echo "Checking transifex client."
+	tx --version
+	@echo "Downloading translationtool.phar"
+	wget https://github.com/nextcloud/docker-ci/raw/master/translations/translationtool/translationtool.phar -O translationtool.phar
+
+
 # general
 deps:
 	mkdir -p vendor

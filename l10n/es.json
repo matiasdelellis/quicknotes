@@ -1,14 +1,15 @@
 { "translations": {
-    "Quick notes" : "Notas rapidas",
-    "Nothing here. Take your quick notes." : "Nada aquí. Toma tus notas rapidas.",
+    "Quick notes" : "Notas rápidas",
+    "Cancel" : "Cancelar",
+    "Save" : "Guardar",
+    "Looking for your notes" : "Buscando tus notas",
+    "Nothing here. Take your first quick notes" : "Nada aquí. Toma tus primeras notas rápidas",
+    "Are you sure you want to delete the note?" : "¿Seguro que quieres eliminar la nota?",
+    "Delete note" : "Eliminar nota",
     "New note" : "Nueva nota",
     "All notes" : "Todas las notas",
-    "Shared with you" : "Compartido contigo",
-    "Shared with others" : "Compartido con otros",
     "Colors" : "Colores",
     "Notes" : "Notas",
-    "Share" : "Compartir",
-    "Cancel" : "Cancelar",
-    "Save" : "Guardar"
-}
+    "Quick notes with a basic rich text" : "Notas rápidas con un texto enriquecido básico"
+},"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

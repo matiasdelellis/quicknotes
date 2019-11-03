@@ -1,0 +1,10 @@
+[main]
+host = https://www.transifex.com
+
+[quicknotes.quicknotes-pot]
+file_filter = translationfiles/<lang>/quicknotes.po
+minimum_perc = 0
+source_file = translationfiles/templates/quicknotes.pot
+source_lang = en
+type = PO
+
