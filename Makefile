@@ -70,12 +70,12 @@ depsmin:
 	mkdir -p vendor
 	rm -rf vendor/*
 	npm i
-	cp node_modules/handlebars/dist/handlebars.min.js vendor/
-	cp node_modules/isotope-layout/dist/isotope.pkgd.min.js vendor/
-	cp node_modules/medium-editor/dist/js/medium-editor.min.js vendor/
-	cp node_modules/medium-editor/dist/css/medium-editor.min.css vendor/
-	cp node_modules/medium-editor/dist/css/themes/beagle.min.css vendor/
-	cp node_modules/medium-editor-autolist/dist/autolist.min.js vendor/
+	cp node_modules/handlebars/dist/handlebars.min.js vendor/handlebars.js
+	cp node_modules/isotope-layout/dist/isotope.pkgd.min.js vendor/isotope.pkgd.js
+	cp node_modules/medium-editor/dist/js/medium-editor.min.js vendor/medium-editor.js
+	cp node_modules/medium-editor/dist/css/medium-editor.min.css vendor/medium-editor.css
+	cp node_modules/medium-editor/dist/css/themes/beagle.min.css vendor/beagle.css
+	cp node_modules/medium-editor-autolist/dist/autolist.min.js vendor/autolist.js
 
 js-templates:
 	node_modules/handlebars/bin/handlebars js/templates -f js/templates.js
@@ -103,6 +103,8 @@ appstore: distclean depsmin
 	    --exclude=composer.json \
 	    --exclude=composer.lock \
 	    --exclude=composer.phar \
+	    --exclude=package.json \
+	    --exclude=package-lock.json \
 	    --exclude=.tx \
 	    --exclude=l10n/no-php \
 	    --exclude=Makefile \
@@ -111,12 +113,15 @@ appstore: distclean depsmin
 	    --exclude=phpunit*xml \
 	    --exclude=tests \
 	    --exclude=vendor/bin \
+	    --exclude=node_modules \
 	    --exclude=js/node_modules \
 	    --exclude=js/tests \
 	    --exclude=js/karma.conf.js \
 	    --exclude=js/gulpfile.js \
 	    --exclude=js/bower.json \
 	    --exclude=js/package.json \
+	    --exclude=translationfiles \
+	    --exclude=translationtool.phar \
 	$(project_dir) $(sign_dir)
 	@echo "Signing…"
 	php ../../occ integrity:sign-app \
