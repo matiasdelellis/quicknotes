@@ -17,25 +17,41 @@ use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\Http\JSONResponse;
 use OCP\AppFramework\Controller;
 
-use OCA\QuickNotes\Db\Note;
 use OCA\QuickNotes\Db\Color;
-use OCA\QuickNotes\Db\NoteShare;
-use OCA\QuickNotes\Db\NoteMapper;
 use OCA\QuickNotes\Db\ColorMapper;
+use OCA\QuickNotes\Db\Note;
+use OCA\QuickNotes\Db\NoteMapper;
+use OCA\QuickNotes\Db\NoteTag;
+use OCA\QuickNotes\Db\NoteTagMapper;
+use OCA\QuickNotes\Db\NoteShare;
 use OCA\QuickNotes\Db\NoteShareMapper;
+use OCA\QuickNotes\Db\Tag;
+use OCA\QuickNotes\Db\TagMapper;
 
 class NoteController extends Controller {
 
 	private $notemapper;
+	private $notetagmapper;
 	private $colormapper;
 	private $notesharemapper;
+	private $tagmapper;
 	private $userId;
 
-	public function __construct($AppName, IRequest $request, NoteMapper $notemapper, NoteShareMapper $notesharemapper, ColorMapper $colormapper, $UserId) {
+	public function __construct($AppName,
+	                            IRequest        $request,
+	                            NoteMapper      $notemapper,
+	                            NoteTagMapper   $notetagmapper,
+	                            NoteShareMapper $notesharemapper,
+	                            ColorMapper     $colormapper,
+	                            TagMapper       $tagmapper,
+	                            $UserId)
+	{
 		parent::__construct($AppName, $request);
 		$this->notemapper = $notemapper;
+		$this->notetagmapper = $notetagmapper;
 		$this->colormapper = $colormapper;
 		$this->notesharemapper = $notesharemapper;
+		$this->tagmapper = $tagmapper;
 		$this->userId = $UserId;
 	}
 
@@ -56,6 +72,7 @@ class NoteController extends Controller {
 			} else {
 				$note->setSharedWith(null);
 			}
+			$note->setTags($this->tagmapper->getTagsForNote($note->getId()));
 		}
 		$shareEntries = $this->notesharemapper->findForUser($this->userId);
 		$shares = array();

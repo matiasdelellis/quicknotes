@@ -2,6 +2,7 @@
 return [
     'resources' => [
         'note' => ['url' => '/notes'],
+        'tag' => ['url' => '/tags'],
         'note_api' => ['url' => '/api/0.1/notes']
     ],
     'routes' => [

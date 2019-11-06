@@ -145,9 +145,38 @@ Notes.prototype = {
     }
 };
 
+// this notes object holds all our tags
+var Tags = function (baseUrl) {
+    this._baseUrl = baseUrl;
+    this._tags = [];
+    this._loaded = false;
+};
+
+Tags.prototype = {
+    loadAll: function () {
+        var deferred = $.Deferred();
+        var self = this;
+        $.get(this._baseUrl).done(function (tags) {
+            self._tags = tags.reverse();
+            self._loaded = true;
+            deferred.resolve();
+        }).fail(function () {
+            deferred.reject();
+        });
+        return deferred.promise();
+    },
+    isLoaded: function () {
+        return this._loaded;
+    },
+    getAll: function () {
+        return this._tags;
+    }
+};
+
 // this will be the view that is used to update the html
-var View = function (notes) {
+var View = function (notes, tags) {
     this._notes = notes;
+    this._tags = tags;
 };
 
 View.prototype = {
@@ -580,10 +609,12 @@ View.prototype = {
         var html = Handlebars.templates['navigation']({
             colors: this._notes.getColors(),
             notes: this._notes.getAll(),
+            tags: this._tags.getAll(),
             newNoteTxt: t('quicknotes', 'New note'),
             allNotesTxt: t('quicknotes', 'All notes'),
             colorsTxt: t('quicknotes', 'Colors'),
             notesTxt: t('quicknotes', 'Notes'),
+            tagsTxt: t('quicknotes', 'Tags'),
         });
 
         $('#app-navigation ul').html(html);
@@ -730,18 +761,25 @@ new OCA.Search(search, function() {
  * Create modules
  */
 var notes = new Notes(OC.generateUrl('/apps/quicknotes/notes'));
-var view = new View(notes);
+var tags = new Tags(OC.generateUrl('/apps/quicknotes/tags'));
+
+var view = new View(notes, tags);
 
 /*
- * Render loading view
+ * Render initial loading view
  */
 view.renderContent();
 
 /*
- * Loading notes and render view.
+ * Loading notes and render final view.
  */
 notes.loadAll().done(function () {
-    view.render();
+    tags.loadAll().done(function () {
+        view.render();
+    }).fail(function () {
+        alert('Could not load tags');
+    });
+    // FIXME: So ugly...
 }).fail(function () {
     alert('Could not load notes');
 });

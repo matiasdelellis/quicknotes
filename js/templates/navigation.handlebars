@@ -31,3 +31,14 @@
 		{{/each}}
 	</ul>
 </li>
+<li id="notes-folder" class="collapsible open">
+	<button class="collapse"></button>
+	<a href="#" class="icon-folder svg">{{tagsTxt}}</a>
+	<ul>
+		{{#each tags}}
+			<li class="note with-menu {{#if active}}active{{/if}}" data-id="{{ id }}">
+				<a href="#">{{{ name }}}</a>
+			</li>
+		{{/each}}
+	</ul>
+</li>

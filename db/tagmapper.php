@@ -20,4 +20,12 @@ class TagMapper extends Mapper {
 		return $this->findEntities($sql, [$userId]);
 	}
 
+	public function getTagsForNote ($noteId) {
+		$sql = 'SELECT T.id, T.name FROM *PREFIX*quicknotes_tags T ';
+		$sql.= 'INNER JOIN *PREFIX*quicknotes_note_tags NT ';
+		$sql.= 'ON T.id = NT.tag_id ';
+		$sql.= 'WHERE NT.note_id = ?';
+		return $this->findEntities($sql, [$noteId]);
+	}
+
 }

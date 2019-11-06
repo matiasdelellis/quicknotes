@@ -28,6 +28,13 @@
 			<div class='note-content'>
 				{{{ content }}}
 			</div>
+			<div class='note-tags'>
+				{{#each tags}}
+					<div class='slim-tag' data-id="{{ id }}">
+						{{{ name }}}
+					</div>
+				{{/each}}
+			</div>
 			{{/if}}
 		</div>
 	</div>
