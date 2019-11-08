@@ -470,6 +470,24 @@ View.prototype = {
             }
         });
 
+        $('#app-content').on('click', '.slim-tag', function (event) {
+            event.stopPropagation();
+            var tagId = parseInt($(this).data('id'), 10);
+            $('.notes-grid').isotope({ filter: function() {
+                var match = false;
+                $(this).find(".slim-tag").siblings().addBack().each(function() {
+                    var id = parseInt($(this).data('id'), 10);
+                    if (tagId === id)
+                        match = true;
+                });
+                return match;
+            }});
+            var oldColorTool = $('#app-navigation .circle-toolbar.icon-checkmark');
+            $.each(oldColorTool, function(i, oct) {
+                $(oct).removeClass('icon-checkmark');
+            });
+        });
+
         // Remove note icon
         var self = this;
         $('#app-content').on("click", ".icon-delete-note", function (event) {
