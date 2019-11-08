@@ -677,6 +677,8 @@ View.prototype = {
             });
         });
 
+        /* Colors Navigation */
+
         $('#colors-folder').click(function () {
             $(this).toggleClass("open");
         });
@@ -685,30 +687,11 @@ View.prototype = {
             event.stopPropagation();
         });
 
-        $('#notes-folder').click(function () {
-            $(this).toggleClass("open");
-        });
-
-        // show a note
-        $('#app-navigation .note > a').click(function (event) {
-            event.stopPropagation();
-            var id = parseInt($(this).parent().data('id'), 10);
-            $('.notes-grid').isotope({ filter: function() {
-                var itemId = parseInt($(this).children().data('id'), 10);
-                return id == itemId;
-            }});
-            var oldColorTool = $('#app-navigation .circle-toolbar.icon-checkmark');
-            $.each(oldColorTool, function(i, oct) {
-               $(oct).removeClass('icon-checkmark');
-            });
-        });
-
-        // Handle colors.
         $('#app-navigation .circle-toolbar').click(function (event) {
             event.stopPropagation();
             var oldColorTool = $('#app-navigation .circle-toolbar.icon-checkmark');
             $.each(oldColorTool, function(i, oct) {
-                 $(oct).removeClass('icon-checkmark');
+                $(oct).removeClass('icon-checkmark');
             });
             $(this).addClass('icon-checkmark');
 
@@ -724,6 +707,39 @@ View.prototype = {
             }
         });
 
+        /* Notes Navigation */
+
+        $('#notes-folder').click(function () {
+            $(this).toggleClass("open");
+        });
+
+        $('#app-navigation .nav-note > a').click(function (event) {
+            event.stopPropagation();
+            var id = parseInt($(this).parent().data('id'), 10);
+            $('.notes-grid').isotope({ filter: function() {
+                var itemId = parseInt($(this).children().data('id'), 10);
+                return id == itemId;
+            }});
+            var oldColorTool = $('#app-navigation .circle-toolbar.icon-checkmark');
+            $.each(oldColorTool, function(i, oct) {
+                $(oct).removeClass('icon-checkmark');
+            });
+        });
+
+        /* Tags Navigation */
+
+        $('#tags-folder').click(function () {
+            $(this).toggleClass("open");
+        });
+
+        $('#app-navigation .nav-tag > a').click(function (event) {
+            event.stopPropagation();
+            $('.notes-grid').isotope({ filter: '*'});
+            var oldColorTool = $('#app-navigation .circle-toolbar.icon-checkmark');
+            $.each(oldColorTool, function(i, oct) {
+                $(oct).removeClass('icon-checkmark');
+            });
+        });
     },
     render: function () {
         this.renderNavigation();
