@@ -404,6 +404,7 @@ View.prototype = {
         var html = Handlebars.templates['notes']({
             loaded: this._notes.isLoaded(),
             notes: this._notes.getAll(),
+            tagTxt: t('quicknotes', 'Tags'),
             cancelTxt: t('quicknotes', 'Cancel'),
             saveTxt: t('quicknotes', 'Save'),
             loadingMsg: t('quicknotes', 'Looking for your notes'),
@@ -609,6 +610,24 @@ View.prototype = {
                     modalNote.outerHeight(startHeight + shareOptions.outerHeight(true));
                 });
            });
+        });
+
+        // handle tags button.
+        $('#modal-note-div #tag-button').click(function (event) {
+            event.stopPropagation();
+            QnDialogs.tags(
+                function(result, value) {
+                    if (result === true && value) {
+                        OC.Notification.showTemporary("TEST TAGS DIALOG OK");
+                    }
+                    else {
+                        OC.Notification.showTemporary("TEST TAGS DIALOG CANCEL");
+                    }
+                },
+                true,
+                t('quicknotes', 'Tags'),
+                false
+            );
         });
 
         // handle cancel editing notes.

@@ -6,6 +6,7 @@ vendor_script('quicknotes', 'medium-editor');
 vendor_style('quicknotes', 'medium-editor');
 vendor_style('quicknotes', 'beagle');
 vendor_script('quicknotes', 'autolist');
+script('quicknotes', 'qn-dialogs');
 script('quicknotes', 'script');
 style('quicknotes', 'style');
 ?>

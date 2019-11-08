@@ -226,6 +226,28 @@ div[contenteditable="true"] {
     border-radius: 12px;
 }
 
+/* Restore defaults select2 rules */
+
+.select2-container-multi
+.select2-choices
+.select2-search-choice {
+    padding: 3px 5px 3px 18px !important;
+    margin: 3px 0 3px 5px !important;
+    line-height: 13px !important;
+}
+
+.select2-search-choice-close {
+    display: block !important;
+}
+
+.select2-container {
+    min-width: 200px;
+}
+
+#select2-drop {
+    z-index: 10000;
+}
+
 /* Modal Content */
 
 .modal-content {
