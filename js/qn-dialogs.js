@@ -24,7 +24,7 @@
  */
 const QnDialogs = {
 
-	tags: function (callback) {
+	tags: function (currentTags, selectedTags, callback) {
 		return $.when(this._getMessageTemplate()).then(function ($tmpl) {
 			var dialogName = 'qn-dialog-content';
 			var dialogId = '#' + dialogName;
@@ -45,10 +45,14 @@ const QnDialogs = {
 
 			input.select2({
 				placeholder: t('quicknotes', 'Enter tag name'),
-				tokenSeparators: [',', ' '],
-				tags: true,
-				allowClear: true
+				tokenSeparators: ',',
+				tags: currentTags.map(function (value) { return value.name; }),
+				allowClear: true,
+				toggleSelect: true
 			});
+
+			input.val(selectedTags.map(function (value) { return value.name; }));
+			input.trigger("change");
 
 			// wrap callback in _.once():
 			// only call callback once and not twice (button handler and close
@@ -62,7 +66,7 @@ const QnDialogs = {
 				click: function () {
 					input.select2('close');
 					if (callback !== undefined) {
-						callback(false, input.val());
+						callback(false, input.select2("val"));
 					}
 					$(dialogId).ocdialog('close');
 				}
@@ -71,7 +75,7 @@ const QnDialogs = {
 				click: function () {
 					input.select2('close');
 					if (callback !== undefined) {
-						callback(true, input.val());
+						callback(true, input.select2("val"));
 					}
 					$(dialogId).ocdialog('close');
 				},

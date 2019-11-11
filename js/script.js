@@ -615,9 +615,13 @@ View.prototype = {
         // handle tags button.
         $('#modal-note-div #tag-button').click(function (event) {
             event.stopPropagation();
+            var id = $("#modal-note-div .quicknote").data('id');
+            self._notes.load(id);
             QnDialogs.tags(
+                self._tags.getAll(),
+                self._notes.getActive().tags,
                 function(result, value) {
-                    if (result === true && value) {
+                    if (result === true) {
                         OC.Notification.showTemporary("TEST TAGS DIALOG OK");
                     }
                     else {
