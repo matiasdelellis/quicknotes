@@ -314,7 +314,7 @@ View.prototype = {
         var color = this.colorToHex($("#modal-note-div .quicknote").css("background-color"));
         var tags = $("#modal-note-div .slim-tag").toArray().map(function (value) {
             return {
-                id: value.getAttribute('data-id'),
+                id: value.getAttribute('tag-id'),
                 name: value.textContent.trim()
             };
         });
@@ -468,11 +468,11 @@ View.prototype = {
 
         $('#app-content').on('click', '.slim-tag', function (event) {
             event.stopPropagation();
-            var tagId = parseInt($(this).data('id'), 10);
+            var tagId = parseInt($(this).attr('tag-id'), 10);
             $('.notes-grid').isotope({ filter: function() {
                 var match = false;
                 $(this).find(".slim-tag").siblings().addBack().each(function() {
-                    var id = parseInt($(this).data('id'), 10);
+                    var id = parseInt($(this).attr('tag-id'), 10);
                     if (tagId === id)
                         match = true;
                 });
@@ -621,7 +621,7 @@ View.prototype = {
                         modalTags.html('');
                         newTags.forEach(function (item, index) {
                             var noteId = parseInt(item.id) || -1;
-                            var tag = $('<div class="slim-tag" data-id="' + noteId + '">' + item.text + '</div>');
+                            var tag = $('<div class="slim-tag" tag-id="' + noteId + '">' + item.text + '</div>');
                             modalTags.append(tag);
                         });
                     }
@@ -773,11 +773,11 @@ View.prototype = {
 
         $('#app-navigation .nav-tag > a').click(function (event) {
             event.stopPropagation();
-            var tagId = parseInt($(this).parent().data('id'), 10);
+            var tagId = parseInt($(this).parent().attr('tag-id'), 10);
             $('.notes-grid').isotope({ filter: function() {
                 var match = false;
                 $(this).find(".slim-tag").siblings().addBack().each(function() {
-                    var id = parseInt($(this).data('id'), 10);
+                    var id = parseInt($(this).attr('tag-id'), 10);
                     if (tagId === id)
                         match = true;
                 });
