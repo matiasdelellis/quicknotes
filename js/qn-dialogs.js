@@ -46,12 +46,19 @@ const QnDialogs = {
 			input.select2({
 				placeholder: t('quicknotes', 'Enter tag name'),
 				tokenSeparators: ',',
-				tags: currentTags.map(function (value) { return value.name; }),
+				multiple: false,
 				allowClear: true,
-				toggleSelect: true
+				toggleSelect: true,
+				tags : function () {
+					var data = [];
+					currentTags.forEach(function (item, index) {
+						data.push({id: item.id, text: item.name});
+					});
+					return data;
+				}
 			});
 
-			input.val(selectedTags.map(function (value) { return value.name; }));
+			input.val(selectedTags.map(function (value) { return value.id; }));
 			input.trigger("change");
 
 			// wrap callback in _.once():
@@ -66,7 +73,7 @@ const QnDialogs = {
 				click: function () {
 					input.select2('close');
 					if (callback !== undefined) {
-						callback(false, input.select2("val"));
+						callback(false, input.select2("data"));
 					}
 					$(dialogId).ocdialog('close');
 				}
@@ -75,7 +82,7 @@ const QnDialogs = {
 				click: function () {
 					input.select2('close');
 					if (callback !== undefined) {
-						callback(true, input.select2("val"));
+						callback(true, input.select2("data"));
 					}
 					$(dialogId).ocdialog('close');
 				},

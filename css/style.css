@@ -240,6 +240,10 @@ div[contenteditable="true"] {
     display: block !important;
 }
 
+.select2-results .select2-selected {
+    display: none !important;
+}
+
 .select2-container {
     min-width: 200px;
 }

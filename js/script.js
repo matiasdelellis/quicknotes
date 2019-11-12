@@ -330,7 +330,10 @@ View.prototype = {
         var content = $('#modal-note-div #content-editable').html().trim();
         var color = this.colorToHex($("#modal-note-div .quicknote").css("background-color"));
         var tags = $("#modal-note-div .slim-tag").toArray().map(function (value) {
-            return value.textContent.trim();
+            return {
+                id: value.getAttribute('data-id'),
+                name: value.textContent.trim()
+            };
         });
 
         /*
@@ -352,6 +355,7 @@ View.prototype = {
             var modalnote = $("#modal-note-div .quicknote");
             var modaltitle = $('#modal-note-div #title-editable');
             var modalcontent = $('#modal-note-div #content-editable');
+            var modaltags = $('#modal-note-div .note-tags');
 
             self._notes.unsetActive();
 
@@ -361,6 +365,7 @@ View.prototype = {
             modalnote.data('id', -1);
             modaltitle.html("");
             modalcontent.html("");
+            modaltags.html("");
 
             self.render();
         }).fail(function () {
@@ -632,7 +637,8 @@ View.prototype = {
                         var modalTags = $('#modal-note-div .note-tags');
                         modalTags.html('');
                         newTags.forEach(function (item, index) {
-                            var tag = $('<div class="slim-tag" data-id="-1">' + item + '</div>');
+                            var noteId = parseInt(item.id) || -1;
+                            var tag = $('<div class="slim-tag" data-id="' + noteId + '">' + item.text + '</div>');
                             modalTags.append(tag);
                         });
                     }

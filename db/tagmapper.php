@@ -43,4 +43,9 @@ class TagMapper extends Mapper {
 		return true;
 	}
 
+	public function dropOld () {
+		$sql = 'DELETE FROM *PREFIX*quicknotes_tags WHERE ';
+		$sql.= 'id NOT IN (SELECT tag_id FROM *PREFIX*quicknotes_note_tags)';
+		return $this->execute($sql, []);
+	}
 }

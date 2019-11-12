@@ -145,6 +145,7 @@ class NoteController extends Controller {
 	 * @param int $id
 	 * @param string $title
 	 * @param string $content
+	 * @param array $tags
 	 * @param string $color
 	 */
 	public function update($id, $title, $content, $tags, $color = "#F7EB96") {
@@ -166,24 +167,31 @@ class NoteController extends Controller {
 		}
 
 		// Delete old tag relations
-		$noteTags = $this->tagmapper->getTagsForNote($this->userId, $id);
-		foreach ($noteTags as $tag) {
-			if (!in_array($tag->getName(), $tags)) {
-				$hnotetag = $this->notetagmapper->findNoteTag($this->userId, $id, $tag->getId());
+		$dbTags = $this->tagmapper->getTagsForNote($this->userId, $id);
+		foreach ($dbTags as $dbTag) {
+			$delete = true;
+			foreach ($tags as $tag) {
+				if ($dbTag->getId() == $tag['id']) {
+					$delete = false;
+					break;
+				}
+			}
+			if ($delete) {
+				$hnotetag = $this->notetagmapper->findNoteTag($this->userId, $id, $dbTag->getId());
 				$this->notetagmapper->delete($hnotetag);
 			}
 		}
 
 		// Add new tags and update relations.
-		foreach ($tags as $name) {
-			if (!$this->tagmapper->tagExists($this->userId, $name)) {
+		foreach ($tags as $tag) {
+			if (!$this->tagmapper->tagExists($this->userId, $tag['name'])) {
 				$htag = new Tag();
-				$htag->setName($name);
+				$htag->setName($tag['name']);
 				$htag->setUserId($this->userId);
 				$htag = $this->tagmapper->insert($htag);
 			}
 			else {
-				$htag = $this->tagmapper->getTag($this->userId, $name);
+				$htag = $this->tagmapper->getTag($this->userId, $tag['name']);
 			}
 
 			if (!$this->notetagmapper->noteTagExists($this->userId, $id, $htag->getId())) {
@@ -194,6 +202,9 @@ class NoteController extends Controller {
 				$this->notetagmapper->insert($noteTag);
 			}
 		}
+
+		// Purge orphan tags.
+		$this->tagmapper->dropOld();
 
 		// Set new info on Note
 		$note->setTitle($title);
