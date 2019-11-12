@@ -203,12 +203,14 @@ View.prototype = {
         var modal = $('#modal-note-div');
         var modaltitle = $('#modal-note-div #title-editable');
         var modalcontent = $('#modal-note-div #content-editable');
+        var modaltags = $('#modal-note-div .note-tags');
         var modalnote = $("#modal-note-div .quicknote");
 
         var note = $('.notes-grid [data-id=' + id + ']').parent();
 
         var title = note.find(".note-title").html();
         var content = note.find(".note-content").html();
+        var tags = note.find(".note-tags").html();
         var color = note.children().css("background-color");
         var colors = modal[0].getElementsByClassName("circle-toolbar");
         $.each(colors, function(i, c) {
@@ -225,6 +227,7 @@ View.prototype = {
         modalnote.data('id', id);
         modaltitle.html(title);
         modalcontent.html(content);
+        modaltags.html(tags);
         modalnote.css("background-color", color);
 
         var autolist = new AutoList();
@@ -620,12 +623,14 @@ View.prototype = {
             QnDialogs.tags(
                 self._tags.getAll(),
                 self._notes.getActive().tags,
-                function(result, value) {
+                function(result, newTags) {
                     if (result === true) {
-                        OC.Notification.showTemporary("TEST TAGS DIALOG OK");
-                    }
-                    else {
-                        OC.Notification.showTemporary("TEST TAGS DIALOG CANCEL");
+                        var modalTags = $('#modal-note-div .note-tags');
+                        modalTags.html('');
+                        newTags.forEach(function (item, index) {
+                            var tag = $('<div class="slim-tag" data-id="-1">' + item + '</div>');
+                            modalTags.append(tag);
+                        });
                     }
                 },
                 true,
