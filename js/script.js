@@ -85,6 +85,7 @@ Notes.prototype = {
             contentType: 'application/json',
             data: JSON.stringify(note)
         }).done(function (note) {
+            note.tags = [];
             self._notes.unshift(note);
             self._activeNote = note;
             self.load(note.id);
