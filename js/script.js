@@ -111,6 +111,16 @@ Notes.prototype = {
         });
         return Ccolors;
     },
+    getTags: function () {
+        var tags = [];
+        $.each(this._notes, function(index, note) {
+            $.each(note.tags, function(index, tag) {
+                if (tags.findIndex(item => item.id == tag.id) === -1)
+                    tags.push(tag);
+            });
+        });
+        return tags;
+    },
     loadAll: function () {
         var deferred = $.Deferred();
         var self = this;
@@ -147,38 +157,10 @@ Notes.prototype = {
     }
 };
 
-// this notes object holds all our tags
-var Tags = function (baseUrl) {
-    this._baseUrl = baseUrl;
-    this._tags = [];
-    this._loaded = false;
-};
-
-Tags.prototype = {
-    loadAll: function () {
-        var deferred = $.Deferred();
-        var self = this;
-        $.get(this._baseUrl).done(function (tags) {
-            self._tags = tags.reverse();
-            self._loaded = true;
-            deferred.resolve();
-        }).fail(function () {
-            deferred.reject();
-        });
-        return deferred.promise();
-    },
-    isLoaded: function () {
-        return this._loaded;
-    },
-    getAll: function () {
-        return this._tags;
-    }
-};
 
 // this will be the view that is used to update the html
-var View = function (notes, tags) {
+var View = function (notes) {
     this._notes = notes;
-    this._tags = tags;
 };
 
 View.prototype = {
@@ -631,7 +613,7 @@ View.prototype = {
             var id = $("#modal-note-div .quicknote").data('id');
             self._notes.load(id);
             QnDialogs.tags(
-                self._tags.getAll(),
+                self._notes.getTags(),
                 self._notes.getActive().tags,
                 function(result, newTags) {
                     if (result === true) {
@@ -666,7 +648,7 @@ View.prototype = {
         var html = Handlebars.templates['navigation']({
             colors: this._notes.getColors(),
             notes: this._notes.getAll(),
-            tags: this._tags.getAll(),
+            tags: this._notes.getTags(),
             newNoteTxt: t('quicknotes', 'New note'),
             allNotesTxt: t('quicknotes', 'All notes'),
             colorsTxt: t('quicknotes', 'Colors'),
@@ -843,9 +825,7 @@ new OCA.Search(search, function() {
  * Create modules
  */
 var notes = new Notes(OC.generateUrl('/apps/quicknotes/notes'));
-var tags = new Tags(OC.generateUrl('/apps/quicknotes/tags'));
-
-var view = new View(notes, tags);
+var view = new View(notes);
 
 /*
  * Render initial loading view
@@ -856,12 +836,7 @@ view.renderContent();
  * Loading notes and render final view.
  */
 notes.loadAll().done(function () {
-    tags.loadAll().done(function () {
-        view.render();
-    }).fail(function () {
-        alert('Could not load tags');
-    });
-    // FIXME: So ugly...
+    view.render();
 }).fail(function () {
     alert('Could not load notes');
 });
