@@ -8,7 +8,7 @@ use OCP\AppFramework\Db\Entity;
 class NoteTag extends Entity implements JsonSerializable {
 
 	protected $noteId;
-	protected $tagId
+	protected $tagId;
 	protected $userId;
 
 	public function jsonSerialize() {

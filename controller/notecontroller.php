@@ -72,7 +72,7 @@ class NoteController extends Controller {
 			} else {
 				$note->setSharedWith(null);
 			}
-			$note->setTags($this->tagmapper->getTagsForNote($note->getId()));
+			$note->setTags($this->tagmapper->getTagsForNote($this->userId, $note->getId()));
 		}
 		$shareEntries = $this->notesharemapper->findForUser($this->userId);
 		$shares = array();
@@ -147,7 +147,7 @@ class NoteController extends Controller {
 	 * @param string $content
 	 * @param string $color
 	 */
-	public function update($id, $title, $content, $color = "#F7EB96") {
+	public function update($id, $title, $content, $tags, $color = "#F7EB96") {
 		// Get current Note and Color.
 		try {
 			$note = $this->notemapper->find($id, $this->userId);
@@ -163,6 +163,36 @@ class NoteController extends Controller {
 			$hcolor = new Color();
 			$hcolor->setColor($color);
 			$hcolor = $this->colormapper->insert($hcolor);
+		}
+
+		// Delete old tag relations
+		$noteTags = $this->tagmapper->getTagsForNote($this->userId, $id);
+		foreach ($noteTags as $tag) {
+			if (!in_array($tag->getName(), $tags)) {
+				$hnotetag = $this->notetagmapper->findNoteTag($this->userId, $id, $tag->getId());
+				$this->notetagmapper->delete($hnotetag);
+			}
+		}
+
+		// Add new tags and update relations.
+		foreach ($tags as $name) {
+			if (!$this->tagmapper->tagExists($this->userId, $name)) {
+				$htag = new Tag();
+				$htag->setName($name);
+				$htag->setUserId($this->userId);
+				$htag = $this->tagmapper->insert($htag);
+			}
+			else {
+				$htag = $this->tagmapper->getTag($this->userId, $name);
+			}
+
+			if (!$this->notetagmapper->noteTagExists($this->userId, $id, $htag->getId())) {
+				$noteTag = new NoteTag();
+				$noteTag->setNoteId($id);
+				$noteTag->setTagId($htag->getId());
+				$noteTag->setUserId($this->userId);
+				$this->notetagmapper->insert($noteTag);
+			}
 		}
 
 		// Set new info on Note

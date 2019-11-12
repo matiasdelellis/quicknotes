@@ -126,10 +126,11 @@ Notes.prototype = {
     isLoaded: function () {
         return this._loaded;
     },
-    updateActive: function (title, content, color) {
+    updateActive: function (title, content, tags, color) {
         var note = this.getActive();
         note.title = title;
         note.content = content;
+        note.tags = tags;
         note.color = color;
 
         return $.ajax({
@@ -139,9 +140,9 @@ Notes.prototype = {
             data: JSON.stringify(note)
         });
     },
-    updateId: function (id, title, content, color) {
+    updateId: function (id, title, content, tags, color) {
         this.load(id);
-        return this.updateActive(title, content, color);
+        return this.updateActive(title, content, tags, color);
     }
 };
 
@@ -328,6 +329,9 @@ View.prototype = {
         var title = $('#modal-note-div #title-editable').html().trim();
         var content = $('#modal-note-div #content-editable').html().trim();
         var color = this.colorToHex($("#modal-note-div .quicknote").css("background-color"));
+        var tags = $("#modal-note-div .slim-tag").toArray().map(function (value) {
+            return value.textContent.trim();
+        });
 
         /*
         var shareSelect = $('.note-share-select');
@@ -343,7 +347,7 @@ View.prototype = {
         */
 
         var self = this;
-        this._notes.updateId(id, title, content, color).done(function () {
+        this._notes.updateId(id, title, content, tags, color).done(function () {
             var modal = $('#modal-note-div');
             var modalnote = $("#modal-note-div .quicknote");
             var modaltitle = $('#modal-note-div #title-editable');
