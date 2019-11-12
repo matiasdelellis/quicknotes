@@ -233,11 +233,11 @@ div[contenteditable="true"] {
 .select2-search-choice {
     padding: 3px 5px 3px 18px !important;
     margin: 3px 0 3px 5px !important;
-    line-height: 13px !important;
 }
 
 .select2-search-choice-close {
     display: block !important;
+    top: 6px !important;
 }
 
 .select2-results .select2-selected {
