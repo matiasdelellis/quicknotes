@@ -61,6 +61,18 @@ const QnDialogs = {
 			input.val(selectedTags.map(function (value) { return value.id; }));
 			input.trigger("change");
 
+			$('.select2-input').on("keyup", function (event) {
+				if (event.keyCode === 27) {
+					event.preventDefault();
+					event.stopPropagation();
+					input.select2('close');
+					if (callback !== undefined) {
+						callback(false, input.select2("data"));
+					}
+					$(dialogId).ocdialog('close');
+				}
+			});
+
 			// wrap callback in _.once():
 			// only call callback once and not twice (button handler and close
 			// event) but call it for the close event, if ESC or the x is hit
@@ -91,17 +103,19 @@ const QnDialogs = {
 			];
 
 			$(dialogId).ocdialog({
-				closeOnEscape: true,
+				closeOnEscape: false,
 				modal: true,
 				buttons: buttonlist,
 				close: function () {
+					input.select2("close");
 					// callback is already fired if Yes/No is clicked directly
 					if (callback !== undefined) {
 						callback(false, input.val());
 					}
 				}
 			});
-			input.focus();
+
+			$('.select2-input').focus();
 		});
 	},
 	_getMessageTemplate: function () {
