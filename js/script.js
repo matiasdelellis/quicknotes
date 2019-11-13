@@ -455,12 +455,14 @@ View.prototype = {
         });
 
         // Handle hotkeys
-        $(document).keyup(function(event) {
+        $(document).off("keyup");  // FIXME: This prevent exponential calls of save note.
+        $(document).on("keyup", function(event) {
             if (event.keyCode == 27) {
                 event.stopPropagation();
                 self.cancelEdit();
             }
             else if (event.keyCode == 13 && event.altKey) {
+                event.preventDefault();
                 event.stopPropagation();
                 self.saveNote();
             }
