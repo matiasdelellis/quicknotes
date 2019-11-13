@@ -1,4 +1,9 @@
-#Changelog
+# Changelog
+
+## [0.2.0]: 2019-11-12
+- Implement notes tagging support and filter with it.
+- Fix calling exponentially to save notes when pressed Alt+Return.
+- Update spanish translation
 
 ## [0.1.10]: 2019-11-02
 ### Added

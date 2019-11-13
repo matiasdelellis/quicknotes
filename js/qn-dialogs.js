@@ -30,7 +30,7 @@ const QnDialogs = {
 			var dialogId = '#' + dialogName;
 			var $dlg = $tmpl.octemplate({
 				dialog_name: dialogName,
-				title: t('quicknotes', 'Tag note'),
+				title: t('quicknotes', 'Tag the note'),
 				message: t('quicknotes', 'Enter tags to organize your note'),
 				type: 'none'
 			});
