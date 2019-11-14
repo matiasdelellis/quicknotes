@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.2.1]: 2019-11-14
+- Support NC15 again. It's the stable version.
+- Update the navigation menu correctly with the new tags.
+- Fill the tag dialog with the modal and not replace it with those in the db.
+
 ## [0.2.0]: 2019-11-12
 - Implement notes tagging support and filter with it.
 - Fix calling exponentially to save notes when pressed Alt+Return.
