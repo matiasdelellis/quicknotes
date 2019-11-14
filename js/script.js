@@ -612,11 +612,15 @@ View.prototype = {
         // handle tags button.
         $('#modal-note-div #tag-button').click(function (event) {
             event.stopPropagation();
-            var id = $("#modal-note-div .quicknote").data('id');
-            self._notes.load(id);
+            var noteTags = $("#modal-note-div .slim-tag").toArray().map(function (value) {
+                return {
+                    id: value.getAttribute('tag-id'),
+                    name: value.textContent.trim()
+                };
+            });
             QnDialogs.tags(
                 self._notes.getTags(),
-                self._notes.getActive().tags,
+                noteTags,
                 function(result, newTags) {
                     if (result === true) {
                         var modalTags = $('#modal-note-div .note-tags');

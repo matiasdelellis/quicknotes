@@ -58,7 +58,7 @@ const QnDialogs = {
 				}
 			});
 
-			input.val(selectedTags.map(function (value) { return value.id; }));
+			input.val(selectedTags.map(function (value) { return value.id >= 0 ? value.id : value.name; }));
 			input.trigger("change");
 
 			$('.select2-input').on("keyup", function (event) {
