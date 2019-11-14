@@ -203,9 +203,6 @@ class NoteController extends Controller {
 			}
 		}
 
-		// Purge orphan tags.
-		$this->tagmapper->dropOld();
-
 		// Set new info on Note
 		$note->setTitle($title);
 		$note->setContent($content);
@@ -217,12 +214,18 @@ class NoteController extends Controller {
 		// Update note.
 		$newnote = $this->notemapper->update($note);
 
+		// Fill new tags
+		$newnote->setTags($this->tagmapper->getTagsForNote($this->userId, $newnote->getId()));
+
 		//  Remove old color if necessary
 		if (($oldcolorid !== $hcolor->getId()) &&
 		    (!$this->notemapper->colorIdCount($oldcolorid))) {
 			$oldcolor = $this->colormapper->find($oldcolorid);
 			$this->colormapper->delete($oldcolor);
 		}
+
+		// Purge orphan tags.
+		$this->tagmapper->dropOld();
 
 		return new DataResponse($newnote);
 	}
