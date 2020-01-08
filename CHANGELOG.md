@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.2.2]: 2020-01-8
+- Support NC18.
+- Fix Italian translation thanks to @valeriop
+
 ## [0.2.1]: 2019-11-14
 - Support NC15 again. It's the stable version.
 - Update the navigation menu correctly with the new tags.
