@@ -1,8 +1,13 @@
 # Changelog
 
-## [0.2.2]: 2020-01-8
+## [0.2.3]: 2020-02-06
+- Drop support to NC15 in line with Nextcloud.
+- Add Russian translation thanks to Rusalan Kortikov.
+- Add Polish translation thanks to Valdnet Valdnet.
+
+## [0.2.2]: 2020-01-08
 - Support NC18.
-- Fix Italian translation thanks to @valeriop
+- Fix Italian translation thanks to Valerio Pulese.
 
 ## [0.2.1]: 2019-11-14
 - Support NC15 again. It's the stable version.

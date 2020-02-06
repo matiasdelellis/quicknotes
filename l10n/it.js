@@ -1,4 +1,6 @@
-{ "translations": {
+OC.L10N.register(
+    "quicknotes",
+    {
     "Quick notes" : "Note veloci",
     "Cancel" : "Annulla",
     "Save" : "Salva",
@@ -16,5 +18,5 @@
     "Enter tag name" : "Inserire il nome del tag",
     "Done" : "Fatto",
     "Tags" : "Tags"
-},"pluralForm" :"nplurals=2; plural=(n != 1);"
-}
+},
+"nplurals=2; plural=(n != 1);");
