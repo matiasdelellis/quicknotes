@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.2.4]: 2020-08-05
+- Add French translation thanks to Aymo XXX.
+- Update German translation thanks to lhsei.
+- Support NC19.
+
 ## [0.2.3]: 2020-02-06
 - Drop support to NC15 in line with Nextcloud.
 - Add Russian translation thanks to Rusalan Kortikov.
