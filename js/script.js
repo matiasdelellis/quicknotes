@@ -675,7 +675,7 @@ View.prototype = {
                         modalTags.html('');
                         newTags.forEach(function (item, index) {
                             var noteId = parseInt(item.id) || -1;
-                            var tag = $('<div class="slim-tag" tag-id="' + noteId + '">' + item.text + '</div>');
+                            var tag = $('<div class="icon-tag slim-tag" tag-id="' + noteId + '">' + item.text + '</div>');
                             modalTags.append(tag);
                         });
                     }

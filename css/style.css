@@ -221,9 +221,16 @@ div[contenteditable="true"] {
 
 .slim-tag {
     display: inline-block;
-    padding: 3px 5px;
+    padding: 0px 6px 0 24px;
     background-color: rgba(0,0,0,0.08);
-    border-radius: 12px;
+    background-position: 8px center;
+    opacity: 0.7;
+    border-radius: 10px;
+    font-size: 90%;
+}
+
+.note-tags {
+    margin-top: 10px;
 }
 
 /* Restore defaults select2 rules */
