@@ -91,9 +91,10 @@
 #div-content .shared-title,
 #div-content .shared-title-owner,
 #div-content .icon-delete-note {
-   float: right;
-   margin: 2px;
-   opacity: 0.5;
+    cursor: pointer;
+    float: right;
+    margin: 2px;
+    opacity: 0.5;
 }
 
 .noselect {
@@ -221,6 +222,7 @@ div[contenteditable="true"] {
 
 .slim-tag {
     display: inline-block;
+    cursor: pointer;
     padding: 0px 6px 0 24px;
     background-color: rgba(0,0,0,0.08);
     background-position: 8px center;
