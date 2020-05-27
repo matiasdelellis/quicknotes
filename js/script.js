@@ -161,6 +161,9 @@ Notes.prototype = {
 // this will be the view that is used to update the html
 var View = function (notes) {
     this._notes = notes;
+
+    this._editor = undefined;
+    this._changed = false;
 };
 
 View.prototype = {
@@ -184,6 +187,7 @@ View.prototype = {
         return digits[1] + '#' + rgb.toString(16).toUpperCase();
     },
     editNote: function (id) {
+        var self = this;
         var modal = $('#modal-note-div');
         var modaltitle = $('#modal-note-div #title-editable');
         var modalcontent = $('#modal-note-div #content-editable');
@@ -236,6 +240,12 @@ View.prototype = {
                 'autolist': autolist
             }
         });
+
+        editor.subscribe('editableInput', function(event, editorElement) {
+            self._changed = true;
+        });
+
+        this._editor = editor;
 
         /*
         var shareSelect = $('.note-share-select');
@@ -350,15 +360,21 @@ View.prototype = {
             modalcontent.html("");
             modaltags.html("");
 
+            self._editor.destroy();
+            self._changed = false;
+
             self.render();
         }).fail(function () {
             alert('DOh!. Could not update note!.');
         });
+
     },
     cancelEdit: function () {
+        var self = this;
         var modal = $('#modal-note-div');
         var modaltitle = $('#modal-note-div #title-editable');
         var modalcontent = $('#modal-note-dive #content-editable');
+        var modaltags = $('#modal-note-div .note-tags');
         var modalcolortools = $("#modal-note-div .circle-toolbar");
         var modalnote = $("#modal-note-div .quicknote");
 
@@ -385,12 +401,18 @@ View.prototype = {
                 modalnote.data('id', -1);
                 modaltitle.html("");
                 modalcontent.html("");
+                modaltags.html("");
 
                 $.each(modalcolortools, function(i, colortool) {
                     $(colortool).removeClass('icon-checkmark');
                 });
+
+                self._editor.destroy();
+                self._changed = false;
             }
         );
+
+        this._changed = false;
     },
     renderContent: function () {
         // Remove all event handlers to prevent double events.
@@ -451,7 +473,20 @@ View.prototype = {
         // Cancel when click outside the modal.
         $('#app-content').on('click', '.modal-note-background', function (event) {
             event.stopPropagation();
-            self.cancelEdit();
+            if (!self._changed) {
+                self.cancelEdit();
+                return;
+            }
+            OC.dialogs.confirm(
+                t('facerecognition', 'Do you want to discard the changes?'),
+                t('facerecognition', 'Unsaved changes'),
+                function(result) {
+                    if (result) {
+                        self.cancelEdit();
+                    }
+                },
+                true
+            );
         });
 
         // Handle hotkeys
@@ -459,7 +494,20 @@ View.prototype = {
         $(document).on("keyup", function(event) {
             if (event.keyCode == 27) {
                 event.stopPropagation();
-                self.cancelEdit();
+                if (!self._changed) {
+                    self.cancelEdit();
+                    return;
+                }
+                OC.dialogs.confirm(
+                    t('facerecognition', 'Do you want to discard the changes?'),
+                    t('facerecognition', 'Unsaved changes'),
+                    function(result) {
+                        if (result) {
+                            self.cancelEdit();
+                        }
+                    },
+                    true
+                );
             }
             else if (event.keyCode == 13 && event.altKey) {
                 event.preventDefault();
