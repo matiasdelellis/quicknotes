@@ -82,19 +82,28 @@
    overflow: hidden;
 }
 
-
 .note-content {
     margin: 4px;
     overflow-wrap: break-word;
 }
 
-#div-content .shared-title,
-#div-content .shared-title-owner,
-#div-content .icon-delete-note {
+.icon-header-note {
     cursor: pointer;
     float: right;
     margin: 2px;
-    opacity: 0.5;
+    padding: 12px;
+    background-color: rgba(0,0,0,0.08);
+    opacity: 0.7;
+    border-radius: 50%;
+}
+
+.hide-header-icon {
+    display: none;
+}
+
+.fixed-header-icon,
+.show-header-icon {
+    display: block;
 }
 
 .noselect {
@@ -160,11 +169,10 @@
     background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
 }
 
-.hide-delete-icon,
 .hide-modal-note {
     display: none;
 }
-.show-delete-icon,
+
 .show-modal-note {
     display: block;
 }

@@ -439,6 +439,13 @@ View.prototype = {
                 isFitWidth: true,
                 fitWidth: true,
                 gutter: 10,
+            },
+            sortBy: 'pinnedNote',
+            getSortData: {
+                pinnedNote: function(itemElem) {
+                    var $item = $(itemElem);
+                    return $item.find('.icon-checkmark').hasClass('fixed-header-icon') ? -1 : $item.index();
+                }
             }
         });
 
@@ -450,10 +457,10 @@ View.prototype = {
 
         // Show delete icon on hover.
         $("#app-content").on("mouseenter", ".quicknote", function() {
-            $(this).find(".icon-delete").addClass( "show-delete-icon");
+            $(this).find(".icon-header-note").addClass( "show-header-icon");
         });
         $("#app-content").on("mouseleave", ".quicknote", function() {
-            $(this).find(".icon-delete").removeClass("show-delete-icon");
+            $(this).find(".icon-header-note").removeClass("show-header-icon");
         });
 
         // Open notes when clicking them.
@@ -564,6 +571,18 @@ View.prototype = {
                 },
                 true
             );
+        });
+
+        $('#app-content').on("click", ".icon-checkmark", function (event) {
+            event.stopPropagation();
+            if ($(this).hasClass("fixed-header-icon")) {
+                $(this).removeClass("fixed-header-icon");
+                $(this).addClass("hide-header-icon");
+            } else {
+                $(this).removeClass("hide-header-icon");
+                $(this).addClass("fixed-header-icon");
+            }
+            $('.notes-grid').isotope('updateSortData').isotope();
         });
 
         /*
