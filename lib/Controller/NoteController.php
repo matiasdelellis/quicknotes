@@ -171,7 +171,7 @@ class NoteController extends Controller {
 		foreach ($dbTags as $dbTag) {
 			$delete = true;
 			foreach ($tags as $tag) {
-				if ($dbTag->getId() == $tag['id']) {
+				if ($dbTag->getId() === $tag['id']) {
 					$delete = false;
 					break;
 				}
