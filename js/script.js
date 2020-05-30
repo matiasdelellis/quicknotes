@@ -220,6 +220,7 @@ View.prototype = {
 
         var autolist = new AutoList();
         var editor = new MediumEditor(modalcontent, {
+            targetBlank: true,
             toolbar: {
                 buttons: [
                     'bold',
@@ -475,6 +476,11 @@ View.prototype = {
             var id = parseInt($(this).data('id'), 10);
 
             self.editNote(id);
+        });
+
+        // Doesn't show modal dialog when opening link
+        $("#app-content").on("click", ".note-grid-item a", function (event) {
+            event.stopPropagation();
         });
 
         // Cancel when click outside the modal.
