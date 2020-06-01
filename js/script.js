@@ -13,6 +13,10 @@
 
 $(document).ready(function () {
 
+var translations = {
+    pinNote: t('quicknotes', 'Pin note'),
+};
+
 // this notes object holds all our notes
 var Notes = function (baseUrl) {
     this._baseUrl = baseUrl;
