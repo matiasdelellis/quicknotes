@@ -1,3 +1,7 @@
+.icon-quicknotes {
+    @include icon-color('app', 'quicknotes', $color-black);
+}
+
 #app-content-wrapper {
     height: 100%;
 }
