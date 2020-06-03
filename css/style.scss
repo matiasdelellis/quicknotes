@@ -2,6 +2,14 @@
     @include icon-color('app', 'quicknotes', $color-black);
 }
 
+.icon-pin {
+    @include icon-color('pin', 'quicknotes', $color-black);
+}
+
+.icon-pinned {
+    @include icon-color('pinned', 'quicknotes', $color-black);
+}
+
 #app-content-wrapper {
     height: 100%;
 }
@@ -100,6 +108,10 @@
     opacity: 0.7;
     border-radius: 50%;
 }
+
+//.icon-header-note:hover {
+//    background-color: rgba(0,0,0,0.14);
+//}
 
 .hide-header-icon {
     display: none;

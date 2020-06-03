@@ -449,7 +449,7 @@ View.prototype = {
             getSortData: {
                 pinnedNote: function(itemElem) {
                     var $item = $(itemElem);
-                    return $item.find('.icon-checkmark').hasClass('fixed-header-icon') ? -1 : $item.index();
+                    return $item.find('.icon-pinned').hasClass('fixed-header-icon') ? -1 : $item.index();
                 }
             }
         });
@@ -583,15 +583,23 @@ View.prototype = {
             );
         });
 
-        $('#app-content').on("click", ".icon-checkmark", function (event) {
+        $('#app-content').on("click", ".icon-pin", function (event) {
             event.stopPropagation();
-            if ($(this).hasClass("fixed-header-icon")) {
-                $(this).removeClass("fixed-header-icon");
-                $(this).addClass("hide-header-icon");
-            } else {
-                $(this).removeClass("hide-header-icon");
-                $(this).addClass("fixed-header-icon");
-            }
+            $(this).removeClass("hide-header-icon");
+            $(this).addClass("fixed-header-icon");
+            $(this).removeClass("icon-pin");
+            $(this).addClass("icon-pinned");
+
+            $('.notes-grid').isotope('updateSortData').isotope();
+        });
+
+        $('#app-content').on("click", ".icon-pinned", function (event) {
+            event.stopPropagation();
+            $(this).removeClass("fixed-header-icon");
+            $(this).addClass("hide-header-icon");
+            $(this).removeClass("icon-pinned");
+            $(this).addClass("icon-pin");
+
             $('.notes-grid').isotope('updateSortData').isotope();
         });
 
