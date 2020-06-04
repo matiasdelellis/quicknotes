@@ -13,10 +13,6 @@
 
 $(document).ready(function () {
 
-var translations = {
-    pinNote: t('quicknotes', 'Pin note'),
-};
-
 // this notes object holds all our notes
 var Notes = function (baseUrl) {
     this._baseUrl = baseUrl;
@@ -589,6 +585,7 @@ View.prototype = {
             $(this).addClass("fixed-header-icon");
             $(this).removeClass("icon-pin");
             $(this).addClass("icon-pinned");
+            $(this).attr('title', t('quicknotes', 'Unpin note'));
 
             $('.notes-grid').isotope('updateSortData').isotope();
         });
@@ -599,6 +596,8 @@ View.prototype = {
             $(this).addClass("hide-header-icon");
             $(this).removeClass("icon-pinned");
             $(this).addClass("icon-pin");
+
+            $(this).attr('title', t('quicknotes', 'Pin note'));
 
             $('.notes-grid').isotope('updateSortData').isotope();
         });

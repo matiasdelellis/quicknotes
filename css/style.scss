@@ -105,13 +105,14 @@
     margin-left: 2px;
     padding: 12px;
     background-color: rgba(0,0,0,0.08);
-    opacity: 0.7;
+    opacity: 0.54;
     border-radius: 50%;
 }
 
-//.icon-header-note:hover {
-//    background-color: rgba(0,0,0,0.14);
-//}
+.icon-header-note:hover {
+    background-color: rgba(0,0,0,0.12);
+    opacity: 0.87;
+}
 
 .hide-header-icon {
     display: none;
@@ -250,9 +251,13 @@ div[contenteditable="true"] {
     padding: 0px 6px 0 24px;
     background-color: rgba(0,0,0,0.08);
     background-position: 8px center;
-    opacity: 0.7;
+    opacity: 0.87;
     border-radius: 10px;
     font-size: 90%;
+}
+
+.slim-tag:hover {
+    background-color: rgba(0,0,0,0.12);
 }
 
 .note-tags {
