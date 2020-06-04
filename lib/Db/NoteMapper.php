@@ -1,14 +1,16 @@
-<?php
+<?php declare(strict_types=1);
+
 namespace OCA\QuickNotes\Db;
 
 use OCP\IDBConnection;
-use OCP\AppFramework\Db\Mapper;
+use OCP\AppFramework\Db\QBMapper;
 use OCP\AppFramework\Db\DoesNotExistException;
+use OCP\DB\QueryBuilder\IQueryBuilder;
 
-class NoteMapper extends Mapper {
+class NoteMapper extends QBMapper {
 
 	public function __construct(IDBConnection $db) {
-		parent::__construct($db, 'quicknotes_notes', '\OCA\QuickNotes\Db\Note');
+		parent::__construct($db, 'quicknotes_notes');
 	}
 
 	/**
@@ -19,26 +21,34 @@ class NoteMapper extends Mapper {
 	 * @return Note
 	 */
 	public function find($id, $userId) {
-		$sql = 'SELECT * FROM *PREFIX*quicknotes_notes WHERE id = ? AND user_id = ?';
-		return $this->findEntity($sql, [$id, $userId]);
-	}
-
-	public function findById($id) {
-		$sql = 'SELECT * FROM *PREFIX*quicknotes_notes WHERE id = ?';
-		return $this->findEntity($sql, [$id]);
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')
+			->from($this->tableName)
+			->where(
+				$qb->expr()->eq('user_id', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR)),
+				$qb->expr()->eq('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT))
+			);
+		return $this->findEntity($qb);
 	}
 
 	public function findAll($userId) {
-		$sql = 'SELECT * FROM *PREFIX*quicknotes_notes WHERE user_id = ?';
-		return $this->findEntities($sql, [$userId]);
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')
+			->from($this->tableName)
+			->where(
+				$qb->expr()->eq('user_id', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR))
+			);
+		return $this->findEntities($qb);
 	}
 
 	public function colorIdCount($colorid) {
-		$sql = 'SELECT COUNT(*) as `count` FROM *PREFIX*quicknotes_notes WHERE color_id = ?';
-		$result = $this->execute($sql, [$colorid]);
-		$row = $result->fetch();
-		$result->closeCursor();
-		return $row['count'];
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('id')
+			->from($this->tableName)
+			->where(
+				$qb->expr()->eq('color_id', $qb->createNamedParameter($colorid, IQueryBuilder::PARAM_INT))
+			);
+		return count($this->findEntities($qb));
 	}
 
 }

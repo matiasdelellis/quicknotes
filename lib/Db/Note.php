@@ -9,6 +9,7 @@ class Note extends Entity implements JsonSerializable {
 
 	protected $title;
 	protected $content;
+	protected $pinned;
 	protected $timestamp;
 	protected $colorId;
 	protected $userId;
@@ -17,9 +18,14 @@ class Note extends Entity implements JsonSerializable {
 	protected $tags;
 
 	protected $color;
+	protected $isPinned;
 
 	public function setColor($color) {
 		$this->color = $color;
+	}
+
+	public function setIsPinned($pinned) {
+		$this->isPinned = $pinned;
 	}
 
 	public function jsonSerialize() {
@@ -27,6 +33,8 @@ class Note extends Entity implements JsonSerializable {
 			'id' => $this->id,
 			'title' => $this->title,
 			'content' => $this->content,
+			'pinned' => $this->pinned,
+			'ispinned' => $this->isPinned,
 			'timestamp' => $this->timestamp,
 			'colorid' => $this->colorId,
 			'color' => $this->color,

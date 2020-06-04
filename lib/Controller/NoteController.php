@@ -88,10 +88,17 @@ class NoteController extends Controller {
 			}
 		}
 		$notes = array_merge($notes, $shares);
+
 		// Insert true color to response
 		foreach ($notes as $note) {
 			$note->setColor($this->colormapper->find($note->getColorId())->getColor());
 		}
+
+		// Insert true color to response
+		foreach ($notes as $note) {
+			$note->setIsPinned($note->getPinned() ? true : false);
+		}
+
 		return new DataResponse($notes);
 	}
 
@@ -145,10 +152,11 @@ class NoteController extends Controller {
 	 * @param int $id
 	 * @param string $title
 	 * @param string $content
+	 * @param boolean $pinned
 	 * @param array $tags
 	 * @param string $color
 	 */
-	public function update($id, $title, $content, $tags, $color = "#F7EB96") {
+	public function update($id, $title, $content, $pinned, $tags, $color = "#F7EB96") {
 		// Get current Note and Color.
 		try {
 			$note = $this->notemapper->find($id, $this->userId);
@@ -206,10 +214,13 @@ class NoteController extends Controller {
 		// Set new info on Note
 		$note->setTitle($title);
 		$note->setContent($content);
+		$note->setPinned($pinned ? 1 : 0);
 		$note->setTimestamp(time());
 		$note->setColorId($hcolor->id);
+
 		// Insert true color to response
 		$note->setColor($hcolor->getColor());
+		$note->setIsPinned($note->getPinned() ? true : false);
 
 		// Update note.
 		$newnote = $this->notemapper->update($note);

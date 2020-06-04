@@ -137,10 +137,11 @@ Notes.prototype = {
     isLoaded: function () {
         return this._loaded;
     },
-    updateActive: function (title, content, tags, color) {
+    updateActive: function (title, content, pinned, tags, color) {
         var note = this.getActive();
         note.title = title;
         note.content = content;
+        note.pinned = pinned;
         note.tags = tags;
         note.color = color;
 
@@ -151,9 +152,14 @@ Notes.prototype = {
             data: JSON.stringify(note)
         });
     },
-    updateId: function (id, title, content, tags, color) {
+    updateId: function (id, title, content, pinned, tags, color) {
         this.load(id);
-        return this.updateActive(title, content, tags, color);
+        return this.updateActive(title, content, pinned, tags, color);
+    },
+    setPinnedNote: function (id, pinned) {
+        this.load(id);
+        var note = this.getActive();
+        return this.updateActive(note.title, note.content, pinned, note.tags, note.color);
     }
 };
 
@@ -344,7 +350,7 @@ View.prototype = {
         */
 
         var self = this;
-        this._notes.updateId(id, title, content, tags, color).done(function () {
+        this._notes.updateId(id, title, content, false, tags, color).done(function () {
             var modal = $('#modal-note-div');
             var modalnote = $("#modal-note-div .quicknote");
             var modaltitle = $('#modal-note-div #title-editable');
@@ -581,25 +587,40 @@ View.prototype = {
 
         $('#app-content').on("click", ".icon-pin", function (event) {
             event.stopPropagation();
-            $(this).removeClass("hide-header-icon");
-            $(this).addClass("fixed-header-icon");
-            $(this).removeClass("icon-pin");
-            $(this).addClass("icon-pinned");
-            $(this).attr('title', t('quicknotes', 'Unpin note'));
 
-            $('.notes-grid').isotope('updateSortData').isotope();
+            var icon =  $(this);
+            var note = icon.parent().parent();
+            var id = parseInt(note.data('id'), 10);
+
+            self._notes.setPinnedNote(id, true).done(function () {
+                icon.removeClass("hide-header-icon");
+                icon.addClass("fixed-header-icon");
+                icon.removeClass("icon-pin");
+                icon.addClass("icon-pinned");
+                icon.attr('title', t('quicknotes', 'Unpin note'));
+                $('.notes-grid').isotope('updateSortData').isotope();
+            }).fail(function () {
+                alert('Could not pin note');
+            });
         });
 
         $('#app-content').on("click", ".icon-pinned", function (event) {
             event.stopPropagation();
-            $(this).removeClass("fixed-header-icon");
-            $(this).addClass("hide-header-icon");
-            $(this).removeClass("icon-pinned");
-            $(this).addClass("icon-pin");
 
-            $(this).attr('title', t('quicknotes', 'Pin note'));
+            var icon =  $(this);
+            var note = icon.parent().parent();
+            var id = parseInt(note.data('id'), 10);
 
-            $('.notes-grid').isotope('updateSortData').isotope();
+            self._notes.setPinnedNote(id, false).done(function () {
+                icon.removeClass("fixed-header-icon");
+                icon.addClass("hide-header-icon");
+                icon.removeClass("icon-pinned");
+                icon.addClass("icon-pin");
+                icon.attr('title', t('quicknotes', 'Pin note'));
+                $('.notes-grid').isotope('updateSortData').isotope();
+            }).fail(function () {
+                alert('Could not unpin');
+            });
         });
 
         /*
