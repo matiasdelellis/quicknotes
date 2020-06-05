@@ -34,7 +34,7 @@
     min-height: 150px;
     width: 250px;
     padding: 10px;
-    border-radius: 3px;
+    border-radius: 8px;
     box-shadow: 0 4px 6px #c1c1c1;
 }
 
@@ -150,9 +150,7 @@
 }
 
 .circle-toolbar:hover {
-   color: #ccc;
-   text-decoration:none;
-   background:#333;
+   border-color: var(--color-primary-element);
 }
 
 .any-color {
@@ -165,8 +163,9 @@
     margin: 0 auto;
     padding: 15px;
 }
+
 .note-grid-item {
-  margin-bottom: 10px;
+  margin-bottom: 14px;
 }
 
 /* Modal Note */

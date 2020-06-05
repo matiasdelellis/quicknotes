@@ -464,7 +464,7 @@ View.prototype = {
             masonry: {
                 isFitWidth: true,
                 fitWidth: true,
-                gutter: 10,
+                gutter: 14,
             },
             sortBy: 'pinnedNote',
             getSortData: {
