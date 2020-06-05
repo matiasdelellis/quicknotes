@@ -139,9 +139,11 @@ Notes.prototype = {
     },
     updateActive: function (title, content, pinned, tags, color) {
         var note = this.getActive();
+
         note.title = title;
         note.content = content;
-        note.pinned = pinned;
+        note.pinned = pinned ? 1 : 0;
+        note.ispinned = pinned;
         note.tags = tags;
         note.color = color;
 
@@ -194,36 +196,51 @@ View.prototype = {
     },
     editNote: function (id) {
         var self = this;
-        var modal = $('#modal-note-div');
+
+        // Get selected note elements
+        var note = $('.notes-grid [data-id=' + id + ']').parent();
+        var title = note.find(".note-title").html();
+        var content = note.find(".note-content").html();
+        var pinned = note.find(".icon-pinned").length > 0;
+        var tags = note.find(".note-tags").html();
+        var color = note.children().css("background-color");
+
+        // Get modal elements
         var modaltitle = $('#modal-note-div #title-editable');
         var modalcontent = $('#modal-note-div #content-editable');
+        var pinicon = $('#modal-note-div .icon-header-note');
         var modaltags = $('#modal-note-div .note-tags');
         var modalnote = $("#modal-note-div .quicknote");
 
-        var note = $('.notes-grid [data-id=' + id + ']').parent();
+        var modalid = modalnote.data('id');
+        if (id == modalid)
+            return;
 
-        var title = note.find(".note-title").html();
-        var content = note.find(".note-content").html();
-        var tags = note.find(".note-tags").html();
-        var color = note.children().css("background-color");
-        var colors = modal[0].getElementsByClassName("circle-toolbar");
+        // Sync color
+        var colors = modalnote[0].getElementsByClassName("circle-toolbar");
         $.each(colors, function(i, c) {
             if(color == c.style.backgroundColor) {
                 c.className += " icon-checkmark";
             }
         });
 
-        var modalid = modalnote.data('id');
+        // Sync pin icon
+        if (pinned) {
+            pinicon.removeClass("icon-pin");
+            pinicon.addClass("icon-pinned");
+        } else {
+            pinicon.removeClass("icon-pinned");
+            pinicon.addClass("icon-pin");
+        }
 
-        if (id == modalid)
-            return;
-
+        // Sync main content
         modalnote.data('id', id);
         modaltitle.html(title);
         modalcontent.html(content);
         modaltags.html(tags);
         modalnote.css("background-color", color);
 
+        // Create medium div editor.
         var autolist = new AutoList();
         var editor = new MediumEditor(modalcontent, {
             targetBlank: true,
@@ -295,6 +312,7 @@ View.prototype = {
 
         /* Animate to center */
 
+        var modal = $('#modal-note-div');
         modal.removeClass("hide-modal-note");
         modal.addClass("show-modal-note");
 
@@ -328,6 +346,7 @@ View.prototype = {
 
         var title = $('#modal-note-div #title-editable').html().trim();
         var content = $('#modal-note-div #content-editable').html().trim();
+        var pinned = $('#modal-note-div').find(".icon-pinned").length > 0;
         var color = this.colorToHex($("#modal-note-div .quicknote").css("background-color"));
         var tags = $("#modal-note-div .slim-tag").toArray().map(function (value) {
             return {
@@ -350,7 +369,7 @@ View.prototype = {
         */
 
         var self = this;
-        this._notes.updateId(id, title, content, false, tags, color).done(function () {
+        this._notes.updateId(id, title, content, pinned, tags, color).done(function () {
             var modal = $('#modal-note-div');
             var modalnote = $("#modal-note-div .quicknote");
             var modaltitle = $('#modal-note-div #title-editable');
@@ -370,11 +389,11 @@ View.prototype = {
             self._editor.destroy();
             self._changed = false;
 
+            // TODO: Update grid note instead of redraw everything
             self.render();
         }).fail(function () {
             alert('DOh!. Could not update note!.');
         });
-
     },
     cancelEdit: function () {
         var self = this;
@@ -463,15 +482,15 @@ View.prototype = {
         var modalnote = $("#modal-note-div .quicknote");
 
         // Show delete icon on hover.
-        $("#app-content").on("mouseenter", ".quicknote", function() {
+        $("#notes-grid-div").on("mouseenter", ".quicknote", function() {
             $(this).find(".icon-header-note").addClass( "show-header-icon");
         });
-        $("#app-content").on("mouseleave", ".quicknote", function() {
+        $("#notes-grid-div").on("mouseleave", ".quicknote", function() {
             $(this).find(".icon-header-note").removeClass("show-header-icon");
         });
 
         // Open notes when clicking them.
-        $("#app-content").on("click", ".quicknote", function (event) {
+        $("#notes-grid-div").on("click", ".quicknote", function (event) {
             event.stopPropagation();
 
             if($(this).hasClass('shared')) return; //shares don't allow editing
@@ -485,57 +504,12 @@ View.prototype = {
         });
 
         // Doesn't show modal dialog when opening link
-        $("#app-content").on("click", ".note-grid-item a", function (event) {
+        $("#notes-grid-div").on("click", ".note-grid-item a", function (event) {
             event.stopPropagation();
         });
 
-        // Cancel when click outside the modal.
-        $('#app-content').on('click', '.modal-note-background', function (event) {
-            event.stopPropagation();
-            if (!self._changed) {
-                self.cancelEdit();
-                return;
-            }
-            OC.dialogs.confirm(
-                t('facerecognition', 'Do you want to discard the changes?'),
-                t('facerecognition', 'Unsaved changes'),
-                function(result) {
-                    if (result) {
-                        self.cancelEdit();
-                    }
-                },
-                true
-            );
-        });
 
-        // Handle hotkeys
-        $(document).off("keyup");  // FIXME: This prevent exponential calls of save note.
-        $(document).on("keyup", function(event) {
-            if (event.keyCode == 27) {
-                event.stopPropagation();
-                if (!self._changed) {
-                    self.cancelEdit();
-                    return;
-                }
-                OC.dialogs.confirm(
-                    t('facerecognition', 'Do you want to discard the changes?'),
-                    t('facerecognition', 'Unsaved changes'),
-                    function(result) {
-                        if (result) {
-                            self.cancelEdit();
-                        }
-                    },
-                    true
-                );
-            }
-            else if (event.keyCode == 13 && event.altKey) {
-                event.preventDefault();
-                event.stopPropagation();
-                self.saveNote();
-            }
-        });
-
-        $('#app-content').on('click', '.slim-tag', function (event) {
+        $('#notes-grid-div').on('click', '.slim-tag', function (event) {
             event.stopPropagation();
             var tagId = parseInt($(this).attr('tag-id'), 10);
             $('.notes-grid').isotope({ filter: function() {
@@ -555,7 +529,7 @@ View.prototype = {
 
         // Remove note icon
         var self = this;
-        $('#app-content').on("click", ".icon-delete-note", function (event) {
+        $('#notes-grid-div').on("click", ".icon-delete-note", function (event) {
             event.stopPropagation();
 
             var note = $(this).parent().parent();
@@ -585,7 +559,7 @@ View.prototype = {
             );
         });
 
-        $('#app-content').on("click", ".icon-pin", function (event) {
+        $('#notes-grid-div').on("click", ".icon-pin", function (event) {
             event.stopPropagation();
 
             var icon =  $(this);
@@ -604,7 +578,7 @@ View.prototype = {
             });
         });
 
-        $('#app-content').on("click", ".icon-pinned", function (event) {
+        $('#notes-grid-div').on("click", ".icon-pinned", function (event) {
             event.stopPropagation();
 
             var icon =  $(this);
@@ -619,7 +593,7 @@ View.prototype = {
                 icon.attr('title', t('quicknotes', 'Pin note'));
                 $('.notes-grid').isotope('updateSortData').isotope();
             }).fail(function () {
-                alert('Could not unpin');
+                alert('Could not unpin note');
             });
         });
 
@@ -627,17 +601,73 @@ View.prototype = {
          * Modal actions.
          */
 
-        // Handle colors.
-        $('#modal-note-div .circle-toolbar').click(function (event) {
+        // Cancel when click outside the modal.
+        $('#div-content').on('click', '.modal-note-background', function (event) {
+            event.stopPropagation();
+            if (!self._changed) {
+                self.cancelEdit();
+                return;
+            }
+            OC.dialogs.confirm(
+                t('facerecognition', 'Do you want to discard the changes?'),
+                t('facerecognition', 'Unsaved changes'),
+                function(result) {
+                    if (result) {
+                        self.cancelEdit();
+                    }
+                },
+                true
+            );
+        });
+
+        // But handles the click until the modal
+        $('#div-content').on('click', '.modal-content', function (event) {
+            event.stopPropagation();
+        });
+
+        // Handle hotkeys
+        $(document).off("keyup");  // FIXME: This prevent exponential calls of save note.
+        $(document).on("keyup", function(event) {
+            if (event.keyCode == 27) {
+                event.stopPropagation();
+                if (!self._changed) {
+                    self.cancelEdit();
+                    return;
+                }
+                OC.dialogs.confirm(
+                    t('facerecognition', 'Do you want to discard the changes?'),
+                    t('facerecognition', 'Unsaved changes'),
+                    function(result) {
+                        if (result) {
+                            self.cancelEdit();
+                        }
+                    },
+                    true
+                );
+            }
+            else if (event.keyCode == 13 && event.altKey) {
+                event.preventDefault();
+                event.stopPropagation();
+                self.saveNote();
+            }
+        });
+
+        // Pin note in modal
+        $('#modal-note-div').on("click", ".icon-pin", function (event) {
             event.stopPropagation();
 
-            var oldColorTool = $('#modal-note-div .circle-toolbar.icon-checkmark');
-            $.each(oldColorTool, function(i, oct) {
-               $(oct).removeClass('icon-checkmark');
-            });
-            $(this).addClass('icon-checkmark');
-            var color = $(this).css("background-color");
-            modalnote.css("background-color", color);
+            $(this).removeClass("icon-pin");
+            $(this).addClass("icon-pinned");
+            $(this).attr('title', t('quicknotes', 'Unpin note'));
+        });
+
+        // Unpin note in modal
+        $('#modal-note-div').on("click", ".icon-pinned", function (event) {
+            event.stopPropagation();
+
+            $(this).removeClass("icon-pinned");
+            $(this).addClass("icon-pin");
+            $(this).attr('title', t('quicknotes', 'Pin note'));
         });
 
         // handle share editing notes.
@@ -712,6 +742,19 @@ View.prototype = {
                     modalNote.outerHeight(startHeight + shareOptions.outerHeight(true));
                 });
            });
+        });
+
+        // Handle colors.
+        $('#modal-note-div .circle-toolbar').click(function (event) {
+            event.stopPropagation();
+
+            var oldColorTool = $('#modal-note-div .circle-toolbar.icon-checkmark');
+            $.each(oldColorTool, function(i, oct) {
+               $(oct).removeClass('icon-checkmark');
+            });
+            $(this).addClass('icon-checkmark');
+            var color = $(this).css("background-color");
+            modalnote.css("background-color", color);
         });
 
         // handle tags button.

@@ -1,8 +1,8 @@
 {{#if notes}}
-<div class="notes-grid">
+<div id="notes-grid-div" class="notes-grid">
 	{{#each notes}}
 	<div class="note-grid-item">
-		<div class="quicknote noselect {{#if active}}note-active{{/if}} {{#if isshared}}shared{{/if}} {{#if sharedwith}}shareowner{{/if}}" style="background-color: {{color}}" data-id="{{ id }}" data-timestamp="{{ timestamp }}" >
+		<div class="quicknote noselect {{#if isshared}}shared{{/if}} {{#if sharedwith}}shareowner{{/if}}" style="background-color: {{color}}" data-id="{{ id }}" data-timestamp="{{ timestamp }}" >
 			{{#if isshared}}
 			<div>
 				<div class='icon-share shared-title' title="Shared by {{ userid }}"></div>
@@ -49,6 +49,7 @@
 	<div class="modal-content">
 		<div class="quicknote note-active" style="background-color: #F7EB96" data-id="-1">
 			<div>
+				<div class="icon-header-note icon-pin fixed-header-icon" title="{{t "quicknotes" "Pin note"}}"></div>
 				<div contenteditable="true" id='title-editable' class='note-title'></div>
 			</div>
 			<div contenteditable="true" id='content-editable' class='note-content'></div>

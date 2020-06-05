@@ -87,10 +87,10 @@
 }
 
 #div-content .note-title {
+   margin-right: 52px;
    font-size: 18px;
    font-weight: bold;
    text-overflow: ellipsis;
-   white-space: nowrap;
    overflow: hidden;
 }
 
@@ -149,7 +149,7 @@
    border: 1px solid rgba(0, 0, 0, 0.2);
 }
 
-.ciclle-toolbar:hover {
+.circle-toolbar:hover {
    color: #ccc;
    text-decoration:none;
    background:#333;
@@ -216,7 +216,7 @@ div[contenteditable="true"] {
 }
 
 #title-editable {
-    width: 100%;
+    width: 90%;
     background: none;
     color: unset;
     border: none;
