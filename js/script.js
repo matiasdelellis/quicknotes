@@ -243,19 +243,20 @@ View.prototype = {
         // Create medium div editor.
         var autolist = new AutoList();
         var editor = new MediumEditor(modalcontent, {
-            targetBlank: true,
             toolbar: {
                 buttons: [
-                    'bold',
-                    'italic',
-                    'underline',
-                    'strikethrough',
-                    'unorderedlist','orderedlist',
-                    'quote',
-                    'removeFormat'
+                    { name: 'bold', aria: t('quicknotes', 'Bold') },
+                    { name: 'italic', aria: t('quicknotes', 'Italic') },
+                    { name: 'underline', aria: t('quicknotes', 'Underline') },
+                    { name: 'strikethrough', aria: t('quicknotes', 'Strikethrough') },
+                    { name: 'unorderedlist', aria: t('quicknotes', 'Bulleted list') },
+                    { name: 'orderedlist', aria: t('quicknotes', 'Numbered list') },
+                    { name: 'quote', aria: t('quicknotes', 'Blockquote') },
+                    { name: 'removeFormat', aria: t('quicknotes', 'Clean format') }
                ]
             },
             autoLink: true,
+            targetBlank: true,
             paste: {
                 forcePlainText: false,
                 cleanPastedHTML: false
