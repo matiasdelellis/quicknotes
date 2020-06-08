@@ -63,7 +63,6 @@ deps:
 	cp node_modules/isotope-layout/dist/isotope.pkgd.js vendor/
 	cp node_modules/medium-editor/dist/js/medium-editor.js vendor/
 	cp node_modules/medium-editor/dist/css/medium-editor.css vendor/
-	cp node_modules/medium-editor/dist/css/themes/beagle.css vendor/
 	cp node_modules/medium-editor-autolist/dist/autolist.js vendor/
 
 depsmin:
@@ -74,7 +73,6 @@ depsmin:
 	cp node_modules/isotope-layout/dist/isotope.pkgd.min.js vendor/isotope.pkgd.js
 	cp node_modules/medium-editor/dist/js/medium-editor.min.js vendor/medium-editor.js
 	cp node_modules/medium-editor/dist/css/medium-editor.min.css vendor/medium-editor.css
-	cp node_modules/medium-editor/dist/css/themes/beagle.min.css vendor/beagle.css
 	cp node_modules/medium-editor-autolist/dist/autolist.min.js vendor/autolist.js
 
 js-templates:
@@ -94,34 +92,20 @@ dist:  appstore
 appstore: distclean depsmin
 	mkdir -p $(sign_dir)
 	rsync -a \
-	    --exclude=.git \
+	    --exclude='.*' \
 	    --exclude=build \
-	    --exclude=.gitignore \
-	    --exclude=.travis.yml \
-	    --exclude=.scrutinizer.yml \
 	    --exclude=CONTRIBUTING.md \
-	    --exclude=composer.json \
-	    --exclude=composer.lock \
-	    --exclude=composer.phar \
-	    --exclude=package.json \
-	    --exclude=package-lock.json \
-	    --exclude=.tx \
-	    --exclude=l10n/no-php \
+	    --exclude=composer* \
+	    --exclude=doc \
 	    --exclude=Makefile \
-	    --exclude=nbproject \
-	    --exclude=screenshots \
+	    --exclude=package*json \
+	    --exclude=l10n/no-php \
 	    --exclude=phpunit*xml \
 	    --exclude=tests \
 	    --exclude=vendor/bin \
 	    --exclude=node_modules \
-	    --exclude=js/node_modules \
-	    --exclude=js/tests \
-	    --exclude=js/karma.conf.js \
-	    --exclude=js/gulpfile.js \
-	    --exclude=js/bower.json \
-	    --exclude=js/package.json \
-	    --exclude=translationfiles \
-	    --exclude=translationtool.phar \
+	    --exclude=js/templates \
+	    --exclude=translation* \
 	$(project_dir) $(sign_dir)
 	@echo "Signing…"
 	php ../../occ integrity:sign-app \

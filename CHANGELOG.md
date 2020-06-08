@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.3.0]: 2020-08-05
+- Implement pin notes to keep notes always in view.
+- Add confirmation dialog to cancel edition. Part of issue #27.
+- New links are created to open in another tab.
+- Translate many new strings. Part of issue #32.
+- Improvements in styles and animations.
+- Move part of the code to the new Nextcloud standards.
+- Update German (Germany) translation thanks to Lars Seidler
+
 ## [0.2.4]: 2020-08-05
 - Add French translation thanks to Aymo XXX.
 - Update German translation thanks to lhsei.
