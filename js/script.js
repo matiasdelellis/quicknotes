@@ -724,6 +724,7 @@ View.prototype = {
     },
     _showEditor: function(id) {
         var note = $('.notes-grid [data-id=' + id + ']').parent();
+        var modal = $(".modal-content");
 
         /* Positioning the modal to the original size */
         $(".modal-content").css({
@@ -739,44 +740,64 @@ View.prototype = {
         $('#modal-note-div').addClass("show-modal-note");
 
         note.css({"opacity": "0.1"});
+        modal.css({"opacity": "0.1"});
 
         /* Animate to center */
 
         var windowWidth = $(window).width();
         var modalWidth = note.width()*2;
+
         var modalTop = 150;
         if (windowWidth < modalWidth) {
             modalWidth = windowWidth;
             modalTop = 50;
         }
+        var noteLeft = note.offset().left;
+        var noteTop = note.offset().top;
+        var modalLeft = (windowWidth / 2 - modalWidth / 2);
 
-        $(".modal-content").animate (
+        var distance = Math.sqrt(Math.pow(noteLeft - modalLeft , 2) + Math.pow(noteTop - modalTop, 2));
+        var duration = distance / 3;
+
+        modal.animate (
             {
-               left: (windowWidth / 2 - modalWidth / 2),
+               left: modalLeft,
                width: modalWidth,
                top: modalTop,
+               opacity: 1.0
             },
-            250,
+            duration,
             function () {
+                modal.css({"opacity": ""});
                 $('#modal-note-div #content-editable').focus();
             }
         );
     },
     _hideEditor: function(id) {
-        if (id === -1)
-            return;
         var note = $('.notes-grid [data-id=' + id + ']').parent();
-        $(".modal-content").animate (
+        var modal = $(".modal-content");
+
+        var noteLeft = note.offset().left;
+        var noteTop = note.offset().top;
+        var modalLeft = modal.offset().left;
+        var modalTop = modal.offset().top;
+
+        var distance = Math.sqrt(Math.pow(noteLeft - modalLeft , 2) + Math.pow(noteTop - modalTop, 2));
+        var duration = distance / 3;
+
+        modal.animate (
             {
-               left: note.offset().left,
+               left: noteLeft,
                width: note.width(),
-               top: note.offset().top
+               top: noteTop,
+               opacity: 0.0
             },
-            250,
+            duration,
             function () {
                 note.css({"opacity": ""});
                 $('#modal-note-div').removeClass("show-modal-note");
                 $('#modal-note-div').addClass("hide-modal-note");
+                modal.css({"opacity": ""});
             }
         );
     },
