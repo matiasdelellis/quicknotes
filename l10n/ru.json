@@ -1,6 +1,11 @@
 { "translations": {
     "Quick notes" : "Заметки",
+    "Tag the note" : "Введите тэги заметки",
+    "Enter tags to organize your note" : "Введите теги, чтобы отфильтровать заметки",
+    "Enter tag name" : "Введите тэг",
     "Cancel" : "Отмена",
+    "Done" : "Закрыть",
+    "Tags" : "Тэги",
     "Save" : "Сохранить",
     "Looking for your notes" : "Ищу ваши заметки",
     "Nothing here. Take your first quick notes" : "Заметок нет. Сделайте свою первую заметку",
@@ -10,11 +15,6 @@
     "All notes" : "Все заметки",
     "Colors" : "Цвет",
     "Notes" : "Заметка",
-    "Quick notes with a basic rich text" : "Быстрые заметки с базовым форматированным текстом",
-    "Tag the note" : "Введите тэги заметки",
-    "Enter tags to organize your note" : "Введите теги, чтобы отфильтровать заметки",
-    "Enter tag name" : "Введите тэг",
-    "Done" : "Закрыть",
-    "Tags" : "Тэги"
+    "Quick notes with a basic rich text" : "Быстрые заметки с базовым форматированным текстом"
 },"pluralForm" :"nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%100>=11 && n%100<=14)? 2 : 3);"
 }

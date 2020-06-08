@@ -1,6 +1,11 @@
 { "translations": {
     "Quick notes" : "Notas rápidas",
+    "Tag the note" : "Etiqueta la nota",
+    "Enter tags to organize your note" : "Ingrese etiquetas para organizar su nota",
+    "Enter tag name" : "Ingrese el nombre de la etiqueta",
     "Cancel" : "Cancelar",
+    "Done" : "Hecho",
+    "Tags" : "Etiquetas",
     "Save" : "Guardar",
     "Looking for your notes" : "Buscando tus notas",
     "Nothing here. Take your first quick notes" : "Nada aquí. Toma tus primeras notas rápidas",
@@ -11,10 +16,17 @@
     "Colors" : "Colores",
     "Notes" : "Notas",
     "Quick notes with a basic rich text" : "Notas rápidas con un texto enriquecido básico",
-    "Tag the note" : "Etiqueta la nota",
-    "Enter tags to organize your note" : "Ingrese etiquetas para organizar su nota",
-    "Enter tag name" : "Ingrese el nombre de la etiqueta",
-    "Done" : "Hecho",
-    "Tags" : "Etiquetas"
+    "Bold" : "Negrita",
+    "Italic" : "Itálica",
+    "Underline" : "Subrayado",
+    "Strikethrough" : "Tachado",
+    "Bulleted list" : "Lista con viñetas",
+    "Numbered list" : "Lista numerada",
+    "Blockquote" : "Cita",
+    "Clean format" : "Limpiar formato",
+    "Unpin note" : "Desanclar la nota",
+    "Pin note" : "Anclar la nota",
+    "Do you want to discard the changes?" : "¿Quieres descartar los cambios?",
+    "Unsaved changes" : "Cambios no guardados"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

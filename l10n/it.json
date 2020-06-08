@@ -1,6 +1,11 @@
 { "translations": {
     "Quick notes" : "Note veloci",
+    "Tag the note" : "Tagga la nota",
+    "Enter tags to organize your note" : "Inserisci tags per organizzare la nota",
+    "Enter tag name" : "Inserire il nome del tag",
     "Cancel" : "Annulla",
+    "Done" : "Fatto",
+    "Tags" : "Tags",
     "Save" : "Salva",
     "Looking for your notes" : "Cerco le tue note",
     "Nothing here. Take your first quick notes" : "Non c'è nulla. Crea le tue prime note veloci",
@@ -10,11 +15,6 @@
     "All notes" : "Tutte le note",
     "Colors" : "Colori",
     "Notes" : "Note",
-    "Quick notes with a basic rich text" : "Note veloci con abbellimenti di base del testo ",
-    "Tag the note" : "Tagga la nota",
-    "Enter tags to organize your note" : "Inserisci tags per organizzare la nota",
-    "Enter tag name" : "Inserire il nome del tag",
-    "Done" : "Fatto",
-    "Tags" : "Tags"
+    "Quick notes with a basic rich text" : "Note veloci con abbellimenti di base del testo "
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }
