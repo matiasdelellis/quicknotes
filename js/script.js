@@ -431,6 +431,12 @@ View.prototype = {
             self._editableColor(color);
         });
 
+        // Handle tags on modal
+        $('#modal-note-div').on('click', '.slim-tag', function (event) {
+            event.stopPropagation();
+            $('#modal-note-div #tag-button').trigger( "click");
+        });
+
         // handle tags button.
         $('#modal-note-div #tag-button').click(function (event) {
             event.stopPropagation();
