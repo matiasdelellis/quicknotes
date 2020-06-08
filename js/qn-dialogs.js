@@ -1,5 +1,5 @@
 /*
- * @copyright 2019 Matias De lellis <mati86dl@gmail.com>
+ * @copyright 2019-2020 Matias De lellis <mati86dl@gmail.com>
  *
  * @author 2019 Matias De lellis <mati86dl@gmail.com>
  *
@@ -49,9 +49,10 @@ const QnDialogs = {
 				multiple: false,
 				allowClear: true,
 				toggleSelect: true,
-				tags : function () {
+				tags: function () {
 					var data = [];
 					currentTags.forEach(function (item, index) {
+						// Select2 expect text instead of name
 						data.push({id: item.id, text: item.name});
 					});
 					return data;
@@ -94,7 +95,13 @@ const QnDialogs = {
 				click: function () {
 					input.select2('close');
 					if (callback !== undefined) {
-						callback(true, input.select2("data"));
+						// Quicknotes use name instead text of selecd
+						newTags = input.select2("data");
+						newTags.forEach(function (item, index, tArray) {
+							item['name'] = item.text;
+							tArray[index] = item;
+						});
+						callback(true, newTags);
 					}
 					$(dialogId).ocdialog('close');
 				},

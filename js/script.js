@@ -1,11 +1,22 @@
-/**
- * NextCloud/ownCloud - quicknotes
+/*
+ * @copyright 2016-2020 Matias De lellis <mati86dl@gmail.com>
  *
- * This file is licensed under the Affero General Public License version 3 or
- * later. See the COPYING file.
+ * @author 2016 Matias De lellis <mati86dl@gmail.com>
  *
- * @author Matias De lellis <mati86dl@gmail.com>
- * @copyright Matias De lellis 2016-2019
+ * @license GNU AGPL version 3 or any later version
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 (function (OC, window, $, undefined) {
@@ -17,87 +28,36 @@ $(document).ready(function () {
 var Notes = function (baseUrl) {
     this._baseUrl = baseUrl;
     this._notes = [];
-    this._activeNote = undefined;
     this._loaded = false;
 };
 
 Notes.prototype = {
-    load: function (id) {
+    // Load notes from backend.
+    load: function () {
         var self = this;
-        this._notes.forEach(function (note) {
-            if (note.id === id) {
-                note.active = true;
-                self._activeNote = note;
-            } else {
-                note.active = false;
-            }
-        });
-    },
-    getActive: function () {
-        return this._activeNote;
-    },
-    unsetActive: function () {
-        this._activeNote = undefined;
-        this._notes.forEach(function (note) {
-            note.active = false;
-        });
-    },
-    removeActive: function () {
-        var index;
         var deferred = $.Deferred();
-        var id = this._activeNote.id;
-        this._notes.forEach(function (note, counter) {
-            if (note.id === id) {
-                index = counter;
-            }
-        });
-
-        if (index !== undefined) {
-            // delete cached active note if necessary
-            if (this._activeNote === this._notes[index]) {
-                delete this._activeNote;
-            }
-
-            this._notes.splice(index, 1);
-
-            $.ajax({
-                url: this._baseUrl + '/' + id,
-                method: 'DELETE'
-            }).done(function () {
-                deferred.resolve();
-            }).fail(function () {
-                deferred.reject();
-            });
-        } else {
-            deferred.reject();
-        }
-        return deferred.promise();
-    },
-    length: function () {
-        return this._notes.length;
-    },
-    create: function (note) {
-        var deferred = $.Deferred();
-        var self = this;
-        $.ajax({
-            url: this._baseUrl,
-            method: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify(note)
-        }).done(function (note) {
-            note.tags = [];
-            self._notes.unshift(note);
-            self._activeNote = note;
-            self.load(note.id);
+        $.get(this._baseUrl).done(function (notes) {
+            self._notes = notes.reverse();
+            self._loaded = true;
             deferred.resolve();
         }).fail(function () {
             deferred.reject();
         });
         return deferred.promise();
     },
+    // Check that all the notes were loaded.
+    isLoaded: function () {
+        return this._loaded;
+    },
+    // Get the amount of notes.
+    length: function () {
+        return this._notes.length;
+    },
+    // Get all notes.
     getAll: function () {
         return this._notes;
     },
+    // Get the colors used in the notes
     getColors: function () {
         var colors = [];
         var Ccolors = [];
@@ -111,6 +71,7 @@ Notes.prototype = {
         });
         return Ccolors;
     },
+    // Get the tags used in the notes
     getTags: function () {
         var tags = [];
         $.each(this._notes, function(index, note) {
@@ -121,47 +82,60 @@ Notes.prototype = {
         });
         return tags;
     },
-    loadAll: function () {
-        var deferred = $.Deferred();
+    // CRUD Create: Need an note template to have the translated title.
+    create: function (noteTemplate) {
         var self = this;
-        $.get(this._baseUrl).done(function (notes) {
-            self._activeNote = undefined;
-            self._notes = notes.reverse();
-            self._loaded = true;
-            deferred.resolve();
+        var deferred = $.Deferred();
+        $.ajax({
+            url: this._baseUrl,
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(noteTemplate)
+        }).done(function (note) {
+            self._notes.unshift(note);
+            deferred.resolve(note);
         }).fail(function () {
             deferred.reject();
         });
         return deferred.promise();
     },
-    isLoaded: function () {
-        return this._loaded;
+    // CRUD Read: Load a note to edit.
+    read: function (id) {
+        return this._notes.find((note) => note.id === id);
     },
-    updateActive: function (title, content, pinned, tags, color) {
-        var note = this.getActive();
-
-        note.title = title;
-        note.content = content;
-        note.pinned = pinned ? 1 : 0;
-        note.ispinned = pinned;
-        note.tags = tags;
-        note.color = color;
-
-        return $.ajax({
+    // CRUD Update
+    update: function (note) {
+        var self = this;
+        var deferred = $.Deferred();
+        $.ajax({
             url: this._baseUrl + '/' + note.id,
             method: 'PUT',
             contentType: 'application/json',
             data: JSON.stringify(note)
+        }).done(function (dbnote) {
+            var index = self._notes.findIndex((aNote) => aNote.id === dbnote.id);
+            self._notes.splice(index, 1, dbnote);
+            deferred.resolve(dbnote);
+        }).fail(function () {
+            deferred.reject();
         });
+        return deferred.promise();
     },
-    updateId: function (id, title, content, pinned, tags, color) {
-        this.load(id);
-        return this.updateActive(title, content, pinned, tags, color);
-    },
-    setPinnedNote: function (id, pinned) {
-        this.load(id);
-        var note = this.getActive();
-        return this.updateActive(note.title, note.content, pinned, note.tags, note.color);
+    // CRUD Delete
+    remove: function (note) {
+        var self = this;
+        var deferred = $.Deferred();
+        $.ajax({
+            url: this._baseUrl + '/' + note.id,
+            method: 'DELETE'
+        }).done(function () {
+            var index = self._notes.findIndex((aNote) => aNote.id === note.id);
+            self._notes.splice(index, 1);
+            deferred.resolve();
+        }).fail(function () {
+            deferred.reject();
+        });
+        return deferred.promise();
     }
 };
 
@@ -175,276 +149,67 @@ var View = function (notes) {
 };
 
 View.prototype = {
-
     showAll: function () {
-        //self._notes.unsetActive();
         $('.notes-grid').isotope({ filter: '*'});
     },
-    colorToHex: function(color) {
-        if (color.substr(0, 1) === '#') {
-            return color.toUpperCase();;
-        }
-        var digits = /(.*?)rgb\((\d+), (\d+), (\d+)\)/.exec(color);
-
-        var red = parseInt(digits[2]);
-        var green = parseInt(digits[3]);
-        var blue = parseInt(digits[4]);
-
-        var rgb = blue | (green << 8) | (red << 16);
-
-        return digits[1] + '#' + rgb.toString(16).toUpperCase();
+    updateSort: function() {
+        $('.notes-grid').isotope('updateSortData').isotope();
     },
     editNote: function (id) {
-        var self = this;
+        // Get selected note and sync content
+        var note = this._notes.read(id);
 
-        // Get selected note elements
-        var note = $('.notes-grid [data-id=' + id + ']').parent();
-        var title = note.find(".note-title").html();
-        var content = note.find(".note-content").html();
-        var pinned = note.find(".icon-pinned").length > 0;
-        var tags = note.find(".note-tags").html();
-        var color = note.children().css("background-color");
-
-        // Get modal elements
-        var modaltitle = $('#modal-note-div #title-editable');
-        var modalcontent = $('#modal-note-div #content-editable');
-        var pinicon = $('#modal-note-div .icon-header-note');
-        var modaltags = $('#modal-note-div .note-tags');
-        var modalnote = $("#modal-note-div .quicknote");
-
-        var modalid = modalnote.data('id');
-        if (id == modalid)
-            return;
-
-        // Sync color
-        var colors = modalnote[0].getElementsByClassName("circle-toolbar");
-        $.each(colors, function(i, c) {
-            if(color == c.style.backgroundColor) {
-                c.className += " icon-checkmark";
-            }
-        });
-
-        // Sync pin icon
-        if (pinned) {
-            pinicon.removeClass("icon-pin");
-            pinicon.addClass("icon-pinned");
-        } else {
-            pinicon.removeClass("icon-pinned");
-            pinicon.addClass("icon-pin");
-        }
-
-        // Sync main content
-        modalnote.data('id', id);
-        modaltitle.html(title);
-        modalcontent.html(content);
-        modaltags.html(tags);
-        modalnote.css("background-color", color);
+        this._editableId(note.id);
+        this._editableTitle(note.title);
+        this._editableContent(note.content);
+        this._editablePinned(note.ispinned);
+        this._editableColor(note.color);
+        this._editableTags(note.tags);
 
         // Create medium div editor.
-        var autolist = new AutoList();
-        var editor = new MediumEditor(modalcontent, {
-            toolbar: {
-                buttons: [
-                    { name: 'bold', aria: t('quicknotes', 'Bold') },
-                    { name: 'italic', aria: t('quicknotes', 'Italic') },
-                    { name: 'underline', aria: t('quicknotes', 'Underline') },
-                    { name: 'strikethrough', aria: t('quicknotes', 'Strikethrough') },
-                    { name: 'unorderedlist', aria: t('quicknotes', 'Bulleted list') },
-                    { name: 'orderedlist', aria: t('quicknotes', 'Numbered list') },
-                    { name: 'quote', aria: t('quicknotes', 'Blockquote') },
-                    { name: 'removeFormat', aria: t('quicknotes', 'Clean format') }
-               ]
-            },
-            autoLink: true,
-            targetBlank: true,
-            paste: {
-                forcePlainText: false,
-                cleanPastedHTML: false
-            },
-            extensions: {
-                'autolist': autolist
-            }
-        });
+        this._initEditor();
 
-        editor.subscribe('editableInput', function(event, editorElement) {
-            self._changed = true;
-        });
-
-        this._editor = editor;
-
-        /*
-        var shareSelect = $('.note-share-select');
-        shareSelect.select2({
-            placeholder: "Share with users or groups",
-            allowClear: true,
-        });
-
-        var formData = {
-            noteId: id
-        }
-        $.post(OC.generateUrl('/apps/quicknotes/api/0.1/getusergroups'), formData, function(data) {
-            $.each(data.users, function(i, user) {
-                var newOption = new Option(user, user , false, false);
-                shareSelect.append(newOption);
-            });
-            shareSelect.trigger('change');
-
-            var sUsers = []
-            $.each(data.posUsers, function(i, user) {
-                var newOption = new Option(user, user , false, false);
-                shareSelect.append(newOption);
-                sUsers.push(user);
-            });
-            shareSelect.val(sUsers);
-            shareSelect.trigger('change');
-        });
-        */
-
-        /* Positioning the modal to the original size */
-
-        $(".modal-content").css({
-            "position" : "absolute",
-            "left"     : note.offset().left,
-            "top"      : note.offset().top,
-            "width"    : note.width(),
-            "min-height": note.height(),
-            "height:"  : "auto"
-        });
-
-        /* Animate to center */
-
-        var modal = $('#modal-note-div');
-        modal.removeClass("hide-modal-note");
-        modal.addClass("show-modal-note");
-
-        note.css({"opacity": "0.1"});
-
-        var windowWidth = $(window).width();
-        var modalWidth = note.width()*2;
-        var modalTop = 150;
-        if (windowWidth < modalWidth) {
-            modalWidth = windowWidth;
-            modalTop = 50;
-        }
-        $(".modal-content").animate (
-            {
-               left: (windowWidth / 2 - modalWidth / 2),
-               width: modalWidth,
-               top: modalTop,
-            },
-            250,
-            function () {
-                modalcontent.focus();
-            }
-        );
+        // Show modal editor
+        this._showEditor(id);
 
     },
     saveNote: function () {
-        var id = $("#modal-note-div .quicknote").data('id');
-
-        if (id === -1)
-            return;
-
-        var title = $('#modal-note-div #title-editable').html().trim();
-        var content = $('#modal-note-div #content-editable').html().trim();
-        var pinned = $('#modal-note-div').find(".icon-pinned").length > 0;
-        var color = this.colorToHex($("#modal-note-div .quicknote").css("background-color"));
-        var tags = $("#modal-note-div .slim-tag").toArray().map(function (value) {
-            return {
-                id: value.getAttribute('tag-id'),
-                name: value.textContent.trim()
-            };
-        });
-
-        /*
-        var shareSelect = $('.note-share-select');
-        var shares = shareSelect.select2('data');
-        for (var i = 0; i < shares.length; i++) {
-            var user = shares[i].id;
-            var formData = {
-                userId : user,
-                noteId : id
-            };
-            $.post(OC.generateUrl('/apps/quicknotes/api/0.1/users/addshare'), formData, function(data){});
-        }
-        */
-
+        var fakeNote = {
+            id: this._editableId(),
+            title: this._editableTitle(),
+            content: this._editableContent(),
+            color: this._editableColor(),
+            pinned: this._editablePinned(),
+            tags: this._editableTags()
+        };
         var self = this;
-        this._notes.updateId(id, title, content, pinned, tags, color).done(function () {
-            var modal = $('#modal-note-div');
-            var modalnote = $("#modal-note-div .quicknote");
-            var modaltitle = $('#modal-note-div #title-editable');
-            var modalcontent = $('#modal-note-div #content-editable');
-            var modaltags = $('#modal-note-div .note-tags');
+        this._notes.update(fakeNote).done(function (note) {
+            // Create an new note and replace in grid.
+            var noteHtml = $(Handlebars.templates['note-item'](note)).children();
+            $('.notes-grid [data-id=' + note.id + ']').replaceWith(noteHtml);
 
-            self._notes.unsetActive();
+            // Hide modal editor and reset it.
+            self._hideEditor(note.id);
+            self._destroyEditor();
 
-            modal.removeClass("show-modal-note");
-            modal.addClass("hide-modal-note");
-
-            modalnote.data('id', -1);
-            modaltitle.html("");
-            modalcontent.html("");
-            modaltags.html("");
-
-            self._editor.destroy();
-            self._changed = false;
-
-            // TODO: Update grid note instead of redraw everything
-            self.render();
+            // Update navigation show the note again and update grid.
+            self.renderNavigation();
+            self.updateSort();
         }).fail(function () {
             alert('DOh!. Could not update note!.');
         });
     },
     cancelEdit: function () {
-        var self = this;
-        var modal = $('#modal-note-div');
-        var modaltitle = $('#modal-note-div #title-editable');
-        var modalcontent = $('#modal-note-dive #content-editable');
-        var modaltags = $('#modal-note-div .note-tags');
-        var modalcolortools = $("#modal-note-div .circle-toolbar");
-        var modalnote = $("#modal-note-div .quicknote");
-
-        var id = $("#modal-note-div .quicknote").data('id');
-
-        /*
-        var shareSelect = $('.note-share-select');
-        shareSelect.val(null).trigger('change');
-        shareSelect.select2('destroy');
-        */
-
-        this._notes.unsetActive();
-
-        var note = $('.notes-grid [data-id=' + id + ']').parent();
-        modal.fadeOut(
-            250,
-            function() {
-                modal.css({"display": ""});
-                modal.removeClass("show-modal-note");
-                modal.addClass("hide-modal-note");
-                note.css({"opacity": ""});
-
-                // Reset modal
-                modalnote.data('id', -1);
-                modaltitle.html("");
-                modalcontent.html("");
-                modaltags.html("");
-
-                $.each(modalcolortools, function(i, colortool) {
-                    $(colortool).removeClass('icon-checkmark');
-                });
-
-                self._editor.destroy();
-                self._changed = false;
-            }
-        );
-
-        this._changed = false;
+        // Hide modal editor and reset it.
+        this._hideEditor(this._editableId());
+        this._destroyEditor();
     },
     renderContent: function () {
         // Remove all event handlers to prevent double events.
-        $("#app-content").off();
+        $("#div-content").off();
+        $("#note-grid-dev").off();
 
+        // Draw notes.
         var html = Handlebars.templates['notes']({
             loaded: this._notes.isLoaded(),
             notes: this._notes.getAll(),
@@ -476,13 +241,7 @@ View.prototype = {
             }
         });
 
-        // Handle click event to open note.
-        var modal = $('#modal-note-div');
-        var modaltitle = $('#modal-note-div #title-editable');
-        var modalcontent = $('#modal-note-div #content-editable');
-        var modalnote = $("#modal-note-div .quicknote");
-
-        // Show delete icon on hover.
+        // Show delete and pin icons when hover over the notes.
         $("#notes-grid-div").on("mouseenter", ".quicknote", function() {
             $(this).find(".icon-header-note").addClass( "show-header-icon");
         });
@@ -493,14 +252,7 @@ View.prototype = {
         // Open notes when clicking them.
         $("#notes-grid-div").on("click", ".quicknote", function (event) {
             event.stopPropagation();
-
-            if($(this).hasClass('shared')) return; //shares don't allow editing
-            var modalnote = $("#modal-note-editable .quicknote");
-            var modalid = modalnote.data('id');
-            if (modalid > 0) return;
-
             var id = parseInt($(this).data('id'), 10);
-
             self.editNote(id);
         });
 
@@ -509,7 +261,7 @@ View.prototype = {
             event.stopPropagation();
         });
 
-
+        // Filter notes by tag.
         $('#notes-grid-div').on('click', '.slim-tag', function (event) {
             event.stopPropagation();
             var tagId = parseInt($(this).attr('tag-id'), 10);
@@ -528,23 +280,23 @@ View.prototype = {
             });
         });
 
-        // Remove note icon
+        // Remove note when click icon
         var self = this;
         $('#notes-grid-div').on("click", ".icon-delete-note", function (event) {
             event.stopPropagation();
 
-            var note = $(this).parent().parent();
-            var id = parseInt(note.data('id'), 10);
+            var gridnote = $(this).parent().parent();
+            var id = parseInt(gridnote.data('id'), 10);
 
-            self._notes.load(id);
+            var note = self._notes.read(id);
             OC.dialogs.confirm(
                 t('quicknotes', 'Are you sure you want to delete the note?'),
                 t('quicknotes', 'Delete note'),
                 function(result) {
                     if (result) {
-                        self._notes.removeActive().done(function () {
+                        self._notes.remove(note).done(function () {
                             if (self._notes.length() > 0) {
-                                $(".notes-grid").isotope('remove', note.parent())
+                                $(".notes-grid").isotope('remove', gridnote.parent())
                                                 .isotope('layout');
                                 self.showAll();
                                 self.renderNavigation();
@@ -560,14 +312,18 @@ View.prototype = {
             );
         });
 
+        // Pin note when click icon
         $('#notes-grid-div').on("click", ".icon-pin", function (event) {
             event.stopPropagation();
 
             var icon =  $(this);
-            var note = icon.parent().parent();
-            var id = parseInt(note.data('id'), 10);
+            var gridNote = icon.parent().parent();
+            var id = parseInt(gridNote.data('id'), 10);
 
-            self._notes.setPinnedNote(id, true).done(function () {
+            var note = self._notes.read(id);
+            note.pinned = true;
+
+            self._notes.update(note).done(function () {
                 icon.removeClass("hide-header-icon");
                 icon.addClass("fixed-header-icon");
                 icon.removeClass("icon-pin");
@@ -579,14 +335,18 @@ View.prototype = {
             });
         });
 
+        // Unpin note when click icon
         $('#notes-grid-div').on("click", ".icon-pinned", function (event) {
             event.stopPropagation();
 
             var icon =  $(this);
-            var note = icon.parent().parent();
-            var id = parseInt(note.data('id'), 10);
+            var gridNote = icon.parent().parent();
+            var id = parseInt(gridNote.data('id'), 10);
 
-            self._notes.setPinnedNote(id, false).done(function () {
+            var note = self._notes.read(id);
+            note.pinned = false;
+
+            self._notes.update(note).done(function () {
                 icon.removeClass("fixed-header-icon");
                 icon.addClass("hide-header-icon");
                 icon.removeClass("icon-pinned");
@@ -601,7 +361,6 @@ View.prototype = {
         /*
          * Modal actions.
          */
-
         // Cancel when click outside the modal.
         $('#div-content').on('click', '.modal-note-background', function (event) {
             event.stopPropagation();
@@ -621,7 +380,7 @@ View.prototype = {
             );
         });
 
-        // But handles the click until the modal
+        // But handles the click of modal within itself.
         $('#div-content').on('click', '.modal-content', function (event) {
             event.stopPropagation();
         });
@@ -656,129 +415,32 @@ View.prototype = {
         // Pin note in modal
         $('#modal-note-div').on("click", ".icon-pin", function (event) {
             event.stopPropagation();
-
-            $(this).removeClass("icon-pin");
-            $(this).addClass("icon-pinned");
-            $(this).attr('title', t('quicknotes', 'Unpin note'));
+            self._editablePinned(true);
         });
 
         // Unpin note in modal
         $('#modal-note-div').on("click", ".icon-pinned", function (event) {
             event.stopPropagation();
-
-            $(this).removeClass("icon-pinned");
-            $(this).addClass("icon-pin");
-            $(this).attr('title', t('quicknotes', 'Pin note'));
-        });
-
-        // handle share editing notes.
-        $('#modal-note-div #share-button').click(function (event) {
-           var id = $('.note-active').data('id');
-           var formData = {
-                noteId: id
-           }
-           $.post(OC.generateUrl('/apps/quicknotes/api/0.1/getusergroups'), formData, function(data) {
-                var shareOptions = $('#note-share-options');
-                var groups = data.groups;
-                var users = data.users;
-                var pos_groups = data.posGroups;
-                var pos_users = data.posUsers;
-                var neg = $('#share-neg');
-                var pos = $('#share-pos');
-                var sear = $('#share-search');
-                for(var i=0; i<groups.length; i++) {
-                    var li = document.createElement('li');
-                    li.appendChild(document.createTextNode(groups[i]));
-                    var sp = document.createElement('span');
-                    sp.appendChild(document.createTextNode('(group)'));
-                    li.className = "unselected-share";
-                    li.appendChild(sp);
-                    $(li).hide();
-                    neg[0].appendChild(li);
-                }
-                for(var i=0; i<users.length; i++) {
-                    var li = document.createElement('li');
-                    li.appendChild(document.createTextNode(users[i]));
-                    li.className = "unselected-share";
-                    $(li).hide();
-                    neg[0].appendChild(li);
-                }
-                for(var i=0; i<pos_groups.length; i++) {
-                    var li = document.createElement('li');
-                    li.appendChild(document.createTextNode(pos_groups[i]));
-                    var sp = document.createElement('span');
-                    sp.appendChild(document.createTextNode('(group)'));
-                    li.className = "selected-share";
-                    li.appendChild(sp);
-                    pos[0].appendChild(li);
-                }
-                for(var i=0; i<pos_users.length; i++) {
-                    var li = document.createElement('li');
-                    li.appendChild(document.createTextNode(pos_users[i]));
-                    li.className = "selected-share";
-                    pos[0].appendChild(li);
-                }
-
-                $('.unselected-share').click(moveToSelectedShare);
-                $('.selected-share').click(moveToUnselectedShare);
-
-                shareOptions.show();
-                var modalNote = $('.note-active');
-                var startHeight = modalNote.outerHeight(true);
-                modalNote.outerHeight(startHeight + shareOptions.outerHeight(true));
-                sear.on('input', function() {
-                    var val = $(this).val().toLowerCase().trim();
-                    var lis = neg.children();
-                    if(val.length == 0) {
-                        lis.hide();
-                    } else {
-                        for(var i=0; i<lis.length; i++) {
-                            if(lis[i].innerHTML.toLowerCase().indexOf(val) >= 0) {
-                                $(lis[i]).show();
-                            } else {
-                                $(lis[i]).hide();
-                            }
-                        }
-                    }
-                    modalNote.outerHeight(startHeight + shareOptions.outerHeight(true));
-                });
-           });
+            self._editablePinned(false);
         });
 
         // Handle colors.
         $('#modal-note-div .circle-toolbar').click(function (event) {
             event.stopPropagation();
-
-            var oldColorTool = $('#modal-note-div .circle-toolbar.icon-checkmark');
-            $.each(oldColorTool, function(i, oct) {
-               $(oct).removeClass('icon-checkmark');
-            });
-            $(this).addClass('icon-checkmark');
             var color = $(this).css("background-color");
-            modalnote.css("background-color", color);
+            self._editableColor(color);
         });
 
         // handle tags button.
         $('#modal-note-div #tag-button').click(function (event) {
             event.stopPropagation();
-            var noteTags = $("#modal-note-div .slim-tag").toArray().map(function (value) {
-                return {
-                    id: value.getAttribute('tag-id'),
-                    name: value.textContent.trim()
-                };
-            });
+            var noteTags = self._editableTags();
             QnDialogs.tags(
                 self._notes.getTags(),
                 noteTags,
                 function(result, newTags) {
                     if (result === true) {
-                        var modalTags = $('#modal-note-div .note-tags');
-                        modalTags.html('');
-                        newTags.forEach(function (item, index) {
-                            var noteId = parseInt(item.id) || -1;
-                            var tag = $('<div class="icon-tag slim-tag" tag-id="' + noteId + '">' + item.text + '</div>');
-                            modalTags.append(tag);
-                        });
+                        self._editableTags(newTags);
                     }
                 },
                 true,
@@ -815,7 +477,6 @@ View.prototype = {
 
         // show all notes
         $('#all-notes').click(function () {
-            self._notes.unsetActive();
             $('.notes-grid').isotope({ filter: '*'});
 
             var oldColorTool = $('#app-navigation .circle-toolbar.icon-checkmark');
@@ -840,30 +501,21 @@ View.prototype = {
         // create a new note
         var self = this;
         $('#new-note').click(function () {
-            var note = {
+            var fakenote = {
                 title: t('quicknotes', 'New note'),
                 content: '',
                 color: '#F7EB96'
             };
-            self._notes.create(note).done(function() {
+            self._notes.create(fakenote).done(function(note) {
                 if (self._notes.length() > 1) {
-                    note = self._notes.getActive();
-                    var $notehtml = $(Handlebars.templates['note-item']({
-                        color: note.color,
-                        id: note.id,
-                        title: note.title,
-                        content: note.content,
-                        timestamp: note.timestamp,
-                    }));
-
+                    var $notehtml = $(Handlebars.templates['note-item'](note));
                     $(".notes-grid").prepend($notehtml)
                                     .isotope('prepended', $notehtml)
-                                    .isotope({ filter: '*'})
                                     .isotope('layout');
-                    self._notes.unsetActive();
+                    self.showAll();
+                    self.updateSort();
                     self.renderNavigation();
                 } else {
-                    self._notes.unsetActive();
                     self.render();
                 }
             }).fail(function () {
@@ -944,12 +596,200 @@ View.prototype = {
             });
         });
     },
+
+    /**
+     * Some 'private' functions as helpers.
+     */
+    _colorToHex: function(color) {
+        if (color.substr(0, 1) === '#') {
+            return color.toUpperCase();;
+        }
+        var digits = /(.*?)rgb\((\d+), (\d+), (\d+)\)/.exec(color);
+
+        var red = parseInt(digits[2]);
+        var green = parseInt(digits[3]);
+        var blue = parseInt(digits[4]);
+
+        var rgb = blue | (green << 8) | (red << 16);
+
+        return digits[1] + '#' + rgb.toString(16).toUpperCase();
+    },
+    _editableId: function(id) {
+        if (id === undefined)
+            return $("#modal-note-div .quicknote").data('id');
+        else
+            $("#modal-note-div .quicknote").data('id', id);
+    },
+    _editableTitle: function(title) {
+        if (title === undefined)
+            return $('#modal-note-div #title-editable').html().trim();
+        else
+            $('#modal-note-div #title-editable').html(title);
+    },
+    _editableContent: function(content) {
+        if (content === undefined)
+            return $('#modal-note-div #content-editable').html().trim();
+        else
+            $('#modal-note-div #content-editable').html(content);
+    },
+    _editablePinned: function(pinned) {
+        if (pinned === undefined)
+            return $('#modal-note-div').find(".icon-pinned").length > 0;
+        else {
+            var icon = $('#modal-note-div .icon-header-note');
+            if (pinned) {
+                icon.removeClass("icon-pin");
+                icon.addClass("icon-pinned");
+                icon.attr('title', t('quicknotes', 'Unpin note'));
+            } else {
+                icon.removeClass("icon-pinned");
+                icon.addClass("icon-pin");
+                icon.attr('title', t('quicknotes', 'Pin note'));
+            }
+        }
+    },
+    _editableColor: function(color) {
+        if (color === undefined)
+            return this._colorToHex($("#modal-note-div .quicknote").css("background-color"));
+        else {
+            var colors = $("#modal-note-div .quicknote")[0].getElementsByClassName("circle-toolbar");
+            $.each(colors, function(i, c) {
+                if (color == c.style.backgroundColor) {
+                    c.className += " icon-checkmark";
+                }
+            });
+            $("#modal-note-div .quicknote").css("background-color", color);
+        }
+    },
+    _editableTags: function(tags) {
+        if (tags === undefined) {
+            return $("#modal-note-div .slim-tag").toArray().map(function (value) {
+                return {
+                    id: value.getAttribute('tag-id'),
+                    name: value.textContent.trim()
+                };
+            });
+        } else {
+            var html = Handlebars.templates['tags']({ tags: tags});
+            $("#modal-note-div .note-tags").replaceWith(html);
+        }
+    },
+    _initEditor: function() {
+        var modalcontent = $('#modal-note-div #content-editable');
+        var editor = new MediumEditor(modalcontent, {
+            toolbar: {
+                buttons: [
+                    { name: 'bold', aria: t('quicknotes', 'Bold') },
+                    { name: 'italic', aria: t('quicknotes', 'Italic') },
+                    { name: 'underline', aria: t('quicknotes', 'Underline') },
+                    { name: 'strikethrough', aria: t('quicknotes', 'Strikethrough') },
+                    { name: 'unorderedlist', aria: t('quicknotes', 'Bulleted list') },
+                    { name: 'orderedlist', aria: t('quicknotes', 'Numbered list') },
+                    { name: 'quote', aria: t('quicknotes', 'Blockquote') },
+                    { name: 'removeFormat', aria: t('quicknotes', 'Clean format') }
+               ]
+            },
+            autoLink: true,
+            targetBlank: true,
+            paste: {
+                forcePlainText: false,
+                cleanPastedHTML: false
+            },
+            extensions: {
+                'autolist': new AutoList()
+            }
+        });
+
+        var self = this;
+        editor.subscribe('editableInput', function(event, editorElement) {
+            self._changed = true;
+        });
+
+        this._editor = editor;
+    },
+    _destroyEditor: function() {
+        this._editor.destroy();
+        this._editor = undefined;
+        this._changed = false;
+
+        this._editableId(-1);
+        this._editableTitle('');
+        this._editableContent('');
+        this._editablePinned(false);
+        this._editableTags([]);
+
+        $.each($("#modal-note-div .circle-toolbar"), function(i, colortool) {
+            $(colortool).removeClass('icon-checkmark');
+        });
+    },
+    _showEditor: function(id) {
+        var note = $('.notes-grid [data-id=' + id + ']').parent();
+
+        /* Positioning the modal to the original size */
+        $(".modal-content").css({
+            "position" : "absolute",
+            "left"     : note.offset().left,
+            "top"      : note.offset().top,
+            "width"    : note.width(),
+            "min-height": note.height(),
+            "height:"  : "auto"
+        });
+
+        $('#modal-note-div').removeClass("hide-modal-note");
+        $('#modal-note-div').addClass("show-modal-note");
+
+        note.css({"opacity": "0.1"});
+
+        /* Animate to center */
+
+        var windowWidth = $(window).width();
+        var modalWidth = note.width()*2;
+        var modalTop = 150;
+        if (windowWidth < modalWidth) {
+            modalWidth = windowWidth;
+            modalTop = 50;
+        }
+
+        $(".modal-content").animate (
+            {
+               left: (windowWidth / 2 - modalWidth / 2),
+               width: modalWidth,
+               top: modalTop,
+            },
+            250,
+            function () {
+                $('#modal-note-div #content-editable').focus();
+            }
+        );
+    },
+    _hideEditor: function(id) {
+        if (id === -1)
+            return;
+        var note = $('.notes-grid [data-id=' + id + ']').parent();
+        $(".modal-content").animate (
+            {
+               left: note.offset().left,
+               width: note.width(),
+               top: note.offset().top
+            },
+            250,
+            function () {
+                note.css({"opacity": ""});
+                $('#modal-note-div').removeClass("show-modal-note");
+                $('#modal-note-div').addClass("hide-modal-note");
+            }
+        );
+    },
     render: function () {
         this.renderNavigation();
         this.renderContent();
     }
 };
 
+
+/**
+ * Filter notes.
+ */
 function search (query) {
     if (query) {
         query = query.toLowerCase();
@@ -990,8 +830,9 @@ view.renderContent();
 /*
  * Loading notes and render final view.
  */
-notes.loadAll().done(function () {
-    view.render();
+notes.load().done(function () {
+    view.renderNavigation();
+    view.renderContent();
 }).fail(function () {
     alert('Could not load notes');
 });

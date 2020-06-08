@@ -12,7 +12,11 @@
 		</div>
 		{{else}}
 		<div>
-			<div class="icon-header-note icon-pin hide-header-icon" title="{{t "quicknotes" "Pin note"}}"></div>
+			{{#if ispinned}}
+				<div class="icon-header-note icon-pinned fixed-header-icon" title="{{t "quicknotes" "Unpin note"}}"></div>
+			{{else}}
+				<div class="icon-header-note icon-pin hide-header-icon" title="{{t "quicknotes" "Pin note"}}"></div>
+			{{/if}}
 			<div class="icon-header-note icon-delete hide-header-icon icon-delete-note" title="{{t "quicknotes" "Delete note"}}"></div>
 			<!--
 			{{#if sharedwith}}

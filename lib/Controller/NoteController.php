@@ -1,12 +1,23 @@
 <?php
-/**
- * ownCloud - quicknotes
+/*
+ * @copyright 2016-2020 Matias De lellis <mati86dl@gmail.com>
  *
- * This file is licensed under the Affero General Public License version 3 or
- * later. See the COPYING file.
+ * @author 2016 Matias De lellis <mati86dl@gmail.com>
  *
- * @author Matias De lellis <mati86dl@gmail.com>
- * @copyright Matias De lellis 2016
+ * @license GNU AGPL version 3 or any later version
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 namespace OCA\QuickNotes\Controller;
@@ -134,16 +145,21 @@ class NoteController extends Controller {
 
 		// Create note and insert it
 		$note = new Note();
+
 		$note->setTitle($title);
 		$note->setContent($content);
 		$note->setTimestamp(time());
 		$note->setColorId($hcolor->id);
 		$note->setUserId($this->userId);
 
-		// Insert true color to response
-		$note->setColor($hcolor->getColor());
+		$newNote = $this->notemapper->insert($note);
 
-		return new DataResponse($this->notemapper->insert($note));
+		// Insert true color pin and tags to response
+		$newNote->setColor($hcolor->getColor());
+		$newNote->setIsPinned(false);
+		$newNote->setTags([]);
+
+		return new DataResponse($newNote);
 	}
 
 	/**
@@ -218,12 +234,12 @@ class NoteController extends Controller {
 		$note->setTimestamp(time());
 		$note->setColorId($hcolor->id);
 
-		// Insert true color to response
-		$note->setColor($hcolor->getColor());
-		$note->setIsPinned($note->getPinned() ? true : false);
-
 		// Update note.
 		$newnote = $this->notemapper->update($note);
+
+		// Insert true color and pin to response
+		$newnote->setColor($hcolor->getColor());
+		$newnote->setIsPinned($note->getPinned() ? true : false);
 
 		// Fill new tags
 		$newnote->setTags($this->tagmapper->getTagsForNote($this->userId, $newnote->getId()));
