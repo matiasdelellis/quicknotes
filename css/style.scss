@@ -25,12 +25,12 @@
 
 #new-note-fixed {
     z-index: 111; /* navigation menu is 110 ;-) */
-    background-color: rgba(255, 255, 255, .75);
     padding: 10px;
     position: relative;
 }
 
 .quicknote {
+    color: #202124;
     min-height: 150px;
     width: 250px;
     padding: 10px;
@@ -55,6 +55,10 @@
     margin: 0px 0px 0px 10px;
     border-left: 1px dotted;
     padding-left: 1ex;
+}
+
+.quicknote a {
+    color: #15c;
 }
 
 .note-active {
