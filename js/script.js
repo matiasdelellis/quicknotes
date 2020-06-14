@@ -444,7 +444,7 @@ View.prototype = {
         // Handle colors.
         $('#modal-note-div .circle-toolbar').click(function (event) {
             event.stopPropagation();
-            var color = $(this).css("background-color");
+            var color = self._colorToHex($(this).css("background-color"));
             self._editableColor(color);
         });
 
@@ -693,9 +693,13 @@ View.prototype = {
         if (color === undefined)
             return this._colorToHex($("#modal-note-div .quicknote").css("background-color"));
         else {
+            var self = this;
             var colors = $("#modal-note-div .quicknote")[0].getElementsByClassName("circle-toolbar");
             $.each(colors, function(i, c) {
-                if (color == c.style.backgroundColor) {
+                $(c).removeClass('icon-checkmark');
+            });
+            $.each(colors, function(i, c) {
+                if (color === self._colorToHex(c.style.backgroundColor)) {
                     c.className += " icon-checkmark";
                 }
             });
