@@ -326,6 +326,22 @@ div[contenteditable="true"] {
     background-color: rgba(210, 210, 210, .5);
 }
 
+.attach-remove {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    padding: 12px;
+    background-color: rgba(210, 210, 210, .4);
+    opacity: 0.54;
+    border-radius: 50%;
+}
+
+.attach-remove:hover {
+    cursor: pointer;
+    background-color: rgba(210, 210, 210, .5);
+    opacity: 0.87;
+}
+
 .note-body {
     padding: 10px;
 }

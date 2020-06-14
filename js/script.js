@@ -423,6 +423,13 @@ View.prototype = {
         });
 
         // Pin note in modal
+        $('#modal-note-div').on("click", ".attach-remove", function (event) {
+            event.stopPropagation();
+            $(this).parent().remove();
+            self._resizeAttachtsModal();
+        });
+
+        // Pin note in modal
         $('#modal-note-div').on("click", ".icon-pin", function (event) {
             event.stopPropagation();
             self._editablePinned(true);
@@ -723,16 +730,22 @@ View.prototype = {
             $("#modal-note-div .note-attachts").replaceWith(html);
 
             lozad('.attach-preview').observe();
-
-            var sAttachts = $('#modal-note-div .note-attach-grid');
-            sAttachts.parent().css('height', (500/sAttachts.length) + 'px');
-            sAttachts.first().children().css('border-top-left-radius', '8px');
-            sAttachts.each(function(index) {
-                $(this).css('width', (100/sAttachts.length) + '%');
-                $(this).css('left', (100/sAttachts.length)*index + '%');
-            });
-            sAttachts.last().children().css('border-top-right-radius', '8px');
+            this._resizeAttachtsModal();
         }
+    },
+    _resizeAttachtsModal: function() {
+        var sAttachts = $('#modal-note-div .note-attach-grid');
+        if (sAttachts.length === 0) {
+            $('#modal-note-div .note-attachts').css('height','');
+            return;
+        }
+        sAttachts.parent().css('height', (500/sAttachts.length) + 'px');
+        sAttachts.first().children().first().css('border-top-left-radius', '8px');
+        sAttachts.each(function(index) {
+            $(this).css('width', (100/sAttachts.length) + '%');
+            $(this).css('left', (100/sAttachts.length)*index + '%');
+        });
+        sAttachts.last().children().first().css('border-top-right-radius', '8px');
     },
     _resizeAttachtsGrid: function() {
         var attachtsgrids = $('#notes-grid-div .note-attachts');
