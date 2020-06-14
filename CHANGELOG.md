@@ -1,6 +1,10 @@
 # Changelog
 
-## [0.3.0]: 2020-08-05
+## [0.4.0]: 2020-06-14
+- Implement attachments to notes.
+- Fix the icon that marks the color of the modal note.
+
+## [0.3.0]: 2020-06-08
 - Implement pin notes to keep notes always in view.
 - Add confirmation dialog to cancel edition. Part of issue #27.
 - New links are created to open in another tab.
