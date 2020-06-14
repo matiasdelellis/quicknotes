@@ -165,6 +165,7 @@ View.prototype = {
         this._editablePinned(note.ispinned);
         this._editableColor(note.color);
         this._editableTags(note.tags);
+        this._editableAttachts(note.attachts);
 
         // Create medium div editor.
         this._initEditor();
@@ -178,6 +179,7 @@ View.prototype = {
             id: this._editableId(),
             title: this._editableTitle(),
             content: this._editableContent(),
+            attachts: this._editableAttachts(),
             color: this._editableColor(),
             pinned: this._editablePinned(),
             tags: this._editableTags()
@@ -187,6 +189,9 @@ View.prototype = {
             // Create an new note and replace in grid.
             var noteHtml = $(Handlebars.templates['note-item'](note)).children();
             $('.notes-grid [data-id=' + note.id + ']').replaceWith(noteHtml);
+
+            self._resizeAttachtsGrid();
+            lozad('.attach-preview').observe();
 
             // Hide modal editor and reset it.
             self._hideEditor(note.id);
@@ -221,7 +226,12 @@ View.prototype = {
             emptyMsg: t('quicknotes', 'Nothing here. Take your first quick notes'),
             emptyIcon: OC.imagePath('quicknotes', 'app'),
         });
+
         $('#div-content').html(html);
+
+        // TODO: Move within handlebars template
+        this._resizeAttachtsGrid();
+        lozad('.attach-preview').observe();
 
         // Init masonty grid to notes.
         $('.notes-grid').isotope({
@@ -285,7 +295,7 @@ View.prototype = {
         $('#notes-grid-div').on("click", ".icon-delete-note", function (event) {
             event.stopPropagation();
 
-            var gridnote = $(this).parent().parent();
+            var gridnote = $(this).parent().parent().parent();
             var id = parseInt(gridnote.data('id'), 10);
 
             var note = self._notes.read(id);
@@ -317,7 +327,7 @@ View.prototype = {
             event.stopPropagation();
 
             var icon =  $(this);
-            var gridNote = icon.parent().parent();
+            var gridNote = icon.parent().parent().parent();
             var id = parseInt(gridNote.data('id'), 10);
 
             var note = self._notes.read(id);
@@ -340,7 +350,7 @@ View.prototype = {
             event.stopPropagation();
 
             var icon =  $(this);
-            var gridNote = icon.parent().parent();
+            var gridNote = icon.parent().parent().parent();
             var id = parseInt(gridNote.data('id'), 10);
 
             var note = self._notes.read(id);
@@ -435,6 +445,26 @@ View.prototype = {
         $('#modal-note-div').on('click', '.slim-tag', function (event) {
             event.stopPropagation();
             $('#modal-note-div #tag-button').trigger( "click");
+        });
+
+        // handle attach button.
+        $('#modal-note-div #attach-button').click(function (event) {
+            event.stopPropagation();
+            OC.dialogs.filepicker(t('quicknotes', 'Select file to attach'), function(datapath, returntype) {
+                OC.Files.getClient().getFileInfo(datapath).then((status, fileInfo) => {
+                    var attach = {
+                        file_id: fileInfo.id,
+                        preview_url: OC.generateUrl('core') + '/preview.png?file=' + encodeURI(datapath) + '&x=512&y=512'
+                    };
+
+                    var attachts = self._editableAttachts();
+                    attachts.push(attach);
+
+                    self._editableAttachts(attachts);
+                }).fail(() => {
+                    console.log("ERRORRR");
+                });
+            }, false, '*', true, OC.dialogs.FILEPICKER_TYPE_CHOOSE)
         });
 
         // handle tags button.
@@ -679,6 +709,43 @@ View.prototype = {
             var html = Handlebars.templates['tags']({ tags: tags});
             $("#modal-note-div .note-tags").replaceWith(html);
         }
+    },
+    _editableAttachts: function(attachts) {
+        if (attachts === undefined) {
+            return $("#modal-note-div .note-attach").toArray().map(function (value) {
+                return {
+                    file_id: value.getAttribute('attach-file-id'),
+                    preview_url: value.getAttribute('data-background-image')
+                };
+            });
+        } else {
+            var html = Handlebars.templates['attachts']({ attachts: attachts});
+            $("#modal-note-div .note-attachts").replaceWith(html);
+
+            lozad('.attach-preview').observe();
+
+            var sAttachts = $('#modal-note-div .note-attach-grid');
+            sAttachts.parent().css('height', (500/sAttachts.length) + 'px');
+            sAttachts.first().children().css('border-top-left-radius', '8px');
+            sAttachts.each(function(index) {
+                $(this).css('width', (100/sAttachts.length) + '%');
+                $(this).css('left', (100/sAttachts.length)*index + '%');
+            });
+            sAttachts.last().children().css('border-top-right-radius', '8px');
+        }
+    },
+    _resizeAttachtsGrid: function() {
+        var attachtsgrids = $('#notes-grid-div .note-attachts');
+        attachtsgrids.each(function() {
+            var sAttachts = $(this).children('.note-attach-grid');
+            sAttachts.parent().css('height', (250/sAttachts.length) + 'px');
+            sAttachts.first().children().css('border-top-left-radius', '8px');
+            sAttachts.each(function(index) {
+            $(this).css('width', (100/sAttachts.length) + '%');
+                $(this).css('left', (100/sAttachts.length)*index + '%');
+            });
+            sAttachts.last().children().css('border-top-right-radius', '8px');
+        });
     },
     _initEditor: function() {
         var modalcontent = $('#modal-note-div #content-editable');

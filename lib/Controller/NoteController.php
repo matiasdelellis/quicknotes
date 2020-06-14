@@ -22,12 +22,15 @@
 
 namespace OCA\QuickNotes\Controller;
 
-use OCP\IRequest;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\Http\JSONResponse;
 use OCP\AppFramework\Controller;
 
+use OCP\IRequest;
+
+use OCA\QuickNotes\Db\Attach;
+use OCA\QuickNotes\Db\AttachMapper;
 use OCA\QuickNotes\Db\Color;
 use OCA\QuickNotes\Db\ColorMapper;
 use OCA\QuickNotes\Db\Note;
@@ -39,13 +42,18 @@ use OCA\QuickNotes\Db\NoteShareMapper;
 use OCA\QuickNotes\Db\Tag;
 use OCA\QuickNotes\Db\TagMapper;
 
+use OCA\QuickNotes\Service\FileService;
+
+
 class NoteController extends Controller {
 
 	private $notemapper;
 	private $notetagmapper;
 	private $colormapper;
 	private $notesharemapper;
+	private $attachMapper;
 	private $tagmapper;
+	private $fileService;
 	private $userId;
 
 	public function __construct($AppName,
@@ -54,16 +62,21 @@ class NoteController extends Controller {
 	                            NoteTagMapper   $notetagmapper,
 	                            NoteShareMapper $notesharemapper,
 	                            ColorMapper     $colormapper,
+	                            AttachMapper    $attachMapper,
 	                            TagMapper       $tagmapper,
+	                            FileService     $fileService,
 	                            $UserId)
 	{
 		parent::__construct($AppName, $request);
-		$this->notemapper = $notemapper;
-		$this->notetagmapper = $notetagmapper;
-		$this->colormapper = $colormapper;
+
+		$this->notemapper      = $notemapper;
+		$this->notetagmapper   = $notetagmapper;
+		$this->colormapper     = $colormapper;
 		$this->notesharemapper = $notesharemapper;
-		$this->tagmapper = $tagmapper;
-		$this->userId = $UserId;
+		$this->attachMapper    = $attachMapper;
+		$this->tagmapper       = $tagmapper;
+		$this->fileService     = $fileService;
+		$this->userId          = $UserId;
 	}
 
 	/**
@@ -108,6 +121,15 @@ class NoteController extends Controller {
 		// Insert true color to response
 		foreach ($notes as $note) {
 			$note->setIsPinned($note->getPinned() ? true : false);
+		}
+
+		// Insert true attachts to response
+		foreach ($notes as $note) {
+			$attachts = $this->attachMapper->findFromNote($this->userId, $note->getId());
+			foreach ($attachts as $attach) {
+				$attach->setPreviewUrl($this->fileService->getPreviewUrl($attach->getFileId(), 512));
+			}
+			$note->setAttachts($attachts);
 		}
 
 		return new DataResponse($notes);
@@ -158,6 +180,7 @@ class NoteController extends Controller {
 		$newNote->setColor($hcolor->getColor());
 		$newNote->setIsPinned(false);
 		$newNote->setTags([]);
+		$newNote->setAttachts([]);
 
 		return new DataResponse($newNote);
 	}
@@ -168,11 +191,12 @@ class NoteController extends Controller {
 	 * @param int $id
 	 * @param string $title
 	 * @param string $content
+	 * @param array $attachts
 	 * @param boolean $pinned
 	 * @param array $tags
 	 * @param string $color
 	 */
-	public function update($id, $title, $content, $pinned, $tags, $color = "#F7EB96") {
+	public function update($id, $title, $content, $attachts, $pinned, $tags, $color = "#F7EB96") {
 		// Get current Note and Color.
 		try {
 			$note = $this->notemapper->find($id, $this->userId);
@@ -188,6 +212,33 @@ class NoteController extends Controller {
 			$hcolor = new Color();
 			$hcolor->setColor($color);
 			$hcolor = $this->colormapper->insert($hcolor);
+		}
+
+		// Delete old attachts
+		$dbAttachts = $this->attachMapper->findFromNote($this->userId, $id);
+		foreach ($dbAttachts as $dbAttach) {
+			$delete = true;
+			foreach ($attachts as $attach) {
+				if ($dbAttach->getFileId() === $attach['file_id']) {
+					$delete = false;
+					break;
+				}
+			}
+			if ($delete) {
+				$this->attachMapper->delete($dbAttach);
+			}
+		}
+
+		// Add new attachts
+		foreach ($attachts as $attach) {
+			if (!$this->attachMapper->fileAttachExists($this->userId, $id, $attach['file_id'])) {
+				$hAttach = new Attach();
+				$hAttach->setUserId($this->userId);
+				$hAttach->setNoteId($id);
+				$hAttach->setFileId($attach['file_id']);
+				$hAttach->setCreatedAt(time());
+				$this->attachMapper->insert($hAttach);
+			}
 		}
 
 		// Delete old tag relations
@@ -244,6 +295,13 @@ class NoteController extends Controller {
 		// Fill new tags
 		$newnote->setTags($this->tagmapper->getTagsForNote($this->userId, $newnote->getId()));
 
+		// Fill attachts to response
+		$attachts = $this->attachMapper->findFromNote($this->userId, $newnote->getId());
+		foreach ($attachts as $attach) {
+			$attach->setPreviewUrl($this->fileService->getPreviewUrl($attach->getFileId(), 512));
+		}
+		$newnote->setAttachts($attachts);
+
 		//  Remove old color if necessary
 		if (($oldcolorid !== $hcolor->getId()) &&
 		    (!$this->notemapper->colorIdCount($oldcolorid))) {
@@ -280,6 +338,11 @@ class NoteController extends Controller {
 		if (!$this->notemapper->colorIdCount($oldcolorid)) {
 			$oldcolor = $this->colormapper->find($oldcolorid);
 			$this->colormapper->delete($oldcolor);
+		}
+
+		$attachts = $this->attachMapper->findFromNote($this->userId, $id);
+		foreach ($attachts as $attach) {
+			$this->attachMapper->delete($attach);
 		}
 
 		return new DataResponse($note);

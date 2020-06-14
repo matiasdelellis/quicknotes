@@ -11,30 +11,41 @@
 			{{{ content }}}
 		</div>
 		{{else}}
-		<div>
-			{{#if ispinned}}
-				<div class="icon-header-note icon-pinned fixed-header-icon" title="{{t "quicknotes" "Unpin note"}}"></div>
-			{{else}}
-				<div class="icon-header-note icon-pin hide-header-icon" title="{{t "quicknotes" "Pin note"}}"></div>
-			{{/if}}
-			<div class="icon-header-note icon-delete hide-header-icon icon-delete-note" title="{{t "quicknotes" "Delete note"}}"></div>
-			<!--
-			{{#if sharedwith}}
-			<div class='icon-share shared-title-owner' title="Shared with {{ sharedwith }}"></div>
-			{{/if}}
-			-->
-			<div class='note-title'>
-				{{{ title }}}
+		<div class='note-header'>
+			<div class='note-attachts'>
+				{{#each attachts}}
+					<div class='note-attach-grid'>
+						<div class="attach-preview note-attach" attach-file-id="{{file_id}}" data-background-image="{{preview_url}}"/>
+					</div>
+				{{/each}}
 			</div>
 		</div>
-		<div class='note-content'>
-			{{{ content }}}
-		</div>
-		<div class='note-tags'>
-			{{#each tags}}
-				<div class="icon-tag slim-tag" tag-id="{{ id }}">{{{ name }}}</div>
-			{{/each}}
-		</div>
+		<div class='note-body'>
+			<div>
+				{{#if ispinned}}
+					<div class="icon-header-note icon-pinned fixed-header-icon" title="{{t "quicknotes" "Unpin note"}}"></div>
+				{{else}}
+					<div class="icon-header-note icon-pin hide-header-icon" title="{{t "quicknotes" "Pin note"}}"></div>
+				{{/if}}
+				<div class="icon-header-note icon-delete hide-header-icon icon-delete-note" title="{{t "quicknotes" "Delete note"}}"></div>
+				<!--
+				{{#if sharedwith}}
+				<div class='icon-share shared-title-owner' title="Shared with {{ sharedwith }}"></div>
+				{{/if}}
+				-->
+				<div class='note-title'>
+					{{{ title }}}
+				</div>
+			</div>
+			<div class='note-content'>
+				{{{ content }}}
+			</div>
+			<div class='note-tags'>
+				{{#each tags}}
+					<div class="icon-tag slim-tag" tag-id="{{ id }}">{{{ name }}}</div>
+				{{/each}}
+			</div>
+		<div>
 		{{/if}}
 	</div>
 </div>

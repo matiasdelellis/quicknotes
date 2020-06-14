@@ -5,6 +5,7 @@ vendor_script('quicknotes', 'isotope.pkgd');
 vendor_script('quicknotes', 'medium-editor');
 vendor_style('quicknotes', 'medium-editor');
 vendor_script('quicknotes', 'autolist');
+vendor_script('quicknotes', 'lozad');
 script('quicknotes', 'qn-dialogs');
 script('quicknotes', 'script');
 style('quicknotes', 'style');

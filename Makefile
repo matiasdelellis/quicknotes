@@ -64,6 +64,7 @@ deps:
 	cp node_modules/medium-editor/dist/js/medium-editor.js vendor/
 	cp node_modules/medium-editor/dist/css/medium-editor.css vendor/
 	cp node_modules/medium-editor-autolist/dist/autolist.js vendor/
+	cp node_modules/lozad/dist/lozad.js vendor/
 
 depsmin:
 	mkdir -p vendor
@@ -74,6 +75,7 @@ depsmin:
 	cp node_modules/medium-editor/dist/js/medium-editor.min.js vendor/medium-editor.js
 	cp node_modules/medium-editor/dist/css/medium-editor.min.css vendor/medium-editor.css
 	cp node_modules/medium-editor-autolist/dist/autolist.min.js vendor/autolist.js
+	cp node_modules/lozad/dist/lozad.min.js vendor/lozad.js
 
 js-templates:
 	node_modules/handlebars/bin/handlebars js/templates -f js/templates.js

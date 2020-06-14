@@ -33,7 +33,6 @@
     color: #202124;
     min-height: 150px;
     width: 250px;
-    padding: 10px;
     border-radius: 8px;
     box-shadow: 0 4px 6px #c1c1c1;
 }
@@ -71,8 +70,9 @@
     display: none;
 }
 
-#div-content .save-button {
+#div-content .buttons-toolbar {
     float: right;
+    display: flex;
     /*padding-right: 8px;*/
     /*padding-bottom: 5px;*/
 }
@@ -101,6 +101,7 @@
 .note-content {
     margin: 4px;
     overflow-wrap: break-word;
+    min-height: 75px;
 }
 
 .icon-header-note {
@@ -137,9 +138,9 @@
                                   not supported by any browser */
 }
 
-.note-toolbar {
-   float:left;
-   padding-top: 12px;
+.colors-toolbar {
+   float: left;
+   padding-top: 10px;
 }
 
 .circle-toolbar {
@@ -226,8 +227,8 @@ div[contenteditable="true"] {
 }
 
 .note-options {
-    bottom: 0;
-    /*padding: 5px;*/
+    padding: 8px;
+    padding-top: 0px;
 }
 
 #note-share-options {
@@ -264,7 +265,7 @@ div[contenteditable="true"] {
 }
 
 .note-tags {
-    margin-top: 10px;
+    margin-top: 8px;
 }
 
 /* Restore defaults select2 rules */
@@ -301,4 +302,37 @@ div[contenteditable="true"] {
     width: 60%;
     height: auto;
     min-height: unset;
+}
+
+.note-attachts {
+    position: relative;
+}
+
+.note-attach-grid {
+    position: absolute;
+    top: 0%;
+    left: 0%;
+    height: 100%;
+    width: 100%;
+}
+
+.note-attach {
+    background-size: contain;
+    width: 100%;
+    height: 100%;
+}
+
+.attach-preview {
+    background-color: rgba(210, 210, 210, .5);
+}
+
+.note-body {
+    padding: 10px;
+}
+
+.round-tool-button {
+    width: 32px;
+    height: 32px;
+    padding: 0px;
+    border-radius: 50%;
 }

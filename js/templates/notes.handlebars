@@ -14,31 +14,42 @@
 				{{{ content }}}
 			</div>
 			{{else}}
-			<div>
-				{{#if ispinned}}
-					<div class="icon-header-note icon-pinned fixed-header-icon" title="{{t "quicknotes" "Unpin note"}}"></div>
-				{{else}}
-					<div class="icon-header-note icon-pin hide-header-icon" title="{{t "quicknotes" "Pin note"}}"></div>
-				{{/if}}
-				<div class="icon-header-note icon-delete hide-header-icon icon-delete-note" title="{{t "quicknotes" "Delete note"}}"></div>
-				<!--
-				{{#if sharedwith}}
-				<div class='icon-share shared-title-owner' title="Shared with {{ sharedwith }}"></div>
-				{{/if}}
-				-->
-				<div class='note-title'>
-					{{{ title }}}
+			<div class='note-header'>
+				<div class='note-attachts'>
+					{{#each attachts}}
+						<div class='note-attach-grid'>
+							<div class="attach-preview note-attach" attach-file-id="{{file_id}}" data-background-image="{{preview_url}}"/>
+						</div>
+					{{/each}}
 				</div>
 			</div>
-			<div class='note-content'>
-				{{{ content }}}
-			</div>
-			<div class='note-tags'>
-				{{#each tags}}
-					<div class='icon-tag slim-tag' tag-id="{{ id }}">
-						{{{ name }}}
+			<div class='note-body'>
+				<div>
+					{{#if ispinned}}
+						<div class="icon-header-note icon-pinned fixed-header-icon" title="{{t "quicknotes" "Unpin note"}}"></div>
+					{{else}}
+						<div class="icon-header-note icon-pin hide-header-icon" title="{{t "quicknotes" "Pin note"}}"></div>
+					{{/if}}
+					<div class="icon-header-note icon-delete hide-header-icon icon-delete-note" title="{{t "quicknotes" "Delete note"}}"></div>
+					<!--
+					{{#if sharedwith}}
+						<div class='icon-share shared-title-owner' title="Shared with {{ sharedwith }}"></div>
+					{{/if}}
+					-->
+					<div class='note-title'>
+						{{{ title }}}
 					</div>
-				{{/each}}
+				</div>
+				<div class='note-content'>
+					{{{ content }}}
+				</div>
+				<div class='note-tags'>
+					{{#each tags}}
+						<div class='icon-tag slim-tag' tag-id="{{ id }}">
+							{{{ name }}}
+						</div>
+					{{/each}}
+				</div>
 			</div>
 			{{/if}}
 		</div>
@@ -48,17 +59,22 @@
 <div id="modal-note-div" class="hide-modal-note modal-note-background">
 	<div class="modal-content">
 		<div class="quicknote note-active" style="background-color: #F7EB96" data-id="-1">
-			<div>
-				<div class="icon-header-note icon-pin fixed-header-icon" title="{{t "quicknotes" "Pin note"}}"></div>
-				<div contenteditable="true" id='title-editable' class='note-title'></div>
+			<div class='note-header'>
+				<div class='note-attachts'></div>
 			</div>
-			<div contenteditable="true" id='content-editable' class='note-content'></div>
-			<div class='note-tags'></div>
+			<div class='note-body'>
+				<div>
+					<div class="icon-header-note icon-pin fixed-header-icon" title="{{t "quicknotes" "Pin note"}}"></div>
+					<div contenteditable="true" id='title-editable' class='note-title'></div>
+				</div>
+				<div contenteditable="true" id='content-editable' class='note-content'></div>
+				<div class='note-tags'></div>
+			</div>
 			<div class="note-options">
 				<!--
 				<select class="note-share-select" name="users[]" multiple="multiple"></select>
 				-->
-				<div class="note-toolbar">
+				<div class="colors-toolbar">
 					<a href="#" class="circle-toolbar" style="background-color: #F7EB96"></a>
 					<a href="#" class="circle-toolbar" style="background-color: #88B7E3"></a>
 					<a href="#" class="circle-toolbar" style="background-color: #C1ECB0"></a>
@@ -70,12 +86,15 @@
 					<a href="#" class="circle-toolbar" style="background-color: #C1D756"></a>
 					<a href="#" class="circle-toolbar" style="background-color: #CECECE"></a>
 				</div>
-				<div class="save-button">
+				<div class="buttons-toolbar">
 					<!--
 					<button id='share-button'><?php p($l->t('Share'));?></button>
 					-->
-					<button id='tag-button'>
-						{{ tagTxt }}
+					<button id='attach-button' class='round-tool-button'>
+						<div class="icon-picture" title="{{t "quicknotes" "Add image"}}"></div>
+					</button>
+					<button id='tag-button' class='round-tool-button'>
+						<div class="icon-tag" title="{{t "quicknotes" "Tags"}}"></div>
 					</button>
 					<button id='cancel-button'>
 						{{ cancelTxt }}

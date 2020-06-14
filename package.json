@@ -23,6 +23,7 @@
   "dependencies": {
     "handlebars": "^4.5.1",
     "isotope-layout": "^3.0.6",
+    "lozad": "^1.15.0",
     "medium-editor": "^5.23.3",
     "medium-editor-autolist": "^1.0.1"
   }

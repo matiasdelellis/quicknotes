@@ -16,6 +16,7 @@ class Note extends Entity implements JsonSerializable {
 	protected $sharedWith;
 	protected $isShared;
 	protected $tags;
+	protected $attachts;
 
 	protected $color;
 	protected $isPinned;
@@ -41,7 +42,8 @@ class Note extends Entity implements JsonSerializable {
 			'userid' => $this->userId,
 			'sharedwith' => $this->sharedWith,
 			'isshared' => $this->isShared,
-			'tags' => $this->tags
+			'tags' => $this->tags,
+			'attachts' => $this->attachts
 		];
 	}
 }
