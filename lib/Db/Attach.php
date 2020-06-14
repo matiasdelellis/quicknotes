@@ -11,9 +11,14 @@ class Attach extends Entity implements JsonSerializable {
 	protected $fileId;
 	protected $createdAt;
 	protected $previewUrl;
+	protected $redirectUrl;
 
 	public function setPreviewUrl($previewUrl) {
 		$this->previewUrl = $previewUrl;
+	}
+
+	public function setRedirectUrl($redirectUrl) {
+		$this->redirectUrl = $redirectUrl;
 	}
 
 	public function jsonSerialize() {
@@ -23,6 +28,7 @@ class Attach extends Entity implements JsonSerializable {
 			'file_id' => $this->fileId,
 			'created_at' => $this->createdAt,
 			'preview_url' => $this->previewUrl,
+			'redirect_url' => $this->redirectUrl
 		];
 	}
 }

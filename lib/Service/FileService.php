@@ -25,11 +25,10 @@ namespace OCA\QuickNotes\Service;
 
 use OCP\IURLGenerator;
 
-use OCP\Files\IRootFolder;
 use OCP\Files\File;
 use OCP\Files\Folder;
 use OCP\Files\Node;
-
+use OCP\Files\IRootFolder;
 use OCP\Files\NotFoundException;
 
 class FileService {
@@ -52,7 +51,13 @@ class FileService {
 		$this->urlGenerator = $urlGenerator;
 	}
 
-	public function getPreviewUrl($fileId, $sideSize): string {
+	/**
+	 * Get thumbnail of the give file id
+	 *
+	 * @param int $fileId file id to show
+	 * @param int $sideSize side lenght to show
+	 */
+	public function getPreviewUrl(int $fileId, int $sideSize): string {
 		$userFolder = $this->rootFolder->getUserFolder($this->userId);
 		$node = current($userFolder->getById($fileId));
 		$path = $userFolder->getRelativePath($node->getPath());
@@ -62,6 +67,26 @@ class FileService {
 			'x' => $sideSize,
 			'y' => $sideSize
 		]);
+	}
+
+	/**
+	 * Redirects to the file list and highlight the given file id
+	 *
+	 * @param int $fileId file id to show
+	 */
+	public function getRedirectToFileUrl(int $fileId): ?string {
+		$userFolder = $this->rootFolder->getUserFolder($this->userId);
+		$file = current($userFolder->getById($fileId));
+
+		if(!($file instanceof File)) {
+			return null;
+		}
+
+		$params = [];
+		$params['dir'] = $userFolder->getRelativePath($file->getParent()->getPath());
+		$params['scrollto'] = $file->getName();
+
+		return $this->urlGenerator->linkToRoute('files.view.index', $params);
 	}
 
 }

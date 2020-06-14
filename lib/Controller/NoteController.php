@@ -128,6 +128,7 @@ class NoteController extends Controller {
 			$attachts = $this->attachMapper->findFromNote($this->userId, $note->getId());
 			foreach ($attachts as $attach) {
 				$attach->setPreviewUrl($this->fileService->getPreviewUrl($attach->getFileId(), 512));
+				$attach->setRedirectUrl($this->fileService->getRedirectToFileUrl($attach->getFileId()));
 			}
 			$note->setAttachts($attachts);
 		}
@@ -299,6 +300,7 @@ class NoteController extends Controller {
 		$attachts = $this->attachMapper->findFromNote($this->userId, $newnote->getId());
 		foreach ($attachts as $attach) {
 			$attach->setPreviewUrl($this->fileService->getPreviewUrl($attach->getFileId(), 512));
+			$attach->setRedirectUrl($this->fileService->getRedirectToFileUrl($attach->getFileId()));
 		}
 		$newnote->setAttachts($attachts);
 

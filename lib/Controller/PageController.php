@@ -1,29 +1,40 @@
 <?php
-/**
- * ownCloud - quicknotes
+/*
+ * @copyright 2016-2020 Matias De lellis <mati86dl@gmail.com>
  *
- * This file is licensed under the Affero General Public License version 3 or
- * later. See the COPYING file.
+ * @author 2016 Matias De lellis <mati86dl@gmail.com>
  *
- * @author Matias De lellis <mati86dl@gmail.com>
- * @copyright Matias De lellis 2016
+ * @license GNU AGPL version 3 or any later version
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 namespace OCA\QuickNotes\Controller;
 
-use OCP\IRequest;
 use OCP\AppFramework\Http\TemplateResponse;
-use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\Controller;
 
+use OCP\IRequest;
+
 class PageController extends Controller {
+	protected $appName;
 
+	public function __construct($appName,
+	                            IRequest $request) {
+		parent::__construct($appName, $request);
 
-	private $userId;
-
-	public function __construct($AppName, IRequest $request, $UserId){
-		parent::__construct($AppName, $request);
-		$this->userId = $UserId;
+		$this->appName = $appName;
 	}
 
 	/**
@@ -37,9 +48,7 @@ class PageController extends Controller {
 	 * @NoCSRFRequired
 	 */
 	public function index() {
-		$params = ['user' => $this->userId];
-		return new TemplateResponse('quicknotes', 'main', $params);  // templates/main.php
+		return new TemplateResponse($this->appName, 'main');
 	}
-
 
 }

@@ -459,14 +459,12 @@ View.prototype = {
             event.stopPropagation();
             OC.dialogs.filepicker(t('quicknotes', 'Select file to attach'), function(datapath, returntype) {
                 OC.Files.getClient().getFileInfo(datapath).then((status, fileInfo) => {
-                    var attach = {
-                        file_id: fileInfo.id,
-                        preview_url: OC.generateUrl('core') + '/preview.png?file=' + encodeURI(datapath) + '&x=512&y=512'
-                    };
-
                     var attachts = self._editableAttachts();
-                    attachts.push(attach);
-
+                    attachts.push({
+                        file_id: fileInfo.id,
+                        preview_url: OC.generateUrl('core') + '/preview.png?file=' + encodeURI(datapath) + '&x=512&y=512',
+                        redirect_url: OC.generateUrl('/apps/files/?dir={dir}&scrollto={scrollto}', {dir: fileInfo.path, scrollto: fileInfo.name})
+                    });
                     self._editableAttachts(attachts);
                 }).fail(() => {
                     console.log("ERRORRR");
@@ -722,7 +720,8 @@ View.prototype = {
             return $("#modal-note-div .note-attach").toArray().map(function (value) {
                 return {
                     file_id: value.getAttribute('attach-file-id'),
-                    preview_url: value.getAttribute('data-background-image')
+                    preview_url: value.getAttribute('data-background-image'),
+                    redirect_url: value.parentElement.getAttribute('href')
                 };
             });
         } else {
