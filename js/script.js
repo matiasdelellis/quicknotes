@@ -739,12 +739,12 @@ View.prototype = {
             return;
         }
         sAttachts.parent().css('height', (500/sAttachts.length) + 'px');
-        sAttachts.first().children().first().css('border-top-left-radius', '8px');
+        sAttachts.first().children().first().children().css('border-top-left-radius', '8px');
         sAttachts.each(function(index) {
             $(this).css('width', (100/sAttachts.length) + '%');
             $(this).css('left', (100/sAttachts.length)*index + '%');
         });
-        sAttachts.last().children().first().css('border-top-right-radius', '8px');
+        sAttachts.last().children().first().children().css('border-top-right-radius', '8px');
     },
     _resizeAttachtsGrid: function() {
         var attachtsgrids = $('#notes-grid-div .note-attachts');

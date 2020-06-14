@@ -107,6 +107,7 @@ appstore: distclean depsmin
 	    --exclude=vendor/bin \
 	    --exclude=node_modules \
 	    --exclude=js/templates \
+	    --exclude=templates/fake.php \
 	    --exclude=translation* \
 	$(project_dir) $(sign_dir)
 	@echo "Signing…"

@@ -11,11 +11,14 @@
     "Nothing here. Take your first quick notes" : "Nada aquí. Toma tus primeras notas rápidas",
     "Are you sure you want to delete the note?" : "¿Seguro que quieres eliminar la nota?",
     "Delete note" : "Eliminar nota",
+    "Unpin note" : "Desanclar la nota",
+    "Pin note" : "Anclar la nota",
+    "Do you want to discard the changes?" : "¿Quieres descartar los cambios?",
+    "Unsaved changes" : "Cambios no guardados",
     "New note" : "Nueva nota",
     "All notes" : "Todas las notas",
     "Colors" : "Colores",
     "Notes" : "Notas",
-    "Quick notes with a basic rich text" : "Notas rápidas con un texto enriquecido básico",
     "Bold" : "Negrita",
     "Italic" : "Itálica",
     "Underline" : "Subrayado",
@@ -24,9 +27,9 @@
     "Numbered list" : "Lista numerada",
     "Blockquote" : "Cita",
     "Clean format" : "Limpiar formato",
-    "Unpin note" : "Desanclar la nota",
-    "Pin note" : "Anclar la nota",
-    "Do you want to discard the changes?" : "¿Quieres descartar los cambios?",
-    "Unsaved changes" : "Cambios no guardados"
+    "Quick notes with a basic rich text" : "Notas rápidas con un texto enriquecido básico",
+    "Select file to attach" : "Seleccione archivo para adjuntar",
+    "Delete attachment" : "Eliminar adjunto",
+    "Attach file" : "Adjuntar archivo"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }
