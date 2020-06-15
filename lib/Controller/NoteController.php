@@ -23,117 +23,41 @@
 namespace OCA\QuickNotes\Controller;
 
 use OCP\AppFramework\Http;
-use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\Http\JSONResponse;
 use OCP\AppFramework\Controller;
 
 use OCP\IRequest;
 
-use OCA\QuickNotes\Db\Attach;
-use OCA\QuickNotes\Db\AttachMapper;
-use OCA\QuickNotes\Db\Color;
-use OCA\QuickNotes\Db\ColorMapper;
-use OCA\QuickNotes\Db\Note;
-use OCA\QuickNotes\Db\NoteMapper;
-use OCA\QuickNotes\Db\NoteTag;
-use OCA\QuickNotes\Db\NoteTagMapper;
-use OCA\QuickNotes\Db\NoteShare;
-use OCA\QuickNotes\Db\NoteShareMapper;
-use OCA\QuickNotes\Db\Tag;
-use OCA\QuickNotes\Db\TagMapper;
-
-use OCA\QuickNotes\Service\FileService;
+use OCA\QuickNotes\Service\NoteService;
 
 
 class NoteController extends Controller {
 
-	private $notemapper;
-	private $notetagmapper;
-	private $colormapper;
-	private $notesharemapper;
-	private $attachMapper;
-	private $tagmapper;
-	private $fileService;
+	private $noteService;
 	private $userId;
 
 	public function __construct($AppName,
-	                            IRequest        $request,
-	                            NoteMapper      $notemapper,
-	                            NoteTagMapper   $notetagmapper,
-	                            NoteShareMapper $notesharemapper,
-	                            ColorMapper     $colormapper,
-	                            AttachMapper    $attachMapper,
-	                            TagMapper       $tagmapper,
-	                            FileService     $fileService,
-	                            $UserId)
+	                            IRequest      $request,
+	                            NoteService $noteService,
+	                            $userId)
 	{
 		parent::__construct($AppName, $request);
 
-		$this->notemapper      = $notemapper;
-		$this->notetagmapper   = $notetagmapper;
-		$this->colormapper     = $colormapper;
-		$this->notesharemapper = $notesharemapper;
-		$this->attachMapper    = $attachMapper;
-		$this->tagmapper       = $tagmapper;
-		$this->fileService     = $fileService;
-		$this->userId          = $UserId;
+		$this->noteService = $noteService;
+		$this->userId      = $userId;
 	}
 
 	/**
 	 * @NoAdminRequired
 	 */
-	 public function index() {
-		$notes = $this->notemapper->findAll($this->userId);
-		foreach($notes as $note) {
-			$note->setIsShared(false);
-			$sharedWith = $this->notesharemapper->getSharesForNote($note->getId());
-			if(count($sharedWith) > 0) {
-				$shareList = array();
-				foreach($sharedWith as $share) {
-					$shareList[] = $share->getSharedUser();
-				}
-				$note->setSharedWith(implode(", ", $shareList));
-			} else {
-				$note->setSharedWith(null);
-			}
-			$note->setTags($this->tagmapper->getTagsForNote($this->userId, $note->getId()));
-		}
-		$shareEntries = $this->notesharemapper->findForUser($this->userId);
-		$shares = array();
-		foreach($shareEntries as $entry) {
-			try {
-				//find is only to check if current user is owner
-				$this->notemapper->find($entry->getNoteId(), $this->userId);
-				//user is owner, nothing to do
-			} catch(\OCP\AppFramework\Db\DoesNotExistException $e) {
-				$share = $this->notemapper->findById($entry->getNoteId());
-				$share->setIsShared(true);
-				$shares[] = $share;
-			}
-		}
-		$notes = array_merge($notes, $shares);
+	public function index(): JSONResponse {
+		$notes = $this->noteService->getAll($this->userId);
+		$etag = md5(json_encode($notes));
 
-		// Insert true color to response
-		foreach ($notes as $note) {
-			$note->setColor($this->colormapper->find($note->getColorId())->getColor());
-		}
+		$response = new JSONResponse($notes);
+		$response->setETag($etag);
 
-		// Insert true color to response
-		foreach ($notes as $note) {
-			$note->setIsPinned($note->getPinned() ? true : false);
-		}
-
-		// Insert true attachts to response
-		foreach ($notes as $note) {
-			$attachts = $this->attachMapper->findFromNote($this->userId, $note->getId());
-			foreach ($attachts as $attach) {
-				$attach->setPreviewUrl($this->fileService->getPreviewUrl($attach->getFileId(), 512));
-				$attach->setRedirectUrl($this->fileService->getRedirectToFileUrl($attach->getFileId()));
-			}
-			$note->setAttachts($attachts);
-		}
-
-		return new DataResponse($notes);
+		return $response;
 	}
 
 	/**
@@ -141,13 +65,18 @@ class NoteController extends Controller {
 	 *
 	 * @param int $id
 	 */
-	public function show($id) {
-		// TODO: Implement.
-		try {
-			return new DataResponse($this->notemapper->find($id, $this->userId));
-		} catch(Exception $e) {
-			return new DataResponse([], Http::STATUS_NOT_FOUND);
+	public function show($id): JSONResponse {
+		$note = $this->noteService->get($this->userId, $id);
+		if (is_null($note)) {
+			return new JSONResponse([], Http::STATUS_NOT_FOUND);
 		}
+
+		$etag = md5(json_encode($note));
+
+		$response = new JSONResponse($note);
+		$response->setETag($etag);
+
+		return $response;
 	}
 
 	/**
@@ -155,35 +84,17 @@ class NoteController extends Controller {
 	 *
 	 * @param string $title
 	 * @param string $content
+	 * @param string $color
 	 */
 	public function create($title, $content, $color = "#F7EB96") {
-		// Get color or append it
-		if ($this->colormapper->colorExists($color)) {
-			$hcolor = $this->colormapper->findByColor($color);
-		} else {
-			$hcolor = new Color();
-			$hcolor->setColor($color);
-			$hcolor = $this->colormapper->insert($hcolor);
-		}
+		$note = $this->noteService->create($this->userId, $title, $content, $color);
 
-		// Create note and insert it
-		$note = new Note();
+		$etag = md5(json_encode($note));
 
-		$note->setTitle($title);
-		$note->setContent($content);
-		$note->setTimestamp(time());
-		$note->setColorId($hcolor->id);
-		$note->setUserId($this->userId);
+		$response = new JSONResponse($note);
+		$response->setETag($etag);
 
-		$newNote = $this->notemapper->insert($note);
-
-		// Insert true color pin and tags to response
-		$newNote->setColor($hcolor->getColor());
-		$newNote->setIsPinned(false);
-		$newNote->setTags([]);
-		$newNote->setAttachts([]);
-
-		return new DataResponse($newNote);
+		return $response;
 	}
 
 	/**
@@ -193,128 +104,22 @@ class NoteController extends Controller {
 	 * @param string $title
 	 * @param string $content
 	 * @param array $attachts
-	 * @param boolean $pinned
+	 * @param bool $pinned
 	 * @param array $tags
 	 * @param string $color
 	 */
-	public function update($id, $title, $content, $attachts, $pinned, $tags, $color = "#F7EB96") {
-		// Get current Note and Color.
-		try {
-			$note = $this->notemapper->find($id, $this->userId);
-		} catch(Exception $e) {
-			return new DataResponse([], Http::STATUS_NOT_FOUND);
-		}
-		$oldcolorid = $note->getColorId();
-
-		// Get new Color or append it.
-		if ($this->colormapper->colorExists($color)) {
-			$hcolor = $this->colormapper->findByColor($color);
-		} else {
-			$hcolor = new Color();
-			$hcolor->setColor($color);
-			$hcolor = $this->colormapper->insert($hcolor);
+	public function update(int $id, string $title, string $content, array $attachts, bool $pinned, array $tags, string $color = "#F7EB96"): JSONResponse {
+		$note = $this->noteService->update($this->userId, $id, $title, $content, $attachts, $pinned, $tags, $color);
+		if (is_null($note)) {
+			return new JSONResponse([], Http::STATUS_NOT_FOUND);
 		}
 
-		// Delete old attachts
-		$dbAttachts = $this->attachMapper->findFromNote($this->userId, $id);
-		foreach ($dbAttachts as $dbAttach) {
-			$delete = true;
-			foreach ($attachts as $attach) {
-				if ($dbAttach->getFileId() === $attach['file_id']) {
-					$delete = false;
-					break;
-				}
-			}
-			if ($delete) {
-				$this->attachMapper->delete($dbAttach);
-			}
-		}
+		$etag = md5(json_encode($note));
 
-		// Add new attachts
-		foreach ($attachts as $attach) {
-			if (!$this->attachMapper->fileAttachExists($this->userId, $id, $attach['file_id'])) {
-				$hAttach = new Attach();
-				$hAttach->setUserId($this->userId);
-				$hAttach->setNoteId($id);
-				$hAttach->setFileId($attach['file_id']);
-				$hAttach->setCreatedAt(time());
-				$this->attachMapper->insert($hAttach);
-			}
-		}
+		$response = new JSONResponse($note);
+		$response->setETag($etag);
 
-		// Delete old tag relations
-		$dbTags = $this->tagmapper->getTagsForNote($this->userId, $id);
-		foreach ($dbTags as $dbTag) {
-			$delete = true;
-			foreach ($tags as $tag) {
-				if ($dbTag->getId() === $tag['id']) {
-					$delete = false;
-					break;
-				}
-			}
-			if ($delete) {
-				$hnotetag = $this->notetagmapper->findNoteTag($this->userId, $id, $dbTag->getId());
-				$this->notetagmapper->delete($hnotetag);
-			}
-		}
-
-		// Add new tags and update relations.
-		foreach ($tags as $tag) {
-			if (!$this->tagmapper->tagExists($this->userId, $tag['name'])) {
-				$htag = new Tag();
-				$htag->setName($tag['name']);
-				$htag->setUserId($this->userId);
-				$htag = $this->tagmapper->insert($htag);
-			}
-			else {
-				$htag = $this->tagmapper->getTag($this->userId, $tag['name']);
-			}
-
-			if (!$this->notetagmapper->noteTagExists($this->userId, $id, $htag->getId())) {
-				$noteTag = new NoteTag();
-				$noteTag->setNoteId($id);
-				$noteTag->setTagId($htag->getId());
-				$noteTag->setUserId($this->userId);
-				$this->notetagmapper->insert($noteTag);
-			}
-		}
-
-		// Set new info on Note
-		$note->setTitle($title);
-		$note->setContent($content);
-		$note->setPinned($pinned ? 1 : 0);
-		$note->setTimestamp(time());
-		$note->setColorId($hcolor->id);
-
-		// Update note.
-		$newnote = $this->notemapper->update($note);
-
-		// Insert true color and pin to response
-		$newnote->setColor($hcolor->getColor());
-		$newnote->setIsPinned($note->getPinned() ? true : false);
-
-		// Fill new tags
-		$newnote->setTags($this->tagmapper->getTagsForNote($this->userId, $newnote->getId()));
-
-		// Fill attachts to response
-		$attachts = $this->attachMapper->findFromNote($this->userId, $newnote->getId());
-		foreach ($attachts as $attach) {
-			$attach->setPreviewUrl($this->fileService->getPreviewUrl($attach->getFileId(), 512));
-			$attach->setRedirectUrl($this->fileService->getRedirectToFileUrl($attach->getFileId()));
-		}
-		$newnote->setAttachts($attachts);
-
-		//  Remove old color if necessary
-		if (($oldcolorid !== $hcolor->getId()) &&
-		    (!$this->notemapper->colorIdCount($oldcolorid))) {
-			$oldcolor = $this->colormapper->find($oldcolorid);
-			$this->colormapper->delete($oldcolor);
-		}
-
-		// Purge orphan tags.
-		$this->tagmapper->dropOld();
-
-		return new DataResponse($newnote);
+		return $response;
 	}
 
 	/**
@@ -322,121 +127,8 @@ class NoteController extends Controller {
 	 *
 	 * @param int $id
 	 */
-	public function destroy($id) {
-		// Get Note and Color
-		try {
-			$note = $this->notemapper->find($id, $this->userId);
-		} catch(Exception $e) {
-			return new DataResponse([], Http::STATUS_NOT_FOUND);
-		}
-		$oldcolorid = $note->getColorId();
-
-		$this->notesharemapper->deleteByNoteId($note->getId());
-
-		// Delete note.
-		$this->notemapper->delete($note);
-
-		// Delete Color if necessary
-		if (!$this->notemapper->colorIdCount($oldcolorid)) {
-			$oldcolor = $this->colormapper->find($oldcolorid);
-			$this->colormapper->delete($oldcolor);
-		}
-
-		$attachts = $this->attachMapper->findFromNote($this->userId, $id);
-		foreach ($attachts as $attach) {
-			$this->attachMapper->delete($attach);
-		}
-
-		return new DataResponse($note);
-	}
-
-	/**
-	 * @NoAdminRequired
-	 */
-	public function getUserGroupsAndUsersWithShare($noteId) {
-		$userMgr = \OC::$server->getUserManager();
-		$grpMgr = \OC::$server->getGroupManager();
-		$users = array();
-		$groups = array();
-		if($grpMgr->isAdmin($this->userId)) {
-			$igroups = $grpMgr->search("");
-			$iusers = $userMgr->search("");
-			foreach($igroups as $g) {
-				$groups[] = $g->getGID();
-			}
-			foreach($iusers as $u) {
-				$users[] = $u->getUID();
-			}
-		} else {
-			$igroups = $grpMgr->getUserGroups($userMgr->get($this->userId));
-			foreach($igroups as $g) {
-				$iusers = $g->getUsers();
-				foreach($iusers as $u) {
-					$users[] = $u->getUID();
-				}
-				$groups[] = $g->getGID();
-			}
-		}
-
-		$users = array_unique($users);
-		if(($i = array_search($this->userId, $users)) !== false) {
-			unset($users[$i]);
-		}
-		$pos_users = array();
-		$pos_groups = array();
-		$shares = $this->notesharemapper->getSharesForNote($noteId);
-		foreach($shares as $s) {
-			$shareType = $s->getSharedUser();
-			if(strlen($shareType) !== 0) {
-				if(($i = array_search($shareType, $users)) !== false) {
-					unset($users[$i]);
-					$pos_users[] = $shareType;
-				}
-			} else {
-				$shareType = $s->getSharedGroup();
-				if(($i = array_search($shareType, $groups)) !== false) {
-					unset($groups[$i]);
-					$pos_groups[] = $shareType;
-				}
-			}
-		}
-		$params = array('groups' => $groups, 'users' => $users, 'posGroups' => $pos_groups, 'posUsers' => $pos_users);
-		return new JSONResponse($params);
-	}
-
-	/**
-	 * @NoAdminRequired
-	 */
-	public function addGroupShare($groupId, $noteId) {
-	    $share = new NoteShare();
-	    $share->setSharedGroup($groupId);
-	    $share->setNoteId($noteId);
-	    $this->notesharemapper->insert($share);
-	}
-
-	/**
-	 * @NoAdminRequired
-	 */
-	public function removeGroupShare($groupId, $noteId) {
-		$share = $this->notesharemapper->findByNoteAndGroup($noteId, $groupId);
-		$this->notesharemapper->delete($share);
-	}
-
-	/**
-	 * @NoAdminRequired
-	 */
-	public function addUserShare($userId, $noteId) {
-		$share = new NoteShare();
-		$share->setSharedUser($userId);
-		$share->setNoteId($noteId);
-		$this->notesharemapper->insert($share);
-	}
-
-	/**
-	 * @NoAdminRequired
-	 */
-	public function removeUserShare($userId, $noteId) {
-		$share = $this->notesharemapper->findByNoteAndUser($noteId, $userId);
-		$this->notesharemapper->delete($share);
+	public function destroy(int $id): JSONResponse {
+		$this->noteService->destroy($this->userId, $id);
+		return new JSONResponse([]);
 	}
 }
