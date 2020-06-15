@@ -164,11 +164,12 @@ View.prototype = {
         this._editableContent(note.content);
         this._editablePinned(note.ispinned);
         this._editableColor(note.color);
+        this._editableShares(note.shared_by, note.shared_with);
         this._editableTags(note.tags);
         this._editableAttachts(note.attachts);
 
         // Create medium div editor.
-        this._initEditor();
+        this._isEditable(!note.is_shared);
 
         // Show modal editor
         this._showEditor(id);
@@ -491,6 +492,12 @@ View.prototype = {
         });
 
         // handle cancel editing notes.
+        $('#modal-note-div #close-button').click(function (event) {
+            event.stopPropagation();
+            self.cancelEdit();
+        });
+
+        // handle cancel editing notes.
         $('#modal-note-div #cancel-button').click(function (event) {
             event.stopPropagation();
             self.cancelEdit();
@@ -655,6 +662,24 @@ View.prototype = {
 
         return digits[1] + '#' + rgb.toString(16).toUpperCase();
     },
+    _isEditable: function(editable) {
+        if (editable === undefined)
+            return $('#title-editable').prop('contenteditable');
+        else {
+            if (editable) {
+                $('#title-editable').prop('contenteditable', true);
+                $('#modal-note-div .icon-header-note').show();
+                $('#modal-note-div .note-options').show();
+                $('#modal-note-div .note-disable-options').hide();
+                this._initEditor();
+            } else {
+                $('#modal-note-div .note-options').hide();
+                $('#modal-note-div .icon-header-note').hide();
+                $('#title-editable').removeAttr("contentEditable");
+                $('#modal-note-div .note-disable-options').show();
+            }
+        }
+    },
     _editableId: function(id) {
         if (id === undefined)
             return $("#modal-note-div .quicknote").data('id');
@@ -704,6 +729,19 @@ View.prototype = {
                 }
             });
             $("#modal-note-div .quicknote").css("background-color", color);
+        }
+    },
+    _editableShares: function(shared_by, shared_with) {
+        if (shared_with === undefined) {
+            return $("#modal-note-div .slim-share").toArray().map(function (value) {
+                return {
+                    id: value.getAttribute('tag-id'),
+                    name: value.textContent.trim()
+                };
+            });
+        } else {
+            var html = Handlebars.templates['shares']({ shared_by: shared_by, shared_with: shared_with});
+            $("#modal-note-div .note-shares").replaceWith(html);
         }
     },
     _editableTags: function(tags) {
@@ -797,8 +835,10 @@ View.prototype = {
         this._editor = editor;
     },
     _destroyEditor: function() {
-        this._editor.destroy();
-        this._editor = undefined;
+        if (this._editor != undefined) {
+            this._editor.destroy();
+            this._editor = undefined;
+        }
         this._changed = false;
 
         this._editableId(-1);
@@ -821,7 +861,6 @@ View.prototype = {
             "left"     : note.offset().left,
             "top"      : note.offset().top,
             "width"    : note.width(),
-            "min-height": note.height(),
             "height:"  : "auto"
         });
 

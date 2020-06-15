@@ -75,50 +75,44 @@ class NoteService {
 	 */
 	 public function getAll(string $userId): array {
 		$notes = $this->notemapper->findAll($userId);
+
+		// Set shares with others.
 		foreach($notes as $note) {
 			$note->setIsShared(false);
-			$sharedWith = $this->notesharemapper->getSharesForNote($note->getId());
-			if(count($sharedWith) > 0) {
-				$shareList = array();
-				foreach($sharedWith as $share) {
-					$shareList[] = $share->getSharedUser();
-				}
-				$note->setSharedWith(implode(", ", $shareList));
-			} else {
-				$note->setSharedWith(null);
-			}
-			$note->setTags($this->tagmapper->getTagsForNote($userId, $note->getId()));
+			$note->setSharedWith($this->notesharemapper->getSharesForNote($note->getId()));
 		}
-		$shareEntries = $this->notesharemapper->findForUser($userId);
-		$shares = array();
-		foreach($shareEntries as $entry) {
-			try {
-				//find is only to check if current user is owner
-				$this->notemapper->find($entry->getNoteId(), $userId);
-				//user is owner, nothing to do
-			} catch(\OCP\AppFramework\Db\DoesNotExistException $e) {
-				$share = $this->notemapper->findById($entry->getNoteId());
-				$share->setIsShared(true);
-				$shares[] = $share;
-			}
+
+		// Get shares from others.
+		$shares = [];
+		$sharedEntries = $this->notesharemapper->findForUser($userId);
+		foreach($sharedEntries as $sharedEntry) {
+			$sharedNote = $this->notemapper->findShared($sharedEntry->getNoteId());
+			$sharedNote->setIsShared(true);
+
+			$sharedEntry->setUserId($sharedNote->getUserId());
+			$sharedNote->setSharedBy([$sharedEntry]);
+			$shares[] = $sharedNote;
 		}
+
+		// Attahch shared notes from others to same response
 		$notes = array_merge($notes, $shares);
 
-		foreach ($notes as $note) {
-			$note->setTitle(strip_tags($note->getTitle()));
+		// Set tags to response.
+		foreach($notes as $note) {
+			$note->setTags($this->tagmapper->getTagsForNote($userId, $note->getId()));
 		}
 
-		// Insert true color to response
+		// Insert color to response
 		foreach ($notes as $note) {
 			$note->setColor($this->colormapper->find($note->getColorId())->getColor());
 		}
 
-		// Insert true color to response
+		// Insert pin to response
 		foreach ($notes as $note) {
 			$note->setIsPinned($note->getPinned() ? true : false);
 		}
 
-		// Insert true attachts to response
+		// Insert attachts to response.
 		foreach ($notes as $note) {
 			$attachts = $this->attachMapper->findFromNote($userId, $note->getId());
 			foreach ($attachts as $attach) {
