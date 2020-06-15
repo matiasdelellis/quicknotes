@@ -54,8 +54,13 @@ class NoteController extends Controller {
 		$notes = $this->noteService->getAll($this->userId);
 		$etag = md5(json_encode($notes));
 
+		$lastModified = new \DateTime(null, new \DateTimeZone('GMT'));
+		$timestamp = max(array_map(function($note) { return $note->getTimestamp(); }, $notes));
+		$lastModified->setTimestamp($timestamp);
+
 		$response = new JSONResponse($notes);
 		$response->setETag($etag);
+		$response->setLastModified($lastModified);
 
 		return $response;
 	}
