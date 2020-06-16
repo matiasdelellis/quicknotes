@@ -29,6 +29,9 @@ var Notes = function (baseUrl) {
     this._baseUrl = baseUrl;
     this._notes = [];
     this._loaded = false;
+
+    this._usersSharing = [];
+    this._loadUsersSharing();
 };
 
 Notes.prototype = {
@@ -70,6 +73,9 @@ Notes.prototype = {
             Ccolors.push({color: value});
         });
         return Ccolors;
+    },
+    getUsersSharing: function () {
+        return this._usersSharing;
     },
     // Get the tags used in the notes
     getTags: function () {
@@ -136,6 +142,23 @@ Notes.prototype = {
             deferred.reject();
         });
         return deferred.promise();
+    },
+    // Get the users to share in the notes
+    _loadUsersSharing: function () {
+        var self = this;
+        $.get(OC.linkToOCS('apps/files_sharing/api/v1/', 1) + 'sharees', {
+            format: 'json',
+            itemType: 'principals'
+        }).done(function (shares) {
+            var users = [];
+            console.log(shares);
+            $.each(shares.ocs.data.exact.users, function(index, user) {
+                users.push(user.value.shareWith);
+            });
+            self._usersSharing = users;
+        }).fail(function () {
+            console.error("Could not get users to share.");
+        });
     }
 };
 
@@ -164,7 +187,7 @@ View.prototype = {
         this._editableContent(note.content);
         this._editablePinned(note.ispinned);
         this._editableColor(note.color);
-        this._editableShares(note.shared_by, note.shared_with);
+        this._editableShares(note.shared_with, note.shared_by);
         this._editableTags(note.tags);
         this._editableAttachts(note.attachts);
 
@@ -455,6 +478,23 @@ View.prototype = {
             $('#modal-note-div #tag-button').trigger( "click");
         });
 
+        // handle tags button.
+        $('#modal-note-div #share-button').click(function (event) {
+            event.stopPropagation();
+            QnDialogs.shares(
+                self._notes.getUsersSharing(),
+                self._editableShares(),
+                function(result, newShares) {
+                    if (result === true) {
+                        self._editableShares(newShares, []);
+                    }
+                },
+                true,
+                t('quicknotes', 'Shares'),
+                false
+            );
+        });
+
         // handle attach button.
         $('#modal-note-div #attach-button').click(function (event) {
             event.stopPropagation();
@@ -731,11 +771,11 @@ View.prototype = {
             $("#modal-note-div .quicknote").css("background-color", color);
         }
     },
-    _editableShares: function(shared_by, shared_with) {
+    _editableShares: function(shared_with, shared_by) {
         if (shared_with === undefined) {
             return $("#modal-note-div .slim-share").toArray().map(function (value) {
                 return {
-                    id: value.getAttribute('tag-id'),
+                    id: value.getAttribute('share-id'),
                     name: value.textContent.trim()
                 };
             });

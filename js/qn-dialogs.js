@@ -56,6 +56,9 @@ const QnDialogs = {
 						data.push({id: item.id, text: item.name});
 					});
 					return data;
+				},
+				formatNoMatches: function() {
+					return t('quicknotes', 'No tags found');
 				}
 			});
 
@@ -102,6 +105,113 @@ const QnDialogs = {
 							tArray[index] = item;
 						});
 						callback(true, newTags);
+					}
+					$(dialogId).ocdialog('close');
+				},
+				defaultButton: true
+			}
+			];
+
+			$(dialogId).ocdialog({
+				closeOnEscape: false,
+				modal: true,
+				buttons: buttonlist,
+				close: function () {
+					input.select2("close");
+					// callback is already fired if Yes/No is clicked directly
+					if (callback !== undefined) {
+						callback(false, input.val());
+					}
+				}
+			});
+
+			$('.select2-input').focus();
+		});
+	},
+	shares: function (availableUsers, selectedUsers, callback) {
+		return $.when(this._getMessageTemplate()).then(function ($tmpl) {
+			var dialogName = 'qn-dialog-content';
+			var dialogId = '#' + dialogName;
+			var $dlg = $tmpl.octemplate({
+				dialog_name: dialogName,
+				title: t('quicknotes', 'Share note'),
+				message: t('quicknotes', 'Select the users to share'),
+				type: 'none'
+			});
+
+			var input = $('<input/>');
+			input.attr('type', 'text');
+			input.attr('id', dialogName + '-input');
+			input.attr('multiple', 'multiple');
+
+			$dlg.append(input);
+			$('body').append($dlg);
+
+			input.select2({
+				placeholder: t('quicknotes', 'Select the users to share'),
+				multiple: true,
+				allowClear: true,
+				toggleSelect: true,
+				createSearchChoice: function(params) {
+					return undefined;
+				},
+				tags: function () {
+					var data = [];
+					availableUsers.forEach(function (item, index) {
+						// Select2 expect id, text.
+						data.push({id: item, text: item});
+					});
+					return data;
+				},
+				formatNoMatches: function() {
+					return t('quicknotes', 'No user found');
+				}
+			});
+
+			input.val(selectedUsers.map(function (value) { return value.name }));
+			input.trigger("change");
+
+			$('.select2-input').on("keyup", function (event) {
+				if (event.keyCode === 27) {
+					event.preventDefault();
+					event.stopPropagation();
+					input.select2('close');
+					if (callback !== undefined) {
+						callback(false, []);
+					}
+					$(dialogId).ocdialog('close');
+				}
+			});
+
+			// wrap callback in _.once():
+			// only call callback once and not twice (button handler and close
+			// event) but call it for the close event, if ESC or the x is hit
+			if (callback !== undefined) {
+				callback = _.once(callback);
+			}
+
+			var buttonlist = [{
+				text: t('quicknotes', 'Cancel'),
+				click: function () {
+					input.select2('close');
+					if (callback !== undefined) {
+						callback(false, []);
+					}
+					$(dialogId).ocdialog('close');
+				}
+			}, {
+				text: t('quicknotes', 'Done'),
+				click: function () {
+					input.select2('close');
+					if (callback !== undefined) {
+						var users = [];
+						// Quicknotes shares expect id, shared_user
+						newUsers = input.select2("data");
+						newUsers.forEach(function (item) {
+							item['shared_user'] = item.text;
+							users.push(item);
+						});
+						callback(true, users);
 					}
 					$(dialogId).ocdialog('close');
 				},
