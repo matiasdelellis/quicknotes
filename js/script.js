@@ -1015,6 +1015,10 @@ new OCA.Search(search, function() {
     search('');
 });
 
+Handlebars.registerHelper('SW', function(user) {
+    return t('quicknotes', 'Shared with {user}', {user: user});
+});
+
 
 /*
  * Create modules

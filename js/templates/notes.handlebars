@@ -34,7 +34,7 @@
 				</div>
 				<div class='note-shares'>
 					{{#each shared_with}}
-						<div class="icon-user slim-share" title="Shared with {{ shared_user }}">{{{ shared_user }}}</div>
+						<div class="icon-user slim-share" share-id="{{ shared_user }}" title="{{SW shared_user}}">{{{ shared_user }}}</div>
 					{{/each}}
 				</div>
 				<div class='note-tags'>

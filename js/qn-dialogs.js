@@ -135,7 +135,7 @@ const QnDialogs = {
 			var $dlg = $tmpl.octemplate({
 				dialog_name: dialogName,
 				title: t('quicknotes', 'Share note'),
-				message: t('quicknotes', 'Select the users to share'),
+				message: t('quicknotes', 'Select the users to share. By default you only share the note. Attachments should be shared from files so they can view it.'),
 				type: 'none'
 			});
 

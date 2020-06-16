@@ -273,6 +273,7 @@ div[contenteditable="true"] {
 
 /* Restore defaults select2 rules */
 
+
 .select2-container-multi
 .select2-choices
 .select2-search-choice {
@@ -295,6 +296,10 @@ div[contenteditable="true"] {
 
 #select2-drop {
     z-index: 10000;
+}
+
+div.select2-container {
+    width: 100%;
 }
 
 /* Modal Content */
