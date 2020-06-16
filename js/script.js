@@ -148,10 +148,9 @@ Notes.prototype = {
         var self = this;
         $.get(OC.linkToOCS('apps/files_sharing/api/v1/', 1) + 'sharees', {
             format: 'json',
-            itemType: 'principals'
+            itemType: '1'
         }).done(function (shares) {
             var users = [];
-            console.log(shares);
             $.each(shares.ocs.data.exact.users, function(index, user) {
                 users.push(user.value.shareWith);
             });
@@ -708,15 +707,16 @@ View.prototype = {
             return $('#title-editable').prop('contenteditable');
         else {
             if (editable) {
-                $('#title-editable').prop('contenteditable', true);
                 $('#modal-note-div .icon-header-note').show();
+                $('#title-editable').prop('contenteditable', true);
                 $('#modal-note-div .note-options').show();
                 $('#modal-note-div .note-disable-options').hide();
                 this._initEditor();
             } else {
-                $('#modal-note-div .note-options').hide();
                 $('#modal-note-div .icon-header-note').hide();
                 $('#title-editable').removeAttr("contentEditable");
+                $('#content-editable').removeAttr("contentEditable");
+                $('#modal-note-div .note-options').hide();
                 $('#modal-note-div .note-disable-options').show();
             }
         }
