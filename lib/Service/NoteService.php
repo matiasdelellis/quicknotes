@@ -114,12 +114,23 @@ class NoteService {
 
 		// Insert attachts to response.
 		foreach ($notes as $note) {
-			$attachts = $this->attachMapper->findFromNote($userId, $note->getId());
+			$rAttachts = [];
+			$attachts = $this->attachMapper->findFromNote($note->getUserId(), $note->getId());
 			foreach ($attachts as $attach) {
-				$attach->setPreviewUrl($this->fileService->getPreviewUrl($attach->getFileId(), 512));
-				$attach->setRedirectUrl($this->fileService->getRedirectToFileUrl($attach->getFileId()));
+				$previewUrl = $this->fileService->getPreviewUrl($attach->getFileId(), 512);
+				if (is_null($previewUrl))
+					continue;
+
+				$redirectUrl = $this->fileService->getRedirectToFileUrl($attach->getFileId());
+				if (is_null($redirectUrl))
+					continue;
+
+				$attach->setPreviewUrl($previewUrl);
+				$attach->setRedirectUrl($redirectUrl);
+
+				$rAttachts[] = $attach;
 			}
-			$note->setAttachts($attachts);
+			$note->setAttachts($rAttachts);
 		}
 
 		return $notes;

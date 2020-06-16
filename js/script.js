@@ -189,7 +189,7 @@ View.prototype = {
         this._editableColor(note.color);
         this._editableShares(note.shared_with, note.shared_by);
         this._editableTags(note.tags);
-        this._editableAttachts(note.attachts);
+        this._editableAttachts(note.attachts, !note.is_shared);
 
         // Create medium div editor.
         this._isEditable(!note.is_shared);
@@ -507,7 +507,7 @@ View.prototype = {
                         preview_url: OC.generateUrl('core') + '/preview.png?file=' + encodeURI(datapath) + '&x=512&y=512',
                         redirect_url: OC.generateUrl('/apps/files/?dir={dir}&scrollto={scrollto}', {dir: fileInfo.path, scrollto: fileInfo.name})
                     });
-                    self._editableAttachts(attachts);
+                    self._editableAttachts(attachts, true);
                 }).fail(() => {
                     console.log("ERRORRR");
                 });
@@ -798,7 +798,7 @@ View.prototype = {
             $("#modal-note-div .note-tags").replaceWith(html);
         }
     },
-    _editableAttachts: function(attachts) {
+    _editableAttachts: function(attachts, can_delete) {
         if (attachts === undefined) {
             return $("#modal-note-div .note-attach").toArray().map(function (value) {
                 return {
@@ -808,7 +808,7 @@ View.prototype = {
                 };
             });
         } else {
-            var html = Handlebars.templates['attachts']({ attachts: attachts});
+            var html = Handlebars.templates['attachts']({ attachts: attachts, can_delete: can_delete});
             $("#modal-note-div .note-attachts").replaceWith(html);
 
             lozad('.attach-preview').observe();

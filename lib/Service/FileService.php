@@ -57,13 +57,16 @@ class FileService {
 	 * @param int $fileId file id to show
 	 * @param int $sideSize side lenght to show
 	 */
-	public function getPreviewUrl(int $fileId, int $sideSize): string {
+	public function getPreviewUrl(int $fileId, int $sideSize): ?string {
 		$userFolder = $this->rootFolder->getUserFolder($this->userId);
-		$node = current($userFolder->getById($fileId));
-		$path = $userFolder->getRelativePath($node->getPath());
+		$file = current($userFolder->getById($fileId));
+
+		if (!($file instanceof File)) {
+			return null;
+		}
 
 		return $this->urlGenerator->linkToRouteAbsolute('core.Preview.getPreview', [
-			'file' => $path,
+			'file' => $userFolder->getRelativePath($file->getPath()),
 			'x' => $sideSize,
 			'y' => $sideSize
 		]);
@@ -78,7 +81,7 @@ class FileService {
 		$userFolder = $this->rootFolder->getUserFolder($this->userId);
 		$file = current($userFolder->getById($fileId));
 
-		if(!($file instanceof File)) {
+		if (!($file instanceof File)) {
 			return null;
 		}
 
