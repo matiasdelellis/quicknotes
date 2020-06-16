@@ -563,30 +563,8 @@ View.prototype = {
 
         $('#app-navigation ul').html(html);
 
-        // show all notes
-        $('#all-notes').click(function () {
-            $('.notes-grid').isotope({ filter: '*'});
+        /* Create a new note */
 
-            var oldColorTool = $('#app-navigation .circle-toolbar.icon-checkmark');
-            $.each(oldColorTool, function(i, oct) {
-               $(oct).removeClass('icon-checkmark');
-            });
-            $('#app-navigation .any-color').addClass('icon-checkmark');
-        });
-
-        $('#shared-with-you').click(function () {
-            $('.notes-grid').isotope({ filter: function() {
-                return $(this).children().hasClass('shared');
-            } });
-        });
-
-        $('#shared-by-you').click(function () {
-            $('.notes-grid').isotope({ filter: function() {
-                return $(this).children().hasClass('shareowner');
-            } });
-        });
-
-        // create a new note
         var self = this;
         $('#new-note').click(function () {
             var fakenote = {
@@ -609,6 +587,38 @@ View.prototype = {
             }).fail(function () {
                 alert('Could not create note');
             });
+        });
+
+        /* Show all notes */
+
+        $('#all-notes').click(function () {
+            $('.notes-grid').isotope({ filter: '*'});
+
+            var oldColorTool = $('#app-navigation .circle-toolbar.icon-checkmark');
+            $.each(oldColorTool, function(i, oct) {
+               $(oct).removeClass('icon-checkmark');
+            });
+            $('#app-navigation .any-color').addClass('icon-checkmark');
+        });
+
+        /* Shares Navigation */
+
+        $('#shared-folder').click(function () {
+            $(this).toggleClass("open");
+        });
+
+        $('#shared-with-you').click(function (event) {
+            event.stopPropagation();
+            $('.notes-grid').isotope({ filter: function() {
+                return $(this).children().hasClass('shared');
+            } });
+        });
+
+        $('#shared-by-you').click(function (event) {
+            event.stopPropagation();
+            $('.notes-grid').isotope({ filter: function() {
+                return $(this).children().hasClass('shareowner');
+            } });
         });
 
         /* Colors Navigation */

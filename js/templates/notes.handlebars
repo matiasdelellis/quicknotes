@@ -2,7 +2,7 @@
 <div id="notes-grid-div" class="notes-grid">
 	{{#each notes}}
 	<div class="note-grid-item">
-		<div class="quicknote noselect" style="background-color: {{color}}" data-id="{{ id }}" data-timestamp="{{ timestamp }}" >
+		<div class="quicknote noselect {{#if is_shared}}shared{{/if}} {{#if shared_with.length}}shareowner{{/if}}" style="background-color: {{color}}" data-id="{{ id }}" data-timestamp="{{ timestamp }}" >
 			<div class='note-header'>
 				<div class='note-attachts'>
 					{{#each attachts}}
