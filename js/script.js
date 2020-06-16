@@ -206,7 +206,8 @@ View.prototype = {
             attachts: this._editableAttachts(),
             color: this._editableColor(),
             pinned: this._editablePinned(),
-            tags: this._editableTags()
+            tags: this._editableTags(),
+            shares: this._editableShares()
         };
         var self = this;
         this._notes.update(fakeNote).done(function (note) {

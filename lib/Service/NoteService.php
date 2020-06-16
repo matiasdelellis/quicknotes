@@ -48,14 +48,14 @@ class NoteService {
 	private $notemapper;
 	private $notetagmapper;
 	private $colormapper;
-	private $notesharemapper;
+	private $noteShareMapper;
 	private $attachMapper;
 	private $tagmapper;
 	private $fileService;
 
 	public function __construct(NoteMapper      $notemapper,
 	                            NoteTagMapper   $notetagmapper,
-	                            NoteShareMapper $notesharemapper,
+	                            NoteShareMapper $noteShareMapper,
 	                            ColorMapper     $colormapper,
 	                            AttachMapper    $attachMapper,
 	                            TagMapper       $tagmapper,
@@ -64,7 +64,7 @@ class NoteService {
 		$this->notemapper      = $notemapper;
 		$this->notetagmapper   = $notetagmapper;
 		$this->colormapper     = $colormapper;
-		$this->notesharemapper = $notesharemapper;
+		$this->noteShareMapper = $noteShareMapper;
 		$this->attachMapper    = $attachMapper;
 		$this->tagmapper       = $tagmapper;
 		$this->fileService     = $fileService;
@@ -79,12 +79,12 @@ class NoteService {
 		// Set shares with others.
 		foreach($notes as $note) {
 			$note->setIsShared(false);
-			$note->setSharedWith($this->notesharemapper->getSharesForNote($note->getId()));
+			$note->setSharedWith($this->noteShareMapper->getSharesForNote($note->getId()));
 		}
 
 		// Get shares from others.
 		$shares = [];
-		$sharedEntries = $this->notesharemapper->findForUser($userId);
+		$sharedEntries = $this->noteShareMapper->findForUser($userId);
 		foreach($sharedEntries as $sharedEntry) {
 			$sharedNote = $this->notemapper->findShared($sharedEntry->getNoteId());
 			$sharedNote->setIsShared(true);
@@ -181,6 +181,7 @@ class NoteService {
 	 * @param array $attachts
 	 * @param bool $pinned
 	 * @param array $tags
+	 * @param array $shares
 	 * @param string $color
 	 */
 	public function update(string $userId,
@@ -190,14 +191,14 @@ class NoteService {
 	                       array  $attachts,
 	                       bool   $pinned,
 	                       array  $tags,
-	                       string $color): Note
+	                       array  $shares,
+	                       string $color): ?Note
 	{
 		// Get current Note and Color.
-		try {
-			$note = $this->notemapper->find($id, $userId);
-		} catch(Exception $e) {
+		$note = $this->get($userId, $id);
+		if (is_null($note))
 			return null;
-		}
+
 		$oldcolorid = $note->getColorId();
 
 		// Get new Color or append it.
@@ -233,6 +234,31 @@ class NoteService {
 				$hAttach->setFileId($attach['file_id']);
 				$hAttach->setCreatedAt(time());
 				$this->attachMapper->insert($hAttach);
+			}
+		}
+
+		// Delete old shares
+		$dbShares = $this->noteShareMapper->getSharesForNote($id);
+		foreach ($dbShares as $dbShare) {
+			$delete = true;
+			foreach ($shares as $share) {
+				if ($dbShare->getSharedUser() === $share['name']) {
+					$delete = false;
+					break;
+				}
+			}
+			if ($delete) {
+				$this->noteShareMapper->delete($dbShare);
+			}
+		}
+
+		// Add new shares
+		foreach ($shares as $share) {
+			if (!$this->noteShareMapper->existsByNoteAndUser($id, $share['name'])) {
+				$hShare = new NoteShare();
+				$hShare->setNoteId($id);
+				$hShare->setSharedUser($share['name']);
+				$this->noteShareMapper->insert($hShare);
 			}
 		}
 
@@ -298,6 +324,10 @@ class NoteService {
 		}
 		$newnote->setAttachts($attachts);
 
+		// Fill shared with with others
+		$newnote->setIsShared(false);
+		$newnote->setSharedWith($this->noteShareMapper->getSharesForNote($newnote->getId()));
+
 		//  Remove old color if necessary
 		if (($oldcolorid !== $hcolor->getId()) &&
 		    (!$this->notemapper->colorIdCount($oldcolorid))) {
@@ -324,7 +354,7 @@ class NoteService {
 		}
 		$oldcolorid = $note->getColorId();
 
-		$this->notesharemapper->deleteByNoteId($note->getId());
+		$this->noteShareMapper->deleteByNoteId($note->getId());
 
 		// Delete note.
 		$this->notemapper->delete($note);
@@ -375,7 +405,7 @@ class NoteService {
 		}
 		$pos_users = array();
 		$pos_groups = array();
-		$shares = $this->notesharemapper->getSharesForNote($noteId);
+		$shares = $this->noteShareMapper->getSharesForNote($noteId);
 		foreach($shares as $s) {
 			$shareType = $s->getSharedUser();
 			if(strlen($shareType) !== 0) {
@@ -400,14 +430,14 @@ class NoteService {
 	    $share = new NoteShare();
 	    $share->setSharedGroup($groupId);
 	    $share->setNoteId($noteId);
-	    $this->notesharemapper->insert($share);
+	    $this->noteShareMapper->insert($share);
 	}
 
 	/**
 	 */
 	public function removeGroupShare($groupId, $noteId) {
-		$share = $this->notesharemapper->findByNoteAndGroup($noteId, $groupId);
-		$this->notesharemapper->delete($share);
+		$share = $this->noteShareMapper->findByNoteAndGroup($noteId, $groupId);
+		$this->noteShareMapper->delete($share);
 	}
 
 	/**
@@ -416,13 +446,13 @@ class NoteService {
 		$share = new NoteShare();
 		$share->setSharedUser($userId);
 		$share->setNoteId($noteId);
-		$this->notesharemapper->insert($share);
+		$this->noteShareMapper->insert($share);
 	}
 
 	/**
 	 */
 	public function removeUserShare($userId, $noteId) {
-		$share = $this->notesharemapper->findByNoteAndUser($noteId, $userId);
-		$this->notesharemapper->delete($share);
+		$share = $this->noteShareMapper->findByNoteAndUser($noteId, $userId);
+		$this->noteShareMapper->delete($share);
 	}
 }

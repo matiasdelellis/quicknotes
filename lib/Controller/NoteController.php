@@ -111,10 +111,11 @@ class NoteController extends Controller {
 	 * @param array $attachts
 	 * @param bool $pinned
 	 * @param array $tags
+	 * @param array $shares
 	 * @param string $color
 	 */
-	public function update(int $id, string $title, string $content, array $attachts, bool $pinned, array $tags, string $color = "#F7EB96"): JSONResponse {
-		$note = $this->noteService->update($this->userId, $id, $title, $content, $attachts, $pinned, $tags, $color);
+	public function update(int $id, string $title, string $content, array $attachts, bool $pinned, array $tags, array $shares, string $color = "#F7EB96"): JSONResponse {
+		$note = $this->noteService->update($this->userId, $id, $title, $content, $attachts, $pinned, $tags, $shares, $color);
 		if (is_null($note)) {
 			return new JSONResponse([], Http::STATUS_NOT_FOUND);
 		}
