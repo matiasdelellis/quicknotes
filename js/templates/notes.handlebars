@@ -15,7 +15,7 @@
 			<div class='note-body'>
 				<div>
 					{{#if is_shared}}
-						<div class="icon-header-note icon-share" title="Shared by {{ userid }}"></div>
+						<div class="icon-header-note icon-share" title="{{tSB userid }}"></div>
 						<div class="icon-header-note icon-delete hide-header-icon icon-delete-note" title="{{t "quicknotes" "Delete note"}}"></div>
 					{{else}}
 						{{#if ispinned}}
@@ -34,7 +34,7 @@
 				</div>
 				<div class='note-shares'>
 					{{#each shared_with}}
-						<div class="icon-user slim-share" share-id="{{ shared_user }}" title="{{SW shared_user}}">{{{ shared_user }}}</div>
+						<div class="icon-user slim-share" share-id="{{ shared_user }}" title="{{tSW shared_user}}">{{{ shared_user }}}</div>
 					{{/each}}
 				</div>
 				<div class='note-tags'>

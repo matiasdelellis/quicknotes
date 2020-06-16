@@ -488,10 +488,7 @@ View.prototype = {
                     if (result === true) {
                         self._editableShares(newShares, []);
                     }
-                },
-                true,
-                t('quicknotes', 'Shares'),
-                false
+                }
             );
         });
 
@@ -524,10 +521,7 @@ View.prototype = {
                     if (result === true) {
                         self._editableTags(newTags);
                     }
-                },
-                true,
-                t('quicknotes', 'Tags'),
-                false
+                }
             );
         });
 
@@ -1015,8 +1009,17 @@ new OCA.Search(search, function() {
     search('');
 });
 
-Handlebars.registerHelper('SW', function(user) {
+
+/**
+ * Add Helpers to handlebars
+ */
+
+Handlebars.registerHelper('tSW', function(user) {
     return t('quicknotes', 'Shared with {user}', {user: user});
+});
+
+Handlebars.registerHelper('tSB', function(user) {
+    return t('quicknotes', 'Shared by {user}', {user: user});
 });
 
 
