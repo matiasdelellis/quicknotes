@@ -500,13 +500,6 @@ View.prototype = {
             self._editablePinned(false);
         });
 
-        // Handle colors.
-        $('#modal-note-div .circle-toolbar').click(function (event) {
-            event.stopPropagation();
-            var color = self._colorToHex($(this).css("background-color"));
-            self._editableColor(color);
-        });
-
         // Handle tags on modal
         $('#modal-note-div').on('click', '.slim-tag', function (event) {
             event.stopPropagation();
@@ -837,17 +830,16 @@ View.prototype = {
         if (color === undefined)
             return this._colorToHex($("#modal-note-div .quicknote").css("background-color"));
         else {
-            var self = this;
-            var colors = $("#modal-note-div .quicknote")[0].getElementsByClassName("circle-toolbar");
-            $.each(colors, function(i, c) {
-                $(c).removeClass('icon-checkmark');
-            });
-            $.each(colors, function(i, c) {
-                if (color === self._colorToHex(c.style.backgroundColor)) {
-                    c.className += " icon-checkmark";
+            $("#color-button").colorPick({
+                'initialColor': color,
+                'paletteLabel': t('quicknotes', 'Colors'),
+                'palette': ['#F7EB96', '#88B7E3', '#C1ECB0', '#BFA6E9', '#DAF188', '#FF96AC', '#FCF66F', '#F2F1EF', '#C1D756', '#CECECE'],
+                'allowRecent': false,
+                'allowCustomColor': false,
+                'onColorSelected': function() {
+                    $("#modal-note-div .quicknote").css("background-color", this.color);
                 }
             });
-            $("#modal-note-div .quicknote").css("background-color", color);
         }
     },
     _editableShares: function(shared_with, shared_by) {

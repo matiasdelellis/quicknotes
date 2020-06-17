@@ -65,6 +65,8 @@ deps:
 	cp node_modules/medium-editor/dist/css/medium-editor.css vendor/
 	cp node_modules/medium-editor-autolist/dist/autolist.js vendor/
 	cp node_modules/lozad/dist/lozad.js vendor/
+	wget https://raw.githubusercontent.com/philzet/ColorPick.js/master/src/colorPick.js -O vendor/colorPick.js
+	wget https://raw.githubusercontent.com/philzet/ColorPick.js/master/src/colorPick.css -O vendor/colorPick.css
 
 depsmin:
 	mkdir -p vendor
@@ -76,6 +78,8 @@ depsmin:
 	cp node_modules/medium-editor/dist/css/medium-editor.min.css vendor/medium-editor.css
 	cp node_modules/medium-editor-autolist/dist/autolist.min.js vendor/autolist.js
 	cp node_modules/lozad/dist/lozad.min.js vendor/lozad.js
+	wget https://raw.githubusercontent.com/philzet/ColorPick.js/master/src/colorPick.js -O vendor/colorPick.js
+	wget https://raw.githubusercontent.com/philzet/ColorPick.js/master/src/colorPick.css -O vendor/colorPick.css
 
 js-templates:
 	node_modules/handlebars/bin/handlebars js/templates -f js/templates.js

@@ -140,9 +140,9 @@
 
 .colors-toolbar {
    float: left;
-   padding-top: 10px;
 }
 
+.colorPickButton,
 .circle-toolbar {
    display:inline-block;
    width:20px;
@@ -360,4 +360,20 @@ div.select2-container {
     height: 32px;
     padding: 0px;
     border-radius: 50%;
+}
+
+/* Color Picker */
+
+#colorPick {
+    border-radius: 8px;
+    padding: 12px;
+    background-color: var(--color-background-dark);
+    opacity: 1.0 !important;
+    z-index: 2500;
+}
+
+#colorPick span {
+    color: var(--color-main-text);
+    font-size: 13px;
+    text-transform: initial;
 }
