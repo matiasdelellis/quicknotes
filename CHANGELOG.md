@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.5.0]: 2020-06-17
+- Enable sharing of notes as read-only between users. Issue #3, #16 and PR #8. Thanks to Vinzenz Rosenkranz
+- Fix many untranslated strings. Issue #31 and #32
+- Add a small modal dialog to change the color of the note.
+- Add an option to select the default color for new notes.
+- First version of an API for third-party applications
+- Modernize some code, clean others and try to improve some css styles.
+- Update Italian translation thanks to Valerio Pulese.
+- Update Spanish translation thanks to Matias De lellis.
+
 ## [0.4.0]: 2020-06-14
 - Implement attachments to notes.
 - Fix the icon that marks the color of the modal note.
