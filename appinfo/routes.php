@@ -5,6 +5,28 @@ return ['resources' =>
 		'noteApi' => ['url' => '/api/v1/notes']
 	],
 	'routes' => [
-		['name' => 'page#index', 'url' => '/', 'verb' => 'GET']
+		// Main page
+		[
+			'name' => 'page#index',
+			'url' => '/',
+			'verb' => 'GET'
+		],
+		// Share
+		[
+			'name' => 'share#destroy',
+			'url' => '/share/{noteId}',
+			'verb' => 'DELETE'
+		],
+		// User Settings
+		[
+			'name' => 'settings#setUserValue',
+			'url' => '/setuservalue',
+			'verb' => 'POST'
+		],
+		[
+			'name' => 'settings#getUserValue',
+			'url' => '/getuservalue',
+			'verb' => 'GET'
+		]
 	]
 ];

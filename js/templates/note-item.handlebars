@@ -1,16 +1,5 @@
 <div class="note-grid-item">
-	<div class="quicknote noselect {{#if active}}note-active{{/if}} {{#if isshared}}shared{{/if}} {{#if sharedwith}}shareowner{{/if}}" style="background-color: {{color}}" data-id="{{ id }}" data-timestamp="{{ timestamp }}" >
-		{{#if isshared}}
-		<div>
-			<div class='icon-share shared-title' title="Shared by {{ userid }}"></div>
-			<div class='note-title'>
-				{{{ title }}}
-			</div>
-		</div>
-		<div id='content' class='note-content'>
-			{{{ content }}}
-		</div>
-		{{else}}
+	<div class="quicknote noselect {{#if is_shared}}shared{{/if}} {{#if shared_with.length}}shareowner{{/if}}" style="background-color: {{color}}" data-id="{{ id }}" data-timestamp="{{ timestamp }}" >
 		<div class='note-header'>
 			<div class='note-attachts'>
 				{{#each attachts}}
@@ -28,11 +17,6 @@
 					<div class="icon-header-note icon-pin hide-header-icon" title="{{t "quicknotes" "Pin note"}}"></div>
 				{{/if}}
 				<div class="icon-header-note icon-delete hide-header-icon icon-delete-note" title="{{t "quicknotes" "Delete note"}}"></div>
-				<!--
-				{{#if sharedwith}}
-				<div class='icon-share shared-title-owner' title="Shared with {{ sharedwith }}"></div>
-				{{/if}}
-				-->
 				<div class='note-title'>
 					{{{ title }}}
 				</div>
@@ -40,12 +24,16 @@
 			<div class='note-content'>
 				{{{ content }}}
 			</div>
+			<div class='note-shares'>
+				{{#each shared_with}}
+					<div class="icon-user slim-share" share-id="{{ shared_user }}" title="Shared with {{ shared_user }}">{{{ shared_user }}}</div>
+				{{/each}}
+			</div>
 			<div class='note-tags'>
 				{{#each tags}}
 					<div class="icon-tag slim-tag" tag-id="{{ id }}">{{{ name }}}</div>
 				{{/each}}
 			</div>
 		<div>
-		{{/if}}
 	</div>
 </div>

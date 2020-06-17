@@ -4,7 +4,9 @@
 			<a target="_blank" href="{{redirect_url}}">
 				<div class="attach-preview note-attach" attach-file-id="{{file_id}}" data-background-image="{{preview_url}}"/>
 			</a>
-			<div class="attach-remove icon-delete" title="{{t "quicknotes" "Delete attachment"}}"/>
+			{{#if ../can_delete}}
+				<div class="attach-remove icon-delete" title="{{t "quicknotes" "Delete attachment"}}"/>
+			{{/if}}
 		</div>
 	{{/each}}
 </div>

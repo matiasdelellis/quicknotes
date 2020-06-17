@@ -2,18 +2,7 @@
 <div id="notes-grid-div" class="notes-grid">
 	{{#each notes}}
 	<div class="note-grid-item">
-		<div class="quicknote noselect {{#if isshared}}shared{{/if}} {{#if sharedwith}}shareowner{{/if}}" style="background-color: {{color}}" data-id="{{ id }}" data-timestamp="{{ timestamp }}" >
-			{{#if isshared}}
-			<div>
-				<div class='icon-share shared-title' title="Shared by {{ userid }}"></div>
-				<div class='note-title'>
-					{{{ title }}}
-				</div>
-			</div>
-			<div id='content' class='note-content'>
-				{{{ content }}}
-			</div>
-			{{else}}
+		<div class="quicknote noselect {{#if is_shared}}shared{{/if}} {{#if shared_with.length}}shareowner{{/if}}" style="background-color: {{color}}" data-id="{{ id }}" data-timestamp="{{ timestamp }}" >
 			<div class='note-header'>
 				<div class='note-attachts'>
 					{{#each attachts}}
@@ -25,23 +14,28 @@
 			</div>
 			<div class='note-body'>
 				<div>
-					{{#if ispinned}}
-						<div class="icon-header-note icon-pinned fixed-header-icon" title="{{t "quicknotes" "Unpin note"}}"></div>
+					{{#if is_shared}}
+						<div class="icon-header-note icon-share" title="{{tSB userid }}"></div>
+						<div class="icon-header-note icon-delete hide-header-icon icon-delete-note" title="{{t "quicknotes" "Delete note"}}"></div>
 					{{else}}
-						<div class="icon-header-note icon-pin hide-header-icon" title="{{t "quicknotes" "Pin note"}}"></div>
+						{{#if ispinned}}
+							<div class="icon-header-note icon-pinned fixed-header-icon" title="{{t "quicknotes" "Unpin note"}}"></div>
+						{{else}}
+							<div class="icon-header-note icon-pin hide-header-icon" title="{{t "quicknotes" "Pin note"}}"></div>
+						{{/if}}
+						<div class="icon-header-note icon-delete hide-header-icon icon-delete-note" title="{{t "quicknotes" "Delete note"}}"></div>
 					{{/if}}
-					<div class="icon-header-note icon-delete hide-header-icon icon-delete-note" title="{{t "quicknotes" "Delete note"}}"></div>
-					<!--
-					{{#if sharedwith}}
-						<div class='icon-share shared-title-owner' title="Shared with {{ sharedwith }}"></div>
-					{{/if}}
-					-->
 					<div class='note-title'>
 						{{{ title }}}
 					</div>
 				</div>
 				<div class='note-content'>
 					{{{ content }}}
+				</div>
+				<div class='note-shares'>
+					{{#each shared_with}}
+						<div class="icon-user slim-share" share-id="{{ shared_user }}" title="{{tSW shared_user}}">{{{ shared_user }}}</div>
+					{{/each}}
 				</div>
 				<div class='note-tags'>
 					{{#each tags}}
@@ -51,7 +45,6 @@
 					{{/each}}
 				</div>
 			</div>
-			{{/if}}
 		</div>
 	</div>
 	{{/each}}
@@ -68,6 +61,7 @@
 					<div contenteditable="true" id='title-editable' class='note-title'></div>
 				</div>
 				<div contenteditable="true" id='content-editable' class='note-content'></div>
+				<div class='note-shares'></div>
 				<div class='note-tags'></div>
 			</div>
 			<div class="note-options">
@@ -87,9 +81,9 @@
 					<a href="#" class="circle-toolbar" style="background-color: #CECECE"></a>
 				</div>
 				<div class="buttons-toolbar">
-					<!--
-					<button id='share-button'><?php p($l->t('Share'));?></button>
-					-->
+					<button id='share-button' class='round-tool-button'>
+						<div class="icon-shared" title="{{t "quicknotes" "Share note"}}"></div>
+					</button>
 					<button id='attach-button' class='round-tool-button'>
 						<div class="icon-picture" title="{{t "quicknotes" "Attach file"}}"></div>
 					</button>
@@ -102,10 +96,14 @@
 					<button id='save-button'>
 						{{ saveTxt }}
 					</button>
-					</div>
-						<div style="clear: both;"></div>
-					</div>
 				</div>
+				<div style="clear: both;"></div>
+			</div>
+			<div class="note-disable-options">
+				<div class="buttons-toolbar">
+					<button id='close-button'>{{t "quicknotes" "Close"}}</button>
+				</div>
+				<div style="clear: both;"></div>
 			</div>
 		</div>
 	</div>

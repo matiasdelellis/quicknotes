@@ -31,6 +31,22 @@ class NoteMapper extends QBMapper {
 		return $this->findEntity($qb);
 	}
 
+	/**
+	 * @param int $id
+	 * @throws \OCP\AppFramework\Db\DoesNotExistException if not found
+	 * @throws \OCP\AppFramework\Db\MultipleObjectsReturnedException if more than one result
+	 * @return Note
+	 */
+	public function findShared($id) {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')
+			->from($this->tableName)
+			->where(
+				$qb->expr()->eq('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT))
+			);
+		return $this->findEntity($qb);
+	}
+
 	public function findAll($userId) {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')

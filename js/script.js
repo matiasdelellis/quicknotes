@@ -29,6 +29,9 @@ var Notes = function (baseUrl) {
     this._baseUrl = baseUrl;
     this._notes = [];
     this._loaded = false;
+
+    this._usersSharing = [];
+    this._loadUsersSharing();
 };
 
 Notes.prototype = {
@@ -70,6 +73,9 @@ Notes.prototype = {
             Ccolors.push({color: value});
         });
         return Ccolors;
+    },
+    getUsersSharing: function () {
+        return this._usersSharing;
     },
     // Get the tags used in the notes
     getTags: function () {
@@ -136,6 +142,42 @@ Notes.prototype = {
             deferred.reject();
         });
         return deferred.promise();
+    },
+    // Delete shared note.
+    forgetShare: function (note) {
+        var self = this;
+        var deferred = $.Deferred();
+        $.ajax({
+            url: OC.generateUrl('/apps/quicknotes/share') + '/' + note.id,
+            method: 'DELETE'
+        }).done(function () {
+            var index = self._notes.findIndex((aNote) => aNote.id === note.id);
+            self._notes.splice(index, 1);
+            deferred.resolve();
+        }).fail(function () {
+            deferred.reject();
+        });
+        return deferred.promise();
+    },
+    // Get the users to share in the notes
+    _loadUsersSharing: function () {
+        var self = this;
+        $.get(OC.linkToOCS('apps/files_sharing/api/v1/', 1) + 'sharees', {
+            format: 'json',
+            perPage: 50,
+            itemType: 1
+        }).done(function (shares) {
+            var users = [];
+            $.each(shares.ocs.data.exact.users, function(index, user) {
+                users.push(user.value.shareWith);
+            });
+            $.each(shares.ocs.data.users, function(index, user) {
+                users.push(user.value.shareWith);
+            });
+            self._usersSharing = users;
+        }).fail(function () {
+            console.error("Could not get users to share.");
+        });
     }
 };
 
@@ -164,11 +206,12 @@ View.prototype = {
         this._editableContent(note.content);
         this._editablePinned(note.ispinned);
         this._editableColor(note.color);
+        this._editableShares(note.shared_with, note.shared_by);
         this._editableTags(note.tags);
-        this._editableAttachts(note.attachts);
+        this._editableAttachts(note.attachts, !note.is_shared);
 
         // Create medium div editor.
-        this._initEditor();
+        this._isEditable(!note.is_shared);
 
         // Show modal editor
         this._showEditor(id);
@@ -182,7 +225,8 @@ View.prototype = {
             attachts: this._editableAttachts(),
             color: this._editableColor(),
             pinned: this._editablePinned(),
-            tags: this._editableTags()
+            tags: this._editableTags(),
+            shares: this._editableShares()
         };
         var self = this;
         this._notes.update(fakeNote).done(function (note) {
@@ -304,18 +348,33 @@ View.prototype = {
                 t('quicknotes', 'Delete note'),
                 function(result) {
                     if (result) {
-                        self._notes.remove(note).done(function () {
-                            if (self._notes.length() > 0) {
-                                $(".notes-grid").isotope('remove', gridnote.parent())
-                                                .isotope('layout');
-                                self.showAll();
-                                self.renderNavigation();
-                            } else {
-                                self.render();
-                            }
-                        }).fail(function () {
-                            alert('Could not delete note, not found');
-                        });
+                        if (!note.is_shared) {
+                            self._notes.remove(note).done(function () {
+                                if (self._notes.length() > 0) {
+                                     $(".notes-grid").isotope('remove', gridnote.parent())
+                                                    .isotope('layout');
+                                    self.showAll();
+                                    self.renderNavigation();
+                                } else {
+                                    self.render();
+                                }
+                            }).fail(function () {
+                                 alert('Could not delete note, not found');
+                            });
+                        } else {
+                            self._notes.forgetShare(note).done(function () {
+                                if (self._notes.length() > 0) {
+                                     $(".notes-grid").isotope('remove', gridnote.parent())
+                                                    .isotope('layout');
+                                    self.showAll();
+                                    self.renderNavigation();
+                                } else {
+                                    self.render();
+                                }
+                            }).fail(function () {
+                                 alert('Could not delete note, not found');
+                            });
+                        }
                     }
                 },
                 true
@@ -454,6 +513,20 @@ View.prototype = {
             $('#modal-note-div #tag-button').trigger( "click");
         });
 
+        // handle tags button.
+        $('#modal-note-div #share-button').click(function (event) {
+            event.stopPropagation();
+            QnDialogs.shares(
+                self._notes.getUsersSharing(),
+                self._editableShares(),
+                function(result, newShares) {
+                    if (result === true) {
+                        self._editableShares(newShares, []);
+                    }
+                }
+            );
+        });
+
         // handle attach button.
         $('#modal-note-div #attach-button').click(function (event) {
             event.stopPropagation();
@@ -465,7 +538,7 @@ View.prototype = {
                         preview_url: OC.generateUrl('core') + '/preview.png?file=' + encodeURI(datapath) + '&x=512&y=512',
                         redirect_url: OC.generateUrl('/apps/files/?dir={dir}&scrollto={scrollto}', {dir: fileInfo.path, scrollto: fileInfo.name})
                     });
-                    self._editableAttachts(attachts);
+                    self._editableAttachts(attachts, true);
                 }).fail(() => {
                     console.log("ERRORRR");
                 });
@@ -483,11 +556,14 @@ View.prototype = {
                     if (result === true) {
                         self._editableTags(newTags);
                     }
-                },
-                true,
-                t('quicknotes', 'Tags'),
-                false
+                }
             );
+        });
+
+        // handle cancel editing notes.
+        $('#modal-note-div #close-button').click(function (event) {
+            event.stopPropagation();
+            self.cancelEdit();
         });
 
         // handle cancel editing notes.
@@ -516,36 +592,13 @@ View.prototype = {
 
         $('#app-navigation ul').html(html);
 
-        // show all notes
-        $('#all-notes').click(function () {
-            $('.notes-grid').isotope({ filter: '*'});
+        /* Create a new note */
 
-            var oldColorTool = $('#app-navigation .circle-toolbar.icon-checkmark');
-            $.each(oldColorTool, function(i, oct) {
-               $(oct).removeClass('icon-checkmark');
-            });
-            $('#app-navigation .any-color').addClass('icon-checkmark');
-        });
-
-        $('#shared-with-you').click(function () {
-            $('.notes-grid').isotope({ filter: function() {
-                return $(this).children().hasClass('shared');
-            } });
-        });
-
-        $('#shared-by-you').click(function () {
-            $('.notes-grid').isotope({ filter: function() {
-                return $(this).children().hasClass('shareowner');
-            } });
-        });
-
-        // create a new note
         var self = this;
         $('#new-note').click(function () {
             var fakenote = {
                 title: t('quicknotes', 'New note'),
-                content: '',
-                color: '#F7EB96'
+                content: ''
             };
             self._notes.create(fakenote).done(function(note) {
                 if (self._notes.length() > 1) {
@@ -564,6 +617,38 @@ View.prototype = {
             });
         });
 
+        /* Show all notes */
+
+        $('#all-notes').click(function () {
+            $('.notes-grid').isotope({ filter: '*'});
+
+            var oldColorTool = $('#colors-folder .circle-toolbar.icon-checkmark');
+            $.each(oldColorTool, function(i, oct) {
+               $(oct).removeClass('icon-checkmark');
+            });
+            $('#app-navigation .any-color').addClass('icon-checkmark');
+        });
+
+        /* Shares Navigation */
+
+        $('#shared-folder').click(function () {
+            $(this).toggleClass("open");
+        });
+
+        $('#shared-with-you').click(function (event) {
+            event.stopPropagation();
+            $('.notes-grid').isotope({ filter: function() {
+                return $(this).children().hasClass('shared');
+            } });
+        });
+
+        $('#shared-by-you').click(function (event) {
+            event.stopPropagation();
+            $('.notes-grid').isotope({ filter: function() {
+                return $(this).children().hasClass('shareowner');
+            } });
+        });
+
         /* Colors Navigation */
 
         $('#colors-folder').click(function () {
@@ -574,9 +659,9 @@ View.prototype = {
             event.stopPropagation();
         });
 
-        $('#app-navigation .circle-toolbar').click(function (event) {
+        $('#colors-folder .circle-toolbar').click(function (event) {
             event.stopPropagation();
-            var oldColorTool = $('#app-navigation .circle-toolbar.icon-checkmark');
+            var oldColorTool = $('#colors-folder .circle-toolbar.icon-checkmark');
             $.each(oldColorTool, function(i, oct) {
                 $(oct).removeClass('icon-checkmark');
             });
@@ -636,8 +721,48 @@ View.prototype = {
                 $(oct).removeClass('icon-checkmark');
             });
         });
-    },
 
+    },
+    renderSettings: function () {
+        /* Render view */
+        var html = Handlebars.templates['settings']({});
+        $('#app-settings-content').html(html);
+        var self = this;
+        $.get(OC.generateUrl('apps/quicknotes/getuservalue'), {'type': 'default_color'})
+        .done(function (response) {
+                var color = response.value;;
+                var colors = $("#setting-defaul-color")[0].getElementsByClassName("circle-toolbar");
+                $.each(colors, function(i, c) {
+                    if (color === self._colorToHex(c.style.backgroundColor)) {
+                        c.className += " icon-checkmark";
+                    }
+                });
+        });
+
+        /* Settings */
+
+        $("#app-settings-content").off();
+
+        $('#app-settings-content').on('click', '.circle-toolbar', function (event) {
+            event.stopPropagation();
+
+            var currentColor = $(this);
+            var color = self._colorToHex(currentColor.css("background-color"));
+
+            $.ajax({
+                url: OC.generateUrl('apps/quicknotes/setuservalue'),
+                type: 'POST',
+                data: {
+                    'type': 'default_color',
+                    'value': color
+                },
+                success: function (response) {
+                    $('#setting-defaul-color .circle-toolbar').removeClass('icon-checkmark');
+                    currentColor.addClass('icon-checkmark');
+                }
+            });
+        });
+    },
     /**
      * Some 'private' functions as helpers.
      */
@@ -654,6 +779,25 @@ View.prototype = {
         var rgb = blue | (green << 8) | (red << 16);
 
         return digits[1] + '#' + rgb.toString(16).toUpperCase();
+    },
+    _isEditable: function(editable) {
+        if (editable === undefined)
+            return $('#title-editable').prop('contenteditable');
+        else {
+            if (editable) {
+                $('#modal-note-div .icon-header-note').show();
+                $('#title-editable').prop('contenteditable', true);
+                $('#modal-note-div .note-options').show();
+                $('#modal-note-div .note-disable-options').hide();
+                this._initEditor();
+            } else {
+                $('#modal-note-div .icon-header-note').hide();
+                $('#title-editable').removeAttr("contentEditable");
+                $('#content-editable').removeAttr("contentEditable");
+                $('#modal-note-div .note-options').hide();
+                $('#modal-note-div .note-disable-options').show();
+            }
+        }
     },
     _editableId: function(id) {
         if (id === undefined)
@@ -706,6 +850,19 @@ View.prototype = {
             $("#modal-note-div .quicknote").css("background-color", color);
         }
     },
+    _editableShares: function(shared_with, shared_by) {
+        if (shared_with === undefined) {
+            return $("#modal-note-div .slim-share").toArray().map(function (value) {
+                return {
+                    id: value.getAttribute('share-id'),
+                    name: value.textContent.trim()
+                };
+            });
+        } else {
+            var html = Handlebars.templates['shares']({ shared_by: shared_by, shared_with: shared_with});
+            $("#modal-note-div .note-shares").replaceWith(html);
+        }
+    },
     _editableTags: function(tags) {
         if (tags === undefined) {
             return $("#modal-note-div .slim-tag").toArray().map(function (value) {
@@ -719,7 +876,7 @@ View.prototype = {
             $("#modal-note-div .note-tags").replaceWith(html);
         }
     },
-    _editableAttachts: function(attachts) {
+    _editableAttachts: function(attachts, can_delete) {
         if (attachts === undefined) {
             return $("#modal-note-div .note-attach").toArray().map(function (value) {
                 return {
@@ -729,7 +886,7 @@ View.prototype = {
                 };
             });
         } else {
-            var html = Handlebars.templates['attachts']({ attachts: attachts});
+            var html = Handlebars.templates['attachts']({ attachts: attachts, can_delete: can_delete});
             $("#modal-note-div .note-attachts").replaceWith(html);
 
             lozad('.attach-preview').observe();
@@ -797,8 +954,10 @@ View.prototype = {
         this._editor = editor;
     },
     _destroyEditor: function() {
-        this._editor.destroy();
-        this._editor = undefined;
+        if (this._editor != undefined) {
+            this._editor.destroy();
+            this._editor = undefined;
+        }
         this._changed = false;
 
         this._editableId(-1);
@@ -821,7 +980,6 @@ View.prototype = {
             "left"     : note.offset().left,
             "top"      : note.offset().top,
             "width"    : note.width(),
-            "min-height": note.height(),
             "height:"  : "auto"
         });
 
@@ -893,6 +1051,7 @@ View.prototype = {
     render: function () {
         this.renderNavigation();
         this.renderContent();
+        this.renderSettings();
     }
 };
 
@@ -926,6 +1085,19 @@ new OCA.Search(search, function() {
 });
 
 
+/**
+ * Add Helpers to handlebars
+ */
+
+Handlebars.registerHelper('tSW', function(user) {
+    return t('quicknotes', 'Shared with {user}', {user: user});
+});
+
+Handlebars.registerHelper('tSB', function(user) {
+    return t('quicknotes', 'Shared by {user}', {user: user});
+});
+
+
 /*
  * Create modules
  */
@@ -941,8 +1113,7 @@ view.renderContent();
  * Loading notes and render final view.
  */
 notes.load().done(function () {
-    view.renderNavigation();
-    view.renderContent();
+    view.render();
 }).fail(function () {
     alert('Could not load notes');
 });

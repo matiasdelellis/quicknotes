@@ -45,4 +45,14 @@ class NoteShareMapper extends Mapper {
 		$sql = 'DELETE FROM *PREFIX*quicknotes_shares WHERE note_id = ?';
 		$this->execute($sql, [$noteId]);
 	}
+
+	public function existsByNoteAndUser($noteId, $userId) {
+		$sql = 'SELECT * FROM *PREFIX*quicknotes_shares WHERE shared_user = ? AND note_id = ?';
+		try {
+			return $this->findEntities($sql, [$userId, $noteId]);
+		} catch (DoesNotExistException $e) {
+			return false;
+		}
+		return true;
+	}
 }

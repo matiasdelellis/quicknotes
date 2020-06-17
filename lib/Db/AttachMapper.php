@@ -73,8 +73,7 @@ class AttachMapper extends QBMapper {
 	 * @param string $userId
 	 * @param int $noteId
 	 * @throws \OCP\AppFramework\Db\DoesNotExistException if not found
-	 * @throws \OCP\AppFramework\Db\MultipleObjectsReturnedException if more than one result
-	 * @return Note[]
+	 * @return Attach[]
 	 */
 	public function findFromNote($userId, $noteId) {
 		$qb = $this->db->getQueryBuilder();
@@ -86,4 +85,5 @@ class AttachMapper extends QBMapper {
 			);
 		return $this->findEntities($qb);
 	}
+
 }
