@@ -11,6 +11,12 @@ return ['resources' =>
 			'url' => '/',
 			'verb' => 'GET'
 		],
+		// Share
+		[
+			'name' => 'share#destroy',
+			'url' => '/share/{noteId}',
+			'verb' => 'DELETE'
+		],
 		// User Settings
 		[
 			'name' => 'settings#setUserValue',

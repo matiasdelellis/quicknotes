@@ -143,6 +143,22 @@ Notes.prototype = {
         });
         return deferred.promise();
     },
+    // Delete shared note.
+    forgetShare: function (note) {
+        var self = this;
+        var deferred = $.Deferred();
+        $.ajax({
+            url: OC.generateUrl('/apps/quicknotes/share') + '/' + note.id,
+            method: 'DELETE'
+        }).done(function () {
+            var index = self._notes.findIndex((aNote) => aNote.id === note.id);
+            self._notes.splice(index, 1);
+            deferred.resolve();
+        }).fail(function () {
+            deferred.reject();
+        });
+        return deferred.promise();
+    },
     // Get the users to share in the notes
     _loadUsersSharing: function () {
         var self = this;
@@ -328,18 +344,33 @@ View.prototype = {
                 t('quicknotes', 'Delete note'),
                 function(result) {
                     if (result) {
-                        self._notes.remove(note).done(function () {
-                            if (self._notes.length() > 0) {
-                                $(".notes-grid").isotope('remove', gridnote.parent())
-                                                .isotope('layout');
-                                self.showAll();
-                                self.renderNavigation();
-                            } else {
-                                self.render();
-                            }
-                        }).fail(function () {
-                            alert('Could not delete note, not found');
-                        });
+                        if (!note.is_shared) {
+                            self._notes.remove(note).done(function () {
+                                if (self._notes.length() > 0) {
+                                     $(".notes-grid").isotope('remove', gridnote.parent())
+                                                    .isotope('layout');
+                                    self.showAll();
+                                    self.renderNavigation();
+                                } else {
+                                    self.render();
+                                }
+                            }).fail(function () {
+                                 alert('Could not delete note, not found');
+                            });
+                        } else {
+                            self._notes.forgetShare(note).done(function () {
+                                if (self._notes.length() > 0) {
+                                     $(".notes-grid").isotope('remove', gridnote.parent())
+                                                    .isotope('layout');
+                                    self.showAll();
+                                    self.renderNavigation();
+                                } else {
+                                    self.render();
+                                }
+                            }).fail(function () {
+                                 alert('Could not delete note, not found');
+                            });
+                        }
                     }
                 },
                 true
