@@ -206,7 +206,7 @@ View.prototype = {
         this._editableContent(note.content);
         this._editablePinned(note.ispinned);
         this._editableColor(note.color);
-        this._editableShares(note.shared_with, note.shared_by);
+        this._editableShares(note.shared_with);
         this._editableTags(note.tags);
         this._editableAttachts(note.attachts, !note.is_shared);
 
@@ -226,7 +226,7 @@ View.prototype = {
             color: this._editableColor(),
             pinned: this._editablePinned(),
             tags: this._editableTags(),
-            shares: this._editableShares()
+            shared_with: this._editableShares()
         };
         var self = this;
         this._notes.update(fakeNote).done(function (note) {
@@ -514,7 +514,7 @@ View.prototype = {
                 self._editableShares(),
                 function(result, newShares) {
                     if (result === true) {
-                        self._editableShares(newShares, []);
+                        self._editableShares(newShares);
                     }
                 }
             );
@@ -842,16 +842,16 @@ View.prototype = {
             });
         }
     },
-    _editableShares: function(shared_with, shared_by) {
+    _editableShares: function(shared_with) {
         if (shared_with === undefined) {
             return $("#modal-note-div .slim-share").toArray().map(function (value) {
                 return {
                     id: value.getAttribute('share-id'),
-                    name: value.textContent.trim()
+                    shared_user: value.textContent.trim()
                 };
             });
         } else {
-            var html = Handlebars.templates['shares']({ shared_by: shared_by, shared_with: shared_with});
+            var html = Handlebars.templates['shares']({shared_with: shared_with});
             $("#modal-note-div .note-shares").replaceWith(html);
         }
     },

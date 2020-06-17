@@ -168,7 +168,7 @@ const QnDialogs = {
 				}
 			});
 
-			input.val(selectedUsers.map(function (value) { return value.name }));
+			input.val(selectedUsers.map(function (value) { return value.shared_user }));
 			input.trigger("change");
 
 			$('.select2-input').on("keyup", function (event) {

@@ -260,7 +260,7 @@ class NoteService {
 		foreach ($dbShares as $dbShare) {
 			$delete = true;
 			foreach ($shares as $share) {
-				if ($dbShare->getSharedUser() === $share['name']) {
+				if ($dbShare->getSharedUser() === $share['shared_user']) {
 					$delete = false;
 					break;
 				}
@@ -272,10 +272,10 @@ class NoteService {
 
 		// Add new shares
 		foreach ($shares as $share) {
-			if (!$this->noteShareMapper->existsByNoteAndUser($id, $share['name'])) {
+			if (!$this->noteShareMapper->existsByNoteAndUser($id, $share['shared_user'])) {
 				$hShare = new NoteShare();
 				$hShare->setNoteId($id);
-				$hShare->setSharedUser($share['name']);
+				$hShare->setSharedUser($share['shared_user']);
 				$this->noteShareMapper->insert($hShare);
 			}
 		}
