@@ -563,8 +563,7 @@ View.prototype = {
         $('#new-note').click(function () {
             var fakenote = {
                 title: t('quicknotes', 'New note'),
-                content: '',
-                color: '#F7EB96'
+                content: ''
             };
             self._notes.create(fakenote).done(function(note) {
                 if (self._notes.length() > 1) {
@@ -588,7 +587,7 @@ View.prototype = {
         $('#all-notes').click(function () {
             $('.notes-grid').isotope({ filter: '*'});
 
-            var oldColorTool = $('#app-navigation .circle-toolbar.icon-checkmark');
+            var oldColorTool = $('#colors-folder .circle-toolbar.icon-checkmark');
             $.each(oldColorTool, function(i, oct) {
                $(oct).removeClass('icon-checkmark');
             });
@@ -625,9 +624,9 @@ View.prototype = {
             event.stopPropagation();
         });
 
-        $('#app-navigation .circle-toolbar').click(function (event) {
+        $('#colors-folder .circle-toolbar').click(function (event) {
             event.stopPropagation();
-            var oldColorTool = $('#app-navigation .circle-toolbar.icon-checkmark');
+            var oldColorTool = $('#colors-folder .circle-toolbar.icon-checkmark');
             $.each(oldColorTool, function(i, oct) {
                 $(oct).removeClass('icon-checkmark');
             });
@@ -687,8 +686,48 @@ View.prototype = {
                 $(oct).removeClass('icon-checkmark');
             });
         });
-    },
 
+    },
+    renderSettings: function () {
+        /* Render view */
+        var html = Handlebars.templates['settings']({});
+        $('#app-settings-content').html(html);
+        var self = this;
+        $.get(OC.generateUrl('apps/quicknotes/getuservalue'), {'type': 'default_color'})
+        .done(function (response) {
+                var color = response.value;;
+                var colors = $("#setting-defaul-color")[0].getElementsByClassName("circle-toolbar");
+                $.each(colors, function(i, c) {
+                    if (color === self._colorToHex(c.style.backgroundColor)) {
+                        c.className += " icon-checkmark";
+                    }
+                });
+        });
+
+        /* Settings */
+
+        $("#app-settings-content").off();
+
+        $('#app-settings-content').on('click', '.circle-toolbar', function (event) {
+            event.stopPropagation();
+
+            var currentColor = $(this);
+            var color = self._colorToHex(currentColor.css("background-color"));
+
+            $.ajax({
+                url: OC.generateUrl('apps/quicknotes/setuservalue'),
+                type: 'POST',
+                data: {
+                    'type': 'default_color',
+                    'value': color
+                },
+                success: function (response) {
+                    $('#setting-defaul-color .circle-toolbar').removeClass('icon-checkmark');
+                    currentColor.addClass('icon-checkmark');
+                }
+            });
+        });
+    },
     /**
      * Some 'private' functions as helpers.
      */
@@ -977,6 +1016,7 @@ View.prototype = {
     render: function () {
         this.renderNavigation();
         this.renderContent();
+        this.renderSettings();
     }
 };
 
@@ -1038,8 +1078,7 @@ view.renderContent();
  * Loading notes and render final view.
  */
 notes.load().done(function () {
-    view.renderNavigation();
-    view.renderContent();
+    view.render();
 }).fail(function () {
     alert('Could not load notes');
 });

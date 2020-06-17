@@ -91,7 +91,7 @@ class NoteController extends Controller {
 	 * @param string $content
 	 * @param string $color
 	 */
-	public function create($title, $content, $color = "#F7EB96") {
+	public function create($title, $content, $color = NULL) {
 		$note = $this->noteService->create($this->userId, $title, $content, $color);
 
 		$etag = md5(json_encode($note));

@@ -267,12 +267,13 @@ div[contenteditable="true"] {
     background-color: rgba(0,0,0,0.12);
 }
 
-.note-tags {
-    margin-top: 8px;
+.note-shares > .slim-share,
+.note-tags > .slim-tag {
+    margin-top: 5px;
 }
 
-/* Restore defaults select2 rules */
 
+/* Restore defaults select2 rules */
 
 .select2-container-multi
 .select2-choices

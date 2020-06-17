@@ -52,6 +52,7 @@ class NoteService {
 	private $attachMapper;
 	private $tagmapper;
 	private $fileService;
+	private $settingsService;
 
 	public function __construct(NoteMapper      $notemapper,
 	                            NoteTagMapper   $notetagmapper,
@@ -59,7 +60,8 @@ class NoteService {
 	                            ColorMapper     $colormapper,
 	                            AttachMapper    $attachMapper,
 	                            TagMapper       $tagmapper,
-	                            FileService     $fileService)
+	                            FileService     $fileService,
+	                            SettingsService $settingsService)
 	{
 		$this->notemapper      = $notemapper;
 		$this->notetagmapper   = $notetagmapper;
@@ -68,6 +70,7 @@ class NoteService {
 		$this->attachMapper    = $attachMapper;
 		$this->tagmapper       = $tagmapper;
 		$this->fileService     = $fileService;
+		$this->settingsService = $settingsService;
 	}
 
 	/**
@@ -154,7 +157,11 @@ class NoteService {
 	 * @param string $content
 	 * @param string $color
 	 */
-	public function create(string $userId, string $title, string $content, string $color = "#F7EB96"): Note {
+	public function create(string $userId, string $title, string $content, string $color = NULL): Note {
+		if (is_null($color)) {
+			$color = $this->settingsService->getColorForNewNotes();
+		}
+
 		// Get color or append it
 		if ($this->colormapper->colorExists($color)) {
 			$hcolor = $this->colormapper->findByColor($color);
