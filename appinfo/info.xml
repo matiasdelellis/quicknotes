@@ -5,7 +5,7 @@
     <name>Quick notes</name>
     <summary>Quick notes with a basic rich text</summary>
     <description>Quick notes with a basic rich text</description>
-    <version>0.4.0</version>
+    <version>0.6.0</version>
     <licence>agpl</licence>
     <author>Matias De lellis</author>
     <namespace>QuickNotes</namespace>
@@ -14,10 +14,11 @@
     <website>https://github.com/matiasdelellis/quicknotes</website>
     <bugs>https://github.com/matiasdelellis/quicknotes/issues</bugs>
     <repository type="git">https://github.com/matiasdelellis/quicknotes.git</repository>
-    <screenshot small-thumbnail="https://raw.githubusercontent.com/matiasdelellis/quicknotes/master/doc/quicknotes-grid-view-small.png">https://raw.githubusercontent.com/matiasdelellis/quicknotes/master/doc/quicknotes-grid-view.png</screenshot>
-    <screenshot>https://raw.githubusercontent.com/matiasdelellis/quicknotes/master/doc/quicknotes-note-edit.png</screenshot>
-    <screenshot>https://raw.githubusercontent.com/matiasdelellis/quicknotes/master/doc/quicknotes-rich-text.png</screenshot>
-    <screenshot>https://raw.githubusercontent.com/matiasdelellis/quicknotes/master/doc/quicknotes-attachments.png</screenshot>
+    <screenshot small-thumbnail="https://raw.githubusercontent.com/matiasdelellis/quicknotes/master/doc/quicknotes-grid-view-small.jpeg">https://raw.githubusercontent.com/matiasdelellis/quicknotes/master/doc/quicknotes-grid-view.jpeg</screenshot>
+    <screenshot>https://raw.githubusercontent.com/matiasdelellis/quicknotes/master/doc/quicknotes-note-edit.jpeg</screenshot>
+    <screenshot>https://raw.githubusercontent.com/matiasdelellis/quicknotes/master/doc/quicknotes-rich-text.jpeg</screenshot>
+    <screenshot>https://raw.githubusercontent.com/matiasdelellis/quicknotes/master/doc/quicknotes-attachments.jpeg</screenshot>
+    <screenshot>https://raw.githubusercontent.com/matiasdelellis/quicknotes/master/doc/quicknotes-shared-note.jpeg</screenshot>
     <dependencies>
         <nextcloud min-version="18" max-version="19"/>
     </dependencies>

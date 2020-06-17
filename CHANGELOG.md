@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.5.0]: 2020-06-17
+## [0.6.0]: 2020-06-17
 - Enable sharing of notes as read-only between users. Issue #3, #16 and PR #8. Thanks to Vinzenz Rosenkranz
 - Fix many untranslated strings. Issue #31 and #32
 - Add a small modal dialog to change the color of the note.

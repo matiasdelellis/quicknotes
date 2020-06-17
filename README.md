@@ -6,7 +6,7 @@ a basic rich text as **Bold**, *italic*, and numbered or bullet list to improve
 the notes. Also it allows attaching files, and the notes can be shared as
 read-only to other users.
 
-![Screenshot of Quick notes](/doc/quicknotes-grid-view.png "App screenshot")
+![Screenshot of Quick notes](/doc/quicknotes-grid-view.jpeg "App screenshot")
 
 ## :rocket: Installation
 
@@ -14,7 +14,7 @@ Quick notes is available in the Nextcloud App Store and can be installed
 directly from your Nextcloud installation looking in the category Office.
 
 Nextcloud will notify you about possible updates. Please have a look at
-CHANGELOG.md for details about changes.
+[CHANGELOG.md](CHANGELOG.md) for details about changes.
 
 ## :exclamation: Bugs
 
