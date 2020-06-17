@@ -164,10 +164,14 @@ Notes.prototype = {
         var self = this;
         $.get(OC.linkToOCS('apps/files_sharing/api/v1/', 1) + 'sharees', {
             format: 'json',
-            itemType: '1'
+            perPage: 50,
+            itemType: 1
         }).done(function (shares) {
             var users = [];
             $.each(shares.ocs.data.exact.users, function(index, user) {
+                users.push(user.value.shareWith);
+            });
+            $.each(shares.ocs.data.users, function(index, user) {
                 users.push(user.value.shareWith);
             });
             self._usersSharing = users;
