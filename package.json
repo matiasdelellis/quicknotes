@@ -21,7 +21,7 @@
   },
   "homepage": "https://github.com/matiasdelellis/quicknotes#readme",
   "dependencies": {
-    "handlebars": "^4.5.1",
+    "handlebars": "^4.5.3",
     "isotope-layout": "^3.0.6",
     "lozad": "^1.15.0",
     "medium-editor": "^5.23.3",
