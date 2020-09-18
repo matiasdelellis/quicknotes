@@ -32,14 +32,18 @@ use OCP\IServerContainer;
 class Application extends App {
 
 	/** @var string */
-	public const APP_NAME = 'quicknotes';
+	public const APP_ID = 'quicknotes';
+
+	/** @var string */
+	public const API_VERSION = '1.0';
 
 	public function __construct(array $urlParams = []) {
-		parent::__construct(self::APP_NAME, $urlParams);
+		parent::__construct(self::APP_ID, $urlParams);
 	}
 
 	public function register(): void {
 		$this->registerNavigationEntry();
+		$this->registerCapabilities();
 	}
 
 	private function registerNavigationEntry(): void {
@@ -57,6 +61,11 @@ class Application extends App {
 				'name' => $l10n->t('Quick notes'),
 			];
 		});
+	}
+
+	private function registerCapabilities(): void {
+		$container = $this->getContainer();
+		$container->registerCapability(Capabilities::class);
 	}
 
 }

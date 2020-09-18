@@ -55,11 +55,11 @@ class SettingsService {
 
 
 	public function getColorForNewNotes(): string {
-		return $this->config->getUserValue($this->userId, Application::APP_NAME, self::COLOR_FOR_NEW_NOTES_KEY, self::DEFAULT_COLOR_FOR_NEW_NOTES);
+		return $this->config->getUserValue($this->userId, Application::APP_ID, self::COLOR_FOR_NEW_NOTES_KEY, self::DEFAULT_COLOR_FOR_NEW_NOTES);
 	}
 
 	public function setColorForNewNotes(string $color) {
-		$this->config->setUserValue($this->userId, Application::APP_NAME, self::COLOR_FOR_NEW_NOTES_KEY, $color);
+		$this->config->setUserValue($this->userId, Application::APP_ID, self::COLOR_FOR_NEW_NOTES_KEY, $color);
 	}
 
 }
