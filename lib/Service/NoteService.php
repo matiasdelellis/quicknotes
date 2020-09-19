@@ -81,7 +81,6 @@ class NoteService {
 
 		// Set shares with others.
 		foreach($notes as $note) {
-			$note->setIsShared(false);
 			$note->setSharedWith($this->noteShareMapper->getSharesForNote($note->getId()));
 		}
 
@@ -90,8 +89,6 @@ class NoteService {
 		$sharedEntries = $this->noteShareMapper->findForUser($userId);
 		foreach($sharedEntries as $sharedEntry) {
 			$sharedNote = $this->notemapper->findShared($sharedEntry->getNoteId());
-			$sharedNote->setIsShared(true);
-
 			$sharedEntry->setUserId($sharedNote->getUserId());
 			$sharedNote->setSharedBy([$sharedEntry]);
 			$shares[] = $sharedNote;
@@ -155,9 +152,21 @@ class NoteService {
 	 * @param string $userId
 	 * @param string $title
 	 * @param string $content
-	 * @param string $color
+	 * @param string $color optional color.
+	 * @param bool   $isPinned optional if note must be pinned
+	 * @param array  $sharedWith optional list of shares
+	 * @param array  $tags optional list of tags
+	 * @param array  $attachments optional list of attachments
 	 */
-	public function create(string $userId, string $title, string $content, string $color = NULL): Note {
+	public function create(string $userId,
+	                       string $title,
+	                       string $content,
+	                       string $color = null,
+	                       bool   $isPinned = false,
+	                       array  $sharedWith = [],
+	                       array  $tags = [],
+	                       array  $attachments = []): ?Note
+	{
 		if (is_null($color)) {
 			$color = $this->settingsService->getColorForNewNotes();
 		}
@@ -171,20 +180,24 @@ class NoteService {
 			$hcolor = $this->colormapper->insert($hcolor);
 		}
 
+
 		// Create note and insert it
 		$note = new Note();
 
 		$note->setTitle($title);
 		$note->setContent($content);
+		$note->setPinned($isPinned ? 1 : 0);
 		$note->setTimestamp(time());
 		$note->setColorId($hcolor->id);
 		$note->setUserId($userId);
 
 		$newNote = $this->notemapper->insert($note);
 
+		// TODO: Insert optional shares, tags and attachments.
+
 		// Insert true color pin and tags to response
 		$newNote->setColor($hcolor->getColor());
-		$newNote->setIsPinned(false);
+		$newNote->setIsPinned($isPinned);
 		$newNote->setTags([]);
 		$newNote->setAttachts([]);
 
@@ -193,24 +206,24 @@ class NoteService {
 
 	/**
 	 * @param string userId
-	 * @param int $id
+	 * @param int    $id
 	 * @param string $title
 	 * @param string $content
-	 * @param array $attachts
-	 * @param bool $pinned
-	 * @param array $tags
-	 * @param array $shares
 	 * @param string $color
+	 * @param bool   $isPinned
+	 * @param array  $tags
+	 * @param array  $attachments
+	 * @param array  $sharedWith
 	 */
 	public function update(string $userId,
 	                       int    $id,
 	                       string $title,
 	                       string $content,
-	                       array  $attachts,
-	                       bool   $pinned,
+	                       string $color,
+	                       bool   $isPinned,
 	                       array  $tags,
-	                       array  $shares,
-	                       string $color): ?Note
+	                       array  $attachments,
+	                       array  $sharedWith): ?Note
 	{
 		// Get current Note and Color.
 		$note = $this->get($userId, $id);
@@ -244,7 +257,7 @@ class NoteService {
 		}
 
 		// Add new attachts
-		foreach ($attachts as $attach) {
+		foreach ($attachments as $attach) {
 			if (!$this->attachMapper->fileAttachExists($userId, $id, $attach['file_id'])) {
 				$hAttach = new Attach();
 				$hAttach->setUserId($userId);
@@ -259,7 +272,7 @@ class NoteService {
 		$dbShares = $this->noteShareMapper->getSharesForNote($id);
 		foreach ($dbShares as $dbShare) {
 			$delete = true;
-			foreach ($shares as $share) {
+			foreach ($sharedWith as $share) {
 				if ($dbShare->getSharedUser() === $share['shared_user']) {
 					$delete = false;
 					break;
@@ -271,7 +284,7 @@ class NoteService {
 		}
 
 		// Add new shares
-		foreach ($shares as $share) {
+		foreach ($sharedWith as $share) {
 			if (!$this->noteShareMapper->existsByNoteAndUser($id, $share['shared_user'])) {
 				$hShare = new NoteShare();
 				$hShare->setNoteId($id);
@@ -320,7 +333,7 @@ class NoteService {
 		// Set new info on Note
 		$note->setTitle($title);
 		$note->setContent($content);
-		$note->setPinned($pinned ? 1 : 0);
+		$note->setPinned($isPinned ? 1 : 0);
 		$note->setTimestamp(time());
 		$note->setColorId($hcolor->id);
 
@@ -329,7 +342,7 @@ class NoteService {
 
 		// Insert true color and pin to response
 		$newnote->setColor($hcolor->getColor());
-		$newnote->setIsPinned($note->getPinned() ? true : false);
+		$newnote->setIsPinned($isPinned);
 
 		// Fill new tags
 		$newnote->setTags($this->tagmapper->getTagsForNote($userId, $newnote->getId()));
@@ -343,7 +356,6 @@ class NoteService {
 		$newnote->setAttachts($attachts);
 
 		// Fill shared with with others
-		$newnote->setIsShared(false);
 		$newnote->setSharedWith($this->noteShareMapper->getSharesForNote($newnote->getId()));
 
 		//  Remove old color if necessary
@@ -363,7 +375,7 @@ class NoteService {
 	 * @param string $userId
 	 * @param int $id
 	 */
-	public function destroy($userId, $id) {
+	public function destroy (string $userId, int $id) {
 		// Get Note and Color
 		try {
 			$note = $this->notemapper->find($id, $userId);

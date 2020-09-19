@@ -204,14 +204,14 @@ View.prototype = {
         this._editableId(note.id);
         this._editableTitle(note.title);
         this._editableContent(note.content);
-        this._editablePinned(note.ispinned);
+        this._editablePinned(note.isPinned);
         this._editableColor(note.color);
-        this._editableShares(note.shared_with);
+        this._editableShares(note.sharedWith);
         this._editableTags(note.tags);
-        this._editableAttachts(note.attachts, !note.is_shared);
+        this._editableAttachts(note.attachments, !note.sharedBy.length);
 
         // Create medium div editor.
-        this._isEditable(!note.is_shared);
+        this._isEditable(!note.sharedBy.length);
 
         // Show modal editor
         this._showEditor(id);
@@ -222,11 +222,11 @@ View.prototype = {
             id: this._editableId(),
             title: this._editableTitle(),
             content: this._editableContent(),
-            attachts: this._editableAttachts(),
+            attachments: this._editableAttachts(),
             color: this._editableColor(),
-            pinned: this._editablePinned(),
+            isPinned: this._editablePinned(),
             tags: this._editableTags(),
-            shared_with: this._editableShares()
+            sharedWith: this._editableShares()
         };
         var self = this;
         this._notes.update(fakeNote).done(function (note) {
@@ -390,7 +390,7 @@ View.prototype = {
             var id = parseInt(gridNote.data('id'), 10);
 
             var note = self._notes.read(id);
-            note.pinned = true;
+            note.isPinned = true;
 
             self._notes.update(note).done(function () {
                 icon.removeClass("hide-header-icon");
@@ -413,7 +413,7 @@ View.prototype = {
             var id = parseInt(gridNote.data('id'), 10);
 
             var note = self._notes.read(id);
-            note.pinned = false;
+            note.isPinned = false;
 
             self._notes.update(note).done(function () {
                 icon.removeClass("fixed-header-icon");
@@ -851,7 +851,7 @@ View.prototype = {
                 };
             });
         } else {
-            var html = Handlebars.templates['shares']({shared_with: shared_with});
+            var html = Handlebars.templates['shares']({sharedWith: shared_with});
             $("#modal-note-div .note-shares").replaceWith(html);
         }
     },
@@ -878,7 +878,7 @@ View.prototype = {
                 };
             });
         } else {
-            var html = Handlebars.templates['attachts']({ attachts: attachts, can_delete: can_delete});
+            var html = Handlebars.templates['attachts']({ attachments: attachts, can_delete: can_delete});
             $("#modal-note-div .note-attachts").replaceWith(html);
 
             lozad('.attach-preview').observe();
