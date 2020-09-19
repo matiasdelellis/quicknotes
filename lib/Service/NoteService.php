@@ -197,7 +197,7 @@ class NoteService {
 
 		// Insert true color pin and tags to response
 		$newNote->setColor($hcolor->getColor());
-		$newNote->setIsPinned(false);
+		$newNote->setIsPinned($isPinned);
 		$newNote->setTags([]);
 		$newNote->setAttachts([]);
 
@@ -206,24 +206,24 @@ class NoteService {
 
 	/**
 	 * @param string userId
-	 * @param int $id
+	 * @param int    $id
 	 * @param string $title
 	 * @param string $content
-	 * @param array $attachts
-	 * @param bool $pinned
-	 * @param array $tags
-	 * @param array $shares
 	 * @param string $color
+	 * @param bool   $isPinned
+	 * @param array  $sharedWith
+	 * @param array  $tags
+	 * @param array  $attachments
 	 */
 	public function update(string $userId,
 	                       int    $id,
 	                       string $title,
 	                       string $content,
-	                       array  $attachts,
-	                       bool   $pinned,
+	                       string $color,
+	                       bool   $isPinned,
+	                       array  $sharedWith,
 	                       array  $tags,
-	                       array  $shares,
-	                       string $color): ?Note
+	                       array  $attachments): ?Note
 	{
 		// Get current Note and Color.
 		$note = $this->get($userId, $id);
@@ -257,7 +257,7 @@ class NoteService {
 		}
 
 		// Add new attachts
-		foreach ($attachts as $attach) {
+		foreach ($attachments as $attach) {
 			if (!$this->attachMapper->fileAttachExists($userId, $id, $attach['file_id'])) {
 				$hAttach = new Attach();
 				$hAttach->setUserId($userId);
@@ -284,7 +284,7 @@ class NoteService {
 		}
 
 		// Add new shares
-		foreach ($shares as $share) {
+		foreach ($sharedWith as $share) {
 			if (!$this->noteShareMapper->existsByNoteAndUser($id, $share['shared_user'])) {
 				$hShare = new NoteShare();
 				$hShare->setNoteId($id);
@@ -333,7 +333,7 @@ class NoteService {
 		// Set new info on Note
 		$note->setTitle($title);
 		$note->setContent($content);
-		$note->setPinned($pinned ? 1 : 0);
+		$note->setPinned($isPinned ? 1 : 0);
 		$note->setTimestamp(time());
 		$note->setColorId($hcolor->id);
 
@@ -342,7 +342,7 @@ class NoteService {
 
 		// Insert true color and pin to response
 		$newnote->setColor($hcolor->getColor());
-		$newnote->setIsPinned($note->getPinned() ? true : false);
+		$newnote->setIsPinned($isPinned);
 
 		// Fill new tags
 		$newnote->setTags($this->tagmapper->getTagsForNote($userId, $newnote->getId()));
