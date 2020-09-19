@@ -1,8 +1,8 @@
 <div class="note-grid-item">
-	<div class="quicknote noselect {{#if is_shared}}shared{{/if}} {{#if shared_with.length}}shareowner{{/if}}" style="background-color: {{color}}" data-id="{{ id }}" data-timestamp="{{ timestamp }}" >
+	<div class="quicknote noselect {{#if sharedBy.length}}shared{{/if}} {{#if sharedWith.length}}shareowner{{/if}}" style="background-color: {{color}}" data-id="{{ id }}" data-timestamp="{{ timestamp }}" >
 		<div class='note-header'>
 			<div class='note-attachts'>
-				{{#each attachts}}
+				{{#each attachments}}
 					<div class='note-attach-grid'>
 						<div class="attach-preview note-attach" attach-file-id="{{file_id}}" data-background-image="{{preview_url}}"/>
 					</div>
@@ -11,7 +11,7 @@
 		</div>
 		<div class='note-body'>
 			<div>
-				{{#if ispinned}}
+				{{#if isPinned}}
 					<div class="icon-header-note icon-pinned fixed-header-icon" title="{{t "quicknotes" "Unpin note"}}"></div>
 				{{else}}
 					<div class="icon-header-note icon-pin hide-header-icon" title="{{t "quicknotes" "Pin note"}}"></div>
@@ -25,7 +25,7 @@
 				{{{ content }}}
 			</div>
 			<div class='note-shares'>
-				{{#each shared_with}}
+				{{#each sharedWith}}
 					<div class="icon-user slim-share" share-id="{{ shared_user }}" title="Shared with {{ shared_user }}">{{{ shared_user }}}</div>
 				{{/each}}
 			</div>
