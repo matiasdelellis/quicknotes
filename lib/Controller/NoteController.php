@@ -37,7 +37,7 @@ class NoteController extends Controller {
 	private $userId;
 
 	public function __construct($AppName,
-	                            IRequest      $request,
+	                            IRequest    $request,
 	                            NoteService $noteService,
 	                            $userId)
 	{
@@ -70,7 +70,7 @@ class NoteController extends Controller {
 	 *
 	 * @param int $id
 	 */
-	public function show($id): JSONResponse {
+	public function show(int $id): JSONResponse {
 		$note = $this->noteService->get($this->userId, $id);
 		if (is_null($note)) {
 			return new JSONResponse([], Http::STATUS_NOT_FOUND);
@@ -91,7 +91,7 @@ class NoteController extends Controller {
 	 * @param string $content
 	 * @param string $color
 	 */
-	public function create($title, $content, $color = NULL) {
+	public function create(string $title, string $content, string $color = null) {
 		$note = $this->noteService->create($this->userId, $title, $content, $color);
 
 		$etag = md5(json_encode($note));
@@ -137,4 +137,5 @@ class NoteController extends Controller {
 		$this->noteService->destroy($this->userId, $id);
 		return new JSONResponse([]);
 	}
+
 }

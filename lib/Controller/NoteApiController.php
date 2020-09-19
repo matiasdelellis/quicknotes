@@ -37,7 +37,7 @@ class NoteApiController extends ApiController {
 	private $userId;
 
 	public function __construct($AppName,
-	                            IRequest      $request,
+	                            IRequest    $request,
 	                            NoteService $noteService,
 	                            $userId)
 	{
@@ -74,7 +74,7 @@ class NoteApiController extends ApiController {
 	 *
 	 * @param int $id
 	 */
-	public function show($id): JSONResponse {
+	public function show(int $id): JSONResponse {
 		$note = $this->noteService->get($this->userId, $id);
 		if (is_null($note)) {
 			return new JSONResponse([], Http::STATUS_NOT_FOUND);
@@ -97,7 +97,7 @@ class NoteApiController extends ApiController {
 	 * @param string $content
 	 * @param string $color
 	 */
-	public function create($title, $content, $color = "#F7EB96") {
+	public function create(string $title, string $content, string $color = null) {
 		$note = $this->noteService->create($this->userId, $title, $content, $color);
 
 		$etag = md5(json_encode($note));
