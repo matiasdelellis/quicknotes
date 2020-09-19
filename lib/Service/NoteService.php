@@ -375,7 +375,7 @@ class NoteService {
 	 * @param string $userId
 	 * @param int $id
 	 */
-	public function destroy($userId, $id) {
+	public function destroy (string $userId, int $id) {
 		// Get Note and Color
 		try {
 			$note = $this->notemapper->find($id, $userId);
