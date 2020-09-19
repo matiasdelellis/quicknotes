@@ -81,7 +81,6 @@ class NoteService {
 
 		// Set shares with others.
 		foreach($notes as $note) {
-			$note->setIsShared(false);
 			$note->setSharedWith($this->noteShareMapper->getSharesForNote($note->getId()));
 		}
 
@@ -90,8 +89,6 @@ class NoteService {
 		$sharedEntries = $this->noteShareMapper->findForUser($userId);
 		foreach($sharedEntries as $sharedEntry) {
 			$sharedNote = $this->notemapper->findShared($sharedEntry->getNoteId());
-			$sharedNote->setIsShared(true);
-
 			$sharedEntry->setUserId($sharedNote->getUserId());
 			$sharedNote->setSharedBy([$sharedEntry]);
 			$shares[] = $sharedNote;
@@ -343,7 +340,6 @@ class NoteService {
 		$newnote->setAttachts($attachts);
 
 		// Fill shared with with others
-		$newnote->setIsShared(false);
 		$newnote->setSharedWith($this->noteShareMapper->getSharesForNote($newnote->getId()));
 
 		//  Remove old color if necessary
