@@ -152,9 +152,21 @@ class NoteService {
 	 * @param string $userId
 	 * @param string $title
 	 * @param string $content
-	 * @param string $color
+	 * @param string $color optional color.
+	 * @param bool   $isPinned optional if note must be pinned
+	 * @param array  $sharedWith optional list of shares
+	 * @param array  $tags optional list of tags
+	 * @param array  $attachments optional list of attachments
 	 */
-	public function create(string $userId, string $title, string $content, string $color = NULL): Note {
+	public function create(string $userId,
+	                       string $title,
+	                       string $content,
+	                       string $color = null,
+	                       bool   $isPinned = false,
+	                       array  $sharedWith = [],
+	                       array  $tags = [],
+	                       array  $attachments = []): ?Note
+	{
 		if (is_null($color)) {
 			$color = $this->settingsService->getColorForNewNotes();
 		}
@@ -168,16 +180,20 @@ class NoteService {
 			$hcolor = $this->colormapper->insert($hcolor);
 		}
 
+
 		// Create note and insert it
 		$note = new Note();
 
 		$note->setTitle($title);
 		$note->setContent($content);
+		$note->setPinned($isPinned ? 1 : 0);
 		$note->setTimestamp(time());
 		$note->setColorId($hcolor->id);
 		$note->setUserId($userId);
 
 		$newNote = $this->notemapper->insert($note);
+
+		// TODO: Insert optional shares, tags and attachments.
 
 		// Insert true color pin and tags to response
 		$newNote->setColor($hcolor->getColor());

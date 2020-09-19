@@ -90,9 +90,27 @@ class NoteController extends Controller {
 	 * @param string $title
 	 * @param string $content
 	 * @param string $color
+	 * @param bool   $isPinned
+	 * @param array  $sharedWith
+	 * @param array  $tags
+	 * @param array  $attachments
 	 */
-	public function create(string $title, string $content, string $color = null) {
-		$note = $this->noteService->create($this->userId, $title, $content, $color);
+	public function create(string $title,
+		               string $content,
+		               string $color = null,
+		               bool   $isPinned = false,
+		               array  $sharedWith = [],
+		               array  $tags = [],
+		               array  $attachments = [])
+		{
+		$note = $this->noteService->create($this->userId,
+		                                   $title,
+		                                   $content,
+		                                   $color,
+		                                   $isPinned,
+		                                   $sharedWith,
+		                                   $tags,
+		                                   $attachments);
 
 		$etag = md5(json_encode($note));
 
