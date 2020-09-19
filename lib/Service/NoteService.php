@@ -211,9 +211,9 @@ class NoteService {
 	 * @param string $content
 	 * @param string $color
 	 * @param bool   $isPinned
-	 * @param array  $sharedWith
 	 * @param array  $tags
 	 * @param array  $attachments
+	 * @param array  $sharedWith
 	 */
 	public function update(string $userId,
 	                       int    $id,
@@ -221,9 +221,9 @@ class NoteService {
 	                       string $content,
 	                       string $color,
 	                       bool   $isPinned,
-	                       array  $sharedWith,
 	                       array  $tags,
-	                       array  $attachments): ?Note
+	                       array  $attachments,
+	                       array  $sharedWith): ?Note
 	{
 		// Get current Note and Color.
 		$note = $this->get($userId, $id);
@@ -272,7 +272,7 @@ class NoteService {
 		$dbShares = $this->noteShareMapper->getSharesForNote($id);
 		foreach ($dbShares as $dbShare) {
 			$delete = true;
-			foreach ($shares as $share) {
+			foreach ($sharedWith as $share) {
 				if ($dbShare->getSharedUser() === $share['shared_user']) {
 					$delete = false;
 					break;

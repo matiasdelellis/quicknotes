@@ -137,8 +137,8 @@ class NoteApiController extends ApiController {
 	 * @param string $color
 	 * @param bool   $isPinned
 	 * @param array  $tags
-	 * @param array  $sharedWith
 	 * @param array  $attachments
+	 * @param array  $sharedWith
 	 */
 	public function update(int    $id,
 	                       string $title,
@@ -146,8 +146,8 @@ class NoteApiController extends ApiController {
 	                       string $color,
 	                       bool   $isPinned,
 	                       array  $tags,
-	                       array  $sharedWith,
-	                       array  $attachments): JSONResponse
+	                       array  $attachments,
+	                       array  $sharedWith): JSONResponse
 	{
 		$note = $this->noteService->update($this->userId,
 		                                   $id,
@@ -156,8 +156,8 @@ class NoteApiController extends ApiController {
 		                                   $color,
 		                                   $isPinned,
 		                                   $tags,
-		                                   $sharedWith,
-		                                   $attachments);
+		                                   $attachments,
+		                                   $sharedWith);
 
 		if (is_null($note)) {
 			return new JSONResponse([], Http::STATUS_NOT_FOUND);
