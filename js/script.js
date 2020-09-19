@@ -390,7 +390,7 @@ View.prototype = {
             var id = parseInt(gridNote.data('id'), 10);
 
             var note = self._notes.read(id);
-            note.pinned = true;
+            note.isPinned = true;
 
             self._notes.update(note).done(function () {
                 icon.removeClass("hide-header-icon");
@@ -413,7 +413,7 @@ View.prototype = {
             var id = parseInt(gridNote.data('id'), 10);
 
             var note = self._notes.read(id);
-            note.pinned = false;
+            note.isPinned = false;
 
             self._notes.update(note).done(function () {
                 icon.removeClass("fixed-header-icon");

@@ -34,7 +34,6 @@ class Note extends Entity implements JsonSerializable {
 			'id'          => $this->id,
 			'title'       => $this->title,
 			'content'     => $this->content,
-			'pinned'      => $this->pinned,
 			'isPinned'    => $this->isPinned,
 			'timestamp'   => $this->timestamp,
 			'color'       => $this->color,
