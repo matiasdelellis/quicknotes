@@ -245,7 +245,7 @@ class NoteService {
 		$dbAttachts = $this->attachMapper->findFromNote($userId, $id);
 		foreach ($dbAttachts as $dbAttach) {
 			$delete = true;
-			foreach ($attachts as $attach) {
+			foreach ($attachments as $attach) {
 				if ($dbAttach->getFileId() === $attach['file_id']) {
 					$delete = false;
 					break;
