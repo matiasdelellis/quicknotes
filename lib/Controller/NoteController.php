@@ -52,14 +52,16 @@ class NoteController extends Controller {
 	 */
 	public function index(): JSONResponse {
 		$notes = $this->noteService->getAll($this->userId);
-		$etag = md5(json_encode($notes));
+		if (count($notes) === 0) {
+			return new JSONResponse([]);
+		}
 
 		$lastModified = new \DateTime(null, new \DateTimeZone('GMT'));
 		$timestamp = max(array_map(function($note) { return $note->getTimestamp(); }, $notes));
 		$lastModified->setTimestamp($timestamp);
 
 		$response = new JSONResponse($notes);
-		$response->setETag($etag);
+		$response->setETag(md5(json_encode($notes)));
 		$response->setLastModified($lastModified);
 
 		return $response;
