@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.6.1]: 2020-10-03
+- Improve API needed to implement the android client.
+- Register nextcloud capabilities to check api versions.
+- Fix response when dont have notes. Issue #44.
+- Update German translation thanks to Lars Seidler.
+- Update German (Germany) translation thanks to Lars Seidler.
+- Update Russian translation thanks to Rusalan Kortikov.
+- Update Polish translation thanks to Valdnet Valdnet.
+
 ## [0.6.0]: 2020-06-17
 - Enable sharing of notes as read-only between users. Issue #3, #16 and PR #8. Thanks to Vinzenz Rosenkranz
 - Fix many untranslated strings. Issue #31 and #32
