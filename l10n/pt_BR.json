@@ -1,0 +1,13 @@
+{ "translations": {
+    "Quick notes" : "Notas rápidas",
+    "Cancel" : "Cancelar",
+    "Done" : "Concluído",
+    "Tags" : "Tags",
+    "Save" : "Salvar",
+    "All notes" : "Todas as notas",
+    "Colors" : "Cores",
+    "Bold" : "Negrito",
+    "Italic" : "Itálico",
+    "Underline" : "Sublinhado"
+},"pluralForm" :"nplurals=2; plural=(n > 1);"
+}
