@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.6.2]: 2020-10-27
+- Enable Nextcloud 20 support.
+- Use the same url from thumbails that Photos.
+- Update French translation thanks to Thovi98
+- New Portuguese (Brazil) translation thanks to THOMAS COUTO ROCHA
+
 ## [0.6.1]: 2020-10-03
 - Improve API needed to implement the android client.
 - Register nextcloud capabilities to check api versions.
