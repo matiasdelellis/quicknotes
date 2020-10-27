@@ -65,11 +65,7 @@ class FileService {
 			return null;
 		}
 
-		return $this->urlGenerator->linkToRouteAbsolute('core.Preview.getPreview', [
-			'file' => $userFolder->getRelativePath($file->getPath()),
-			'x' => $sideSize,
-			'y' => $sideSize
-		]);
+		return $this->urlGenerator->getAbsoluteURL('core/preview?fileId=' . $fileId .'&x=' . $sideSize . '&y=' . $sideSize . '&a=false&v=' . $file->getETag());
 	}
 
 	/**
