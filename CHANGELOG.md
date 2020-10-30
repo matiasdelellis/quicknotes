@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.6.3]: 2020-10-31
+- Fix thumbnail when pretty url is disabled. Issue #48
+- Update French translation thanks to Thovi98
+
 ## [0.6.2]: 2020-10-27
 - Enable Nextcloud 20 support.
 - Use the same url from thumbails that Photos.
