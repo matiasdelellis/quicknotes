@@ -65,7 +65,7 @@ class FileService {
 			return null;
 		}
 
-		return $this->urlGenerator->getAbsoluteURL('core/preview?fileId=' . $fileId .'&x=' . $sideSize . '&y=' . $sideSize . '&a=false&v=' . $file->getETag());
+		return $this->urlGenerator->getAbsoluteURL('index.php/core/preview?fileId=' . $fileId .'&x=' . $sideSize . '&y=' . $sideSize . '&a=false&v=' . $file->getETag());
 	}
 
 	/**
