@@ -180,7 +180,6 @@ class NoteService {
 			$hcolor = $this->colormapper->insert($hcolor);
 		}
 
-
 		// Create note and insert it
 		$note = new Note();
 
@@ -195,10 +194,31 @@ class NoteService {
 
 		// TODO: Insert optional shares, tags and attachments.
 
+		// Add new tags and update relations.
+		foreach ($tags as $tag) {
+			if (!$this->tagmapper->tagExists($userId, $tag['name'])) {
+				$htag = new Tag();
+				$htag->setName($tag['name']);
+				$htag->setUserId($userId);
+				$htag = $this->tagmapper->insert($htag);
+			}
+			else {
+				$htag = $this->tagmapper->getTag($userId, $tag['name']);
+			}
+
+			if (!$this->notetagmapper->noteTagExists($userId, $newNote->getId(), $htag->getId())) {
+				$noteTag = new NoteTag();
+				$noteTag->setNoteId($newNote->getId());
+				$noteTag->setTagId($htag->getId());
+				$noteTag->setUserId($userId);
+				$this->notetagmapper->insert($noteTag);
+			}
+		}
+
 		// Insert true color pin and tags to response
 		$newNote->setColor($hcolor->getColor());
 		$newNote->setIsPinned($isPinned);
-		$newNote->setTags([]);
+		$newNote->setTags($this->tagmapper->getTagsForNote($userId, $newNote->getId()));
 		$newNote->setAttachts([]);
 
 		return $newNote;
