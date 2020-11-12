@@ -36,6 +36,9 @@ class SettingsService {
 	const COLOR_FOR_NEW_NOTES_KEY = 'default_color';
 	const DEFAULT_COLOR_FOR_NEW_NOTES = '#F7EB96';
 
+	const ATTACHMENTS_FOLDER_KEY = 'attachments_folder';
+	const DEFAULT_ATTACHMENTS_FOLDER = 'Quicknotes';
+
 	/** @var IConfig Config */
 	private $config;
 
@@ -60,6 +63,14 @@ class SettingsService {
 
 	public function setColorForNewNotes(string $color) {
 		$this->config->setUserValue($this->userId, Application::APP_ID, self::COLOR_FOR_NEW_NOTES_KEY, $color);
+	}
+
+	public function getAttachmentsFolder(): string {
+		return $this->config->getUserValue($this->userId, Application::APP_ID, self::ATTACHMENTS_FOLDER_KEY, self::DEFAULT_ATTACHMENTS_FOLDER);
+	}
+
+	public function setAttachmentsFolder(string $folder) {
+		$this->config->setUserValue($this->userId, Application::APP_ID, self::ATTACHMENTS_FOLDER_KEY, $folder);
 	}
 
 }

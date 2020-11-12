@@ -17,6 +17,12 @@ return ['resources' =>
 			'url' => '/share/{noteId}',
 			'verb' => 'DELETE'
 		],
+		// Upload attachments
+		[
+			'name' => 'AttachmentApi#upload',
+			'url' => '/api/v1/attachments',
+			'verb' => 'POST'
+		],
 		// User Settings
 		[
 			'name' => 'settings#setUserValue',

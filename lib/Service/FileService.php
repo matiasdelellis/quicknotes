@@ -23,6 +23,8 @@
 
 namespace OCA\QuickNotes\Service;
 
+use OCP\AppFramework\Utility\ITimeFactory;
+
 use OCP\IURLGenerator;
 
 use OCP\Files\File;
@@ -30,6 +32,9 @@ use OCP\Files\Folder;
 use OCP\Files\Node;
 use OCP\Files\IRootFolder;
 use OCP\Files\NotFoundException;
+
+
+use OCA\QuickNotes\Service\SettingsService;
 
 class FileService {
 
@@ -40,15 +45,25 @@ class FileService {
 	private $rootFolder;
 
 	/** @var IURLGenerator */
-	protected $urlGenerator;
+	private $urlGenerator;
+
+	/** @var ITimeFactory */
+	private $timeFactory;
+
+	/** @var SettingsService */
+	private SettingsService $settingsService;
 
 	public function __construct($userId,
-	                            IRootFolder   $rootFolder,
-	                            IURLGenerator $urlGenerator)
+	                            IRootFolder     $rootFolder,
+	                            IURLGenerator   $urlGenerator,
+	                            ITimeFactory    $timeFactory,
+	                            SettingsService $settingsService)
 	{
-		$this->userId       = $userId;
-		$this->rootFolder   = $rootFolder;
-		$this->urlGenerator = $urlGenerator;
+		$this->userId          = $userId;
+		$this->rootFolder      = $rootFolder;
+		$this->urlGenerator    = $urlGenerator;
+		$this->timeFactory     = $timeFactory;
+		$this->settingsService = $settingsService;
 	}
 
 	/**
@@ -88,4 +103,38 @@ class FileService {
 		return $this->urlGenerator->linkToRoute('files.view.index', $params);
 	}
 
+	/**
+	 * Upload attachment and return fileId
+	 */
+	public function upload($fileName, $fileContent): int {
+		$userFolder = $this->rootFolder->getUserFolder($this->userId);
+
+		$ts = $this->timeFactory->getTime();
+		$dt = new \DateTime();
+		$dt->setTimestamp($ts);
+
+		$secureFileName = $dt->format('YmdHis') . ' - ' . $fileName;
+		$attachmentsFolder = $this->getAttachmentsFolder();
+
+		$file = $attachmentsFolder->newFile($secureFileName);
+		$file->putContent($fileContent);
+
+		return $file->getId();
+	}
+
+	/**
+	 * @return \OCP\Files\Folder
+	 */
+	private function getAttachmentsFolder() {
+		$userFolder = $this->rootFolder->getUserFolder($this->userId);
+		$attachmentsFolder = $this->settingsService->getAttachmentsFolder();
+
+		try {
+			$attachmentsFolderNode = $userFolder->get($attachmentsFolder);
+		} catch (NotFoundException $e) {
+			$attachmentsFolderNode = $userFolder->newFolder($attachmentsFolder);
+		}
+
+		return $attachmentsFolderNode;
+	}
 }
