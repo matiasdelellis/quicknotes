@@ -125,8 +125,13 @@ class NoteService {
 				if (is_null($redirectUrl))
 					continue;
 
+				$deepLinkUrl = $this->fileService->getDeepLinkUrl($attach->getFileId());
+				if (is_null($deepLinkUrl))
+					continue;
+
 				$attach->setPreviewUrl($previewUrl);
 				$attach->setRedirectUrl($redirectUrl);
+				$attach->setDeepLinkUrl($deepLinkUrl);
 
 				$rAttachts[] = $attach;
 			}
@@ -372,6 +377,7 @@ class NoteService {
 		foreach ($attachts as $attach) {
 			$attach->setPreviewUrl($this->fileService->getPreviewUrl($attach->getFileId(), 512));
 			$attach->setRedirectUrl($this->fileService->getRedirectToFileUrl($attach->getFileId()));
+			$attach->setDeepLinkUrl($this->fileService->getDeepLinkUrl($attach->getFileId()));
 		}
 		$newnote->setAttachts($attachts);
 

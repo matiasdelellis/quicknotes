@@ -65,9 +65,10 @@ class AttachmentApiController extends ApiController {
 
 		$fileId = $this->fileService->upload($file['name'], file_get_contents($file['tmp_name']));
 		return new JSONResponse([
-			'file_id'      => $fileId,
-			'preview_url'  => $this->fileService->getPreviewUrl($fileId, 512),
-			'redirect_url' => $this->fileService->getRedirectToFileUrl($fileId)
+			'file_id'       => $fileId,
+			'preview_url'   => $this->fileService->getPreviewUrl($fileId, 512),
+			'redirect_url'  => $this->fileService->getRedirectToFileUrl($fileId),
+			'deep_link_url' => $this->fileService->getDeepLinkUrl($fileId)
 		]);
 	}
 

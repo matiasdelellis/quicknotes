@@ -100,7 +100,28 @@ class FileService {
 		$params['dir'] = $userFolder->getRelativePath($file->getParent()->getPath());
 		$params['scrollto'] = $file->getName();
 
-		return $this->urlGenerator->linkToRoute('files.view.index', $params);
+		return $this->urlGenerator->getAbsoluteURL(
+			$this->urlGenerator->linkToRoute('files.view.index', $params)
+		);
+	}
+
+	/**
+	 * Get a deep link that can open directly on clients to the given file id
+	 *
+	 * @param int $fileId file id to open
+	 */
+	public function getDeepLinkUrl(int $fileId): ?string {
+		$userFolder = $this->rootFolder->getUserFolder($this->userId);
+		$file = current($userFolder->getById($fileId));
+
+		if (!($file instanceof File)) {
+			return null;
+		}
+
+//		return "nc://directlink/f/" . $fileId;
+		return $this->urlGenerator->getAbsoluteURL(
+			"/f/" . $fileId
+		);
 	}
 
 	/**
