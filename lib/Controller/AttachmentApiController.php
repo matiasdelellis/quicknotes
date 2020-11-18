@@ -63,7 +63,12 @@ class AttachmentApiController extends ApiController {
 
 		$file = array_pop($files);
 
+		if (!empty($file) && array_key_exists('error', $file) && $file['error'] !== UPLOAD_ERR_OK) {
+			return new JSONResponse([],Http::STATUS_BAD_REQUEST);
+		}
+
 		$fileId = $this->fileService->upload($file['name'], file_get_contents($file['tmp_name']));
+
 		return new JSONResponse([
 			'file_id'       => $fileId,
 			'preview_url'   => $this->fileService->getPreviewUrl($fileId, 512),
