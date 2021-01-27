@@ -159,7 +159,7 @@ const QnDialogs = {
 					var data = [];
 					availableUsers.forEach(function (item, index) {
 						// Select2 expect id, text.
-						data.push({id: item, text: item});
+						data.push({id: item[0], text: item[1]});
 					});
 					return data;
 				},

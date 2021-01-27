@@ -169,10 +169,10 @@ Notes.prototype = {
         }).done(function (shares) {
             var users = [];
             $.each(shares.ocs.data.exact.users, function(index, user) {
-                users.push(user.value.shareWith);
+                users.push([user.value.shareWith, user.label]);
             });
             $.each(shares.ocs.data.users, function(index, user) {
-                users.push(user.value.shareWith);
+                users.push([user.value.shareWith, user.label]);
             });
             self._usersSharing = users;
         }).fail(function () {
