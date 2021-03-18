@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.6.4]: 2021-03-18
+- Initial Nextcloud 21 support.
+- Add new api for uploading attachments. For now only used in the Android
+  client.
+- Update Portuguese (Brazil) thanks to flaviove.
+
 ## [0.6.3]: 2020-10-31
 - Fix thumbnail when pretty url is disabled. Issue #48
 - Update French translation thanks to Thovi98

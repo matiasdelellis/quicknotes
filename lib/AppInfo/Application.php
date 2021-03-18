@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 /*
- * @copyright 2016-2020 Matias De lellis <mati86dl@gmail.com>
+ * @copyright 2016-2021 Matias De lellis <mati86dl@gmail.com>
  *
  * @author 2016 Matias De lellis <mati86dl@gmail.com>
  *
@@ -23,13 +23,16 @@
 namespace OCA\QuickNotes\AppInfo;
 
 use OCP\AppFramework\App;
+use OCP\AppFramework\Bootstrap\IBootstrap;
+use OCP\AppFramework\Bootstrap\IBootContext;
+use OCP\AppFramework\Bootstrap\IRegistrationContext;
 
 use OCP\IL10N;
 use OCP\IURLGenerator;
 use OCP\IServerContainer;
 
 
-class Application extends App {
+class Application extends App implements IBootstrap {
 
 	/** @var string */
 	public const APP_ID = 'quicknotes';
@@ -41,31 +44,27 @@ class Application extends App {
 		parent::__construct(self::APP_ID, $urlParams);
 	}
 
-	public function register(): void {
-		$this->registerNavigationEntry();
-		$this->registerCapabilities();
+	public function register(IRegistrationContext $context): void {
+		$context->registerCapability(Capabilities::class);
 	}
 
-	private function registerNavigationEntry(): void {
-		$container = $this->getContainer();
-		$server = $container->getServer();
+	public function boot(IBootContext $context): void {
+		$server = $context->getServerContainer();
+		$this->registerNavigationEntry($server);
+	}
 
-		$server->getNavigationManager()->add(static function () use ($container) {
-			$urlGenerator = $container->query(IURLGenerator::class);
-			$l10n = $container->query(IL10N::class);
+	private function registerNavigationEntry(IServerContainer $server): void {
+		$server->getNavigationManager()->add(static function () use ($server) {
+			$urlGenerator = $server->getURLGenerator();
+			$l10n = $server->getL10N(self::APP_ID);
 			return [
-				'id' => 'quicknotes',
+				'id' => self::APP_ID,
 				'order' => 10,
 				'href' => $urlGenerator->linkToRoute('quicknotes.page.index'),
-				'icon' => $urlGenerator->imagePath('quicknotes', 'app.svg'),
-				'name' => $l10n->t('Quick notes'),
+				'icon' => $urlGenerator->imagePath(self::APP_ID, 'app.svg'),
+				'name' => $l10n->t('Quick notes')
 			];
 		});
-	}
-
-	private function registerCapabilities(): void {
-		$container = $this->getContainer();
-		$container->registerCapability(Capabilities::class);
 	}
 
 }
