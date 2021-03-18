@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.6.5]: 2021-03-18
+- Emergency release to truly enable NC21. Thanks @nursoda for report it on
+  issue #57
+
 ## [0.6.4]: 2021-03-18
 - Initial Nextcloud 21 support.
 - Add new api for uploading attachments. For now only used in the Android
