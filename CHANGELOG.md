@@ -1,5 +1,8 @@
 # Changelog
 
+## [0.6.6] 2021-03-19
+- Fix on NC20
+
 ## [0.6.3]: 2020-10-31
 - Fix thumbnail when pretty url is disabled. Issue #48
 - Update French translation thanks to Thovi98
