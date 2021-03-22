@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.7.0] 2021-03-19
+- Bump version to move the numbering away from the version nc20 or lower.
+
+## [0.6.6] 2021-03-19
+- Fix on NC20
+
 ## [0.6.5]: 2021-03-18
 - Emergency release to truly enable NC21. Thanks @nursoda for report it on
   issue #57
