@@ -28,7 +28,7 @@ OC.L10N.register(
     "Strikethrough" : "Przekreślenie",
     "Bulleted list" : "Lista wypunktowana",
     "Numbered list" : "Lista numerowana",
-    "Blockquote" : "Zablokować cytat",
+    "Blockquote" : "Blok cytatu",
     "Clean format" : "Czysty format",
     "Quick notes with a basic rich text" : "Szybkie notatki z podstawowym tekstem sformatowanym",
     "No tags found" : "Nie znaleziono etykiet",
