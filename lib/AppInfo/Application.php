@@ -31,6 +31,7 @@ use OCP\IL10N;
 use OCP\IURLGenerator;
 use OCP\IServerContainer;
 
+use OCA\QuickNotes\Search\NoteSearchProvider;
 
 class Application extends App implements IBootstrap {
 
@@ -45,6 +46,7 @@ class Application extends App implements IBootstrap {
 	}
 
 	public function register(IRegistrationContext $context): void {
+		$context->registerSearchProvider(NoteSearchProvider::class);
 		$context->registerCapability(Capabilities::class);
 	}
 

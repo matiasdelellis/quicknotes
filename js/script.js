@@ -295,6 +295,9 @@ View.prototype = {
             }
         });
 
+        // Save instance of View
+        var self = this;
+
         // Show delete and pin icons when hover over the notes.
         $("#notes-grid-div").on("mouseenter", ".quicknote", function() {
             $(this).find(".icon-header-note").addClass( "show-header-icon");
@@ -319,23 +322,12 @@ View.prototype = {
         $('#notes-grid-div').on('click', '.slim-tag', function (event) {
             event.stopPropagation();
             var tagId = parseInt($(this).attr('tag-id'), 10);
-            $('.notes-grid').isotope({ filter: function() {
-                var match = false;
-                $(this).find(".slim-tag").siblings().addBack().each(function() {
-                    var id = parseInt($(this).attr('tag-id'), 10);
-                    if (tagId === id)
-                        match = true;
-                });
-                return match;
-            }});
-            var oldColorTool = $('#app-navigation .circle-toolbar.icon-checkmark');
-            $.each(oldColorTool, function(i, oct) {
-                $(oct).removeClass('icon-checkmark');
-            });
+            self._cleanNavigation();
+            self._filterTag(tagId);
+            setFilterUrl('t', tagId);
         });
 
         // Remove note when click icon
-        var self = this;
         $('#notes-grid-div').on("click", ".icon-delete-note", function (event) {
             event.stopPropagation();
 
@@ -613,13 +605,10 @@ View.prototype = {
         /* Show all notes */
 
         $('#all-notes').click(function () {
+            event.preventDefault();
+            self._cleanNavigation();
             $('.notes-grid').isotope({ filter: '*'});
-
-            var oldColorTool = $('#colors-folder .circle-toolbar.icon-checkmark');
-            $.each(oldColorTool, function(i, oct) {
-               $(oct).removeClass('icon-checkmark');
-            });
-            $('#app-navigation .any-color').addClass('icon-checkmark');
+            setFilterUrl();
         });
 
         /* Shares Navigation */
@@ -629,17 +618,23 @@ View.prototype = {
         });
 
         $('#shared-with-you').click(function (event) {
+            event.preventDefault();
             event.stopPropagation();
+            self._cleanNavigation();
             $('.notes-grid').isotope({ filter: function() {
                 return $(this).children().hasClass('shared');
             } });
+            setFilterUrl();
         });
 
         $('#shared-by-you').click(function (event) {
+            event.preventDefault();
             event.stopPropagation();
+            self._cleanNavigation();
             $('.notes-grid').isotope({ filter: function() {
                 return $(this).children().hasClass('shareowner');
             } });
+            setFilterUrl();
         });
 
         /* Colors Navigation */
@@ -654,18 +649,13 @@ View.prototype = {
 
         $('#colors-folder .circle-toolbar').click(function (event) {
             event.stopPropagation();
-            var oldColorTool = $('#colors-folder .circle-toolbar.icon-checkmark');
-            $.each(oldColorTool, function(i, oct) {
-                $(oct).removeClass('icon-checkmark');
-            });
+            self._cleanNavigation();
             $(this).addClass('icon-checkmark');
 
             if (!$(this).hasClass("any-color")) {
                 var color = $(this).css("background-color");
-                $('.notes-grid').isotope({ filter: function() {
-                    var itemColor = $(this).children().css("background-color");
-                    return color == itemColor;
-                }});
+                self._filterColor(color);
+                setFilterUrl('c', color);
             }
             else {
                 self.showAll();
@@ -679,16 +669,12 @@ View.prototype = {
         });
 
         $('#app-navigation .nav-note > a').click(function (event) {
+            event.preventDefault();
             event.stopPropagation();
             var id = parseInt($(this).parent().data('id'), 10);
-            $('.notes-grid').isotope({ filter: function() {
-                var itemId = parseInt($(this).children().data('id'), 10);
-                return id == itemId;
-            }});
-            var oldColorTool = $('#app-navigation .circle-toolbar.icon-checkmark');
-            $.each(oldColorTool, function(i, oct) {
-                $(oct).removeClass('icon-checkmark');
-            });
+            self._cleanNavigation();
+            self._filterNote(id);
+            setFilterUrl('n', id);
         });
 
         /* Tags Navigation */
@@ -698,23 +684,13 @@ View.prototype = {
         });
 
         $('#app-navigation .nav-tag > a').click(function (event) {
+            event.preventDefault();
             event.stopPropagation();
             var tagId = parseInt($(this).parent().attr('tag-id'), 10);
-            $('.notes-grid').isotope({ filter: function() {
-                var match = false;
-                $(this).find(".slim-tag").siblings().addBack().each(function() {
-                    var id = parseInt($(this).attr('tag-id'), 10);
-                    if (tagId === id)
-                        match = true;
-                });
-                return match;
-            }});
-            var oldColorTool = $('#app-navigation .circle-toolbar.icon-checkmark');
-            $.each(oldColorTool, function(i, oct) {
-                $(oct).removeClass('icon-checkmark');
-            });
+            self._cleanNavigation();
+            self._filterTag(tagId);
+            setFilterUrl('t', tagId);
         });
-
     },
     renderSettings: function () {
         /* Render view */
@@ -1040,11 +1016,86 @@ View.prototype = {
             }
         );
     },
+    _filterNote: function (noteId) {
+        $('.notes-grid').isotope({
+            filter: function() {
+                return noteId == parseInt($(this).children().data('id'), 10);
+            }
+        });
+    },
+    _filterTag: function (tagId) {
+        $('.notes-grid').isotope({
+            filter: function() {
+                var match = false;
+                $(this).find(".slim-tag").siblings().addBack().each(function() {
+                    var id = parseInt($(this).attr('tag-id'), 10);
+                    if (tagId == id)
+                        match = true;
+                });
+                return match;
+            }
+        });
+    },
+    _filterColor: function (color) {
+        $('.notes-grid').isotope({
+            filter: function() {
+                return color == $(this).children().css("background-color");
+            }
+        });
+    },
+    _selectColor: function (color) {
+        var circles = $("#colors-folder")[0].getElementsByClassName("circle-toolbar");
+        $.each(circles, function(i, c) {
+            if (color == c.style.backgroundColor) {
+                c.className += " icon-checkmark";
+            }
+        });
+    },
+    _cleanNavigation: function () {
+        var oldColorTool = $('#app-navigation .circle-toolbar.icon-checkmark');
+        $.each(oldColorTool, function(i, oct) {
+            $(oct).removeClass('icon-checkmark');
+        });
+    },
     render: function () {
         this.renderNavigation();
         this.renderContent();
         this.renderSettings();
     }
+};
+
+
+
+/**
+ * Get the filter as URL parameter
+ */
+var getFilterUrl = function (filterParam) {
+    var filter = undefined;
+    var parser = document.createElement('a');
+    parser.href = window.location.href;
+    var query = parser.search.substring(1);
+    var vars = query.split('&');
+    for (var i = 0; i < vars.length; i++) {
+        var pair = vars[i].split('=');
+        if (pair[0] === filterParam) {
+            filter = decodeURIComponent(pair[1]);
+            break;
+        }
+    }
+    return filter;
+};
+
+/**
+ *  Change the URL location with query as parameter
+ */
+var setFilterUrl = function (filterParam, filter) {
+    var cleanUrl = window.location.href.split("?")[0];
+    var title = t('quicknotes', 'Quick notes');
+    if (filter) {
+        cleanUrl += '?'+ filterParam + '=' + encodeURIComponent(filter);
+    }
+    window.history.replaceState({}, title, cleanUrl);
+    document.title = title;
 };
 
 
@@ -1106,6 +1157,20 @@ view.renderContent();
  */
 notes.load().done(function () {
     view.render();
+
+    var noteId = getFilterUrl('n');
+    if (noteId !== undefined)
+        view._filterNote(noteId);
+
+    var tagId = getFilterUrl('t');
+    if (tagId !== undefined)
+        view._filterTag(tagId);
+
+    var color = getFilterUrl('c');
+    if (color !== undefined) {
+        view._selectColor(color);
+        view._filterColor(color);
+    }
 }).fail(function () {
     alert('Could not load notes');
 });
