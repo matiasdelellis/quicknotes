@@ -51,7 +51,7 @@ class FileService {
 	private $timeFactory;
 
 	/** @var SettingsService */
-	private SettingsService $settingsService;
+	private $settingsService;
 
 	public function __construct($userId,
 	                            IRootFolder     $rootFolder,

@@ -41,6 +41,7 @@ use OCA\QuickNotes\Db\Tag;
 use OCA\QuickNotes\Db\TagMapper;
 
 use OCA\QuickNotes\Service\FileService;
+use OCA\QuickNotes\Service\SettingsService;
 
 
 class NoteService {
