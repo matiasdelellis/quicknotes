@@ -1,5 +1,8 @@
 # Changelog
 
+## [0.6.7] 2021-03-26
+- Bump again, this time just to restore the tarball.
+
 ## [0.6.6] 2021-03-19
 - Fix on NC20
 
