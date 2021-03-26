@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.7.1] 2021-03-19
+- Fix php 7.3 support, as it accidentally used more modern features.
+- Introduce initial unified search support, that search by title and content.
+- Implements some consistent urls, which allow you to mark a note, tag or color
+  as a favorite in the browser to easily access to them.
+
 ## [0.7.0] 2021-03-19
 - Bump version to move the numbering away from the version nc20 or lower.
 - New Macedonian translation thanks to Сашко Тодоров.
