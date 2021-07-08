@@ -26,7 +26,7 @@ class Version000205Date20200604122312 extends SimpleMigrationStep {
 
 		$table = $schema->getTable('quicknotes_notes');
 		$table->addColumn('pinned', 'boolean', [
-			'notnull' => true,
+			'notnull' => false,
 			'default' => false,
 		]);
 		return $schema;
