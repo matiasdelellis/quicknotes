@@ -607,6 +607,7 @@ View.prototype = {
         $('#all-notes').click(function () {
             event.preventDefault();
             self._cleanNavigation();
+            $(this).addClass("active");
             $('.notes-grid').isotope({ filter: '*'});
             setFilterUrl();
         });
@@ -621,6 +622,7 @@ View.prototype = {
             event.preventDefault();
             event.stopPropagation();
             self._cleanNavigation();
+            $(this).addClass("active");
             $('.notes-grid').isotope({ filter: function() {
                 return $(this).children().hasClass('shared');
             } });
@@ -631,6 +633,7 @@ View.prototype = {
             event.preventDefault();
             event.stopPropagation();
             self._cleanNavigation();
+            $(this).addClass("active");
             $('.notes-grid').isotope({ filter: function() {
                 return $(this).children().hasClass('shareowner');
             } });
@@ -656,6 +659,7 @@ View.prototype = {
                 var color = $(this).css("background-color");
                 self._filterColor(color);
                 setFilterUrl('c', color);
+                $(this).parent().addClass("active");
             }
             else {
                 self.showAll();
@@ -673,6 +677,7 @@ View.prototype = {
             event.stopPropagation();
             var id = parseInt($(this).parent().data('id'), 10);
             self._cleanNavigation();
+            $(this).addClass("active");
             self._filterNote(id);
             setFilterUrl('n', id);
         });
@@ -688,6 +693,7 @@ View.prototype = {
             event.stopPropagation();
             var tagId = parseInt($(this).parent().attr('tag-id'), 10);
             self._cleanNavigation();
+            $(this).addClass("active");
             self._filterTag(tagId);
             setFilterUrl('t', tagId);
         });
@@ -1052,6 +1058,10 @@ View.prototype = {
         });
     },
     _cleanNavigation: function () {
+        var navItems = $('#app-navigation .active');
+        $.each(navItems, function(i, item) {
+            $(item).removeClass('active');
+        });
         var oldColorTool = $('#app-navigation .circle-toolbar.icon-checkmark');
         $.each(oldColorTool, function(i, oct) {
             $(oct).removeClass('icon-checkmark');
