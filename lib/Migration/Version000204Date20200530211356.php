@@ -127,35 +127,6 @@ class Version000204Date20200530211356 extends SimpleMigrationStep {
 			$table->setPrimaryKey(['id']);
 		}
 
-		if (!$schema->hasTable('quicknotes_tasks')) {
-			$table = $schema->createTable('quicknotes_tasks');
-			$table->addColumn('id', 'bigint', [
-				'autoincrement' => true,
-				'notnull' => true,
-				'length' => 8,
-				'unsigned' => true,
-			]);
-			$table->addColumn('note_id', 'bigint', [
-				'notnull' => true,
-				'length' => 8,
-				'unsigned' => true,
-			]);
-			$table->addColumn('description', 'string', [
-				'notnull' => true,
-				'length' => 200,
-				'default' => '',
-			]);
-			$table->addColumn('done', 'boolean', [
-				'notnull' => true,
-				'default' => false,
-			]);
-			$table->addColumn('ordering', 'integer', [
-				'notnull' => true,
-				'default' => 0,
-			]);
-			$table->setPrimaryKey(['id']);
-		}
-
 		if (!$schema->hasTable('quicknotes_shares')) {
 			$table = $schema->createTable('quicknotes_shares');
 			$table->addColumn('id', 'bigint', [
