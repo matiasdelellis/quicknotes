@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.7.2] 2021-08-03
+- Initial support for NC22.
+- Highlight the note or filter used in the side panel.
+- New Chinese (Taiwan) and Czech translations. Many thanks to the contributors.
+
 ## [0.7.1] 2021-03-19
 - Fix php 7.3 support, as it accidentally used more modern features.
 - Introduce initial unified search support, that search by title and content.
