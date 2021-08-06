@@ -29,3 +29,7 @@ Before reporting bugs:
 1. Clone this into your `apps` folder of your Nextcloud: `git clone https://github.com/matiasdelellis/quicknotes.git`
 2. In a terminal, just run the command `make` to install the dependencies and build the aplication.
 3. Enable the app through the app management of your Nextcloud.
+
+## Translating
+
+Join project on https://www.transifex.com/matias/quicknotes/
