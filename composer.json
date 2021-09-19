@@ -1,0 +1,9 @@
+{
+    "require-dev": {
+        "psalm/phar": "^4.10"
+    },
+    "scripts": {
+        "lint": "find . -name \\*.php -not -path './vendor/*' -print0 | xargs -0 -n1 php -l",
+        "psalm": "psalm.phar"
+    }
+}
