@@ -96,6 +96,8 @@ class NoteController extends Controller {
 	 * @param array  $sharedWith
 	 * @param array  $tags
 	 * @param array  $attachments
+	 *
+	 * @return JSONResponse
 	 */
 	public function create(string $title,
 		               string $content,
@@ -103,7 +105,7 @@ class NoteController extends Controller {
 		               bool   $isPinned = false,
 		               array  $sharedWith = [],
 		               array  $tags = [],
-		               array  $attachments = [])
+		               array  $attachments = []): JSONResponse
 		{
 		$note = $this->noteService->create($this->userId,
 		                                   $title,

@@ -92,7 +92,9 @@ class NoteApiController extends ApiController {
 
 	/**
 	 * @NoAdminRequired
+	 *
 	 * @CORS
+	 *
 	 * @NoCSRFRequired
 	 *
 	 * @param string $title
@@ -102,6 +104,8 @@ class NoteApiController extends ApiController {
 	 * @param array  $sharedWith
 	 * @param array  $tags
 	 * @param array  $attachments
+	 *
+	 * @return JSONResponse
 	 */
 	public function create(string $title,
 	                       string $content,
@@ -109,7 +113,7 @@ class NoteApiController extends ApiController {
 	                       bool   $isPinned = false,
 	                       array  $sharedWith = [],
 	                       array  $tags = [],
-	                       array  $attachments = [])
+	                       array  $attachments = []): JSONResponse
 	{
 		$note = $this->noteService->create($this->userId,
 		                                   $title,
