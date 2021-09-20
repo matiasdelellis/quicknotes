@@ -1,7 +1,8 @@
 {
     "require-dev": {
         "psalm/phar": "^4.10",
-        "christophwurst/nextcloud": "^21.0"
+        "christophwurst/nextcloud": "^21.0",
+        "psr/container": "^2.0"
     },
     "scripts": {
         "lint": "find . -name \\*.php -not -path './vendor/*' -print0 | xargs -0 -n1 php -l",
