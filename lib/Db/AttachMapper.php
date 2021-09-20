@@ -7,6 +7,8 @@ use OCP\AppFramework\Db\QBMapper;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 
+use OCA\QuickNotes\Db\Attach;
+
 class AttachMapper extends QBMapper {
 
 	public function __construct(IDBConnection $db) {
@@ -20,7 +22,7 @@ class AttachMapper extends QBMapper {
 	 * @throws \OCP\AppFramework\Db\MultipleObjectsReturnedException if more than one result
 	 * @return Attach
 	 */
-	public function find($id, $userId) {
+	public function find($id, $userId): Attach {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')
 			->from($this->tableName)
@@ -31,7 +33,10 @@ class AttachMapper extends QBMapper {
 		return $this->findEntity($qb);
 	}
 
-	public function findAll($userId) {
+	/**
+	 * @return Attach[]
+	 */
+	public function findAll($userId): array {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')
 			->from($this->tableName)
@@ -48,7 +53,7 @@ class AttachMapper extends QBMapper {
 	 * @throws \OCP\AppFramework\Db\MultipleObjectsReturnedException if more than one result
 	 * @return Attach
 	 */
-	public function findFileAttachFromNote($userId, $noteId, $fileId) {
+	public function findFileAttachFromNote($userId, $noteId, $fileId): Attach {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')
 			->from($this->tableName)
@@ -60,13 +65,16 @@ class AttachMapper extends QBMapper {
 		return $this->findEntity($qb);
 	}
 
-	public function fileAttachExists($userId, $noteId, $fileId) {
+	/**
+	 * @return bool
+	 */
+	public function fileAttachExists(string $userId, int $noteId, $fileId): bool {
 		try {
-			return $this->findFileAttachFromNote($userId, $noteId, $fileId);
+			$this->findFileAttachFromNote($userId, $noteId, $fileId);
 		} catch (DoesNotExistException $e) {
 			return false;
 		}
-		return false;
+		return true;
 	}
 
 	/**
@@ -75,7 +83,7 @@ class AttachMapper extends QBMapper {
 	 * @throws \OCP\AppFramework\Db\DoesNotExistException if not found
 	 * @return Attach[]
 	 */
-	public function findFromNote($userId, $noteId) {
+	public function findFromNote($userId, $noteId): array {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')
 			->from($this->tableName)

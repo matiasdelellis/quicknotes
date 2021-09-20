@@ -14,15 +14,15 @@ class Attach extends Entity implements JsonSerializable {
 	protected $redirectUrl;
 	protected $deepLinkUrl;
 
-	public function setPreviewUrl($previewUrl) {
+	public function setPreviewUrl(string $previewUrl): void {
 		$this->previewUrl = $previewUrl;
 	}
 
-	public function setRedirectUrl($redirectUrl) {
+	public function setRedirectUrl(string $redirectUrl): void {
 		$this->redirectUrl = $redirectUrl;
 	}
 
-	public function setDeepLinkUrl($deepLinkUrl) {
+	public function setDeepLinkUrl(string $deepLinkUrl): void {
 		$this->deepLinkUrl = $deepLinkUrl;
 	}
 
