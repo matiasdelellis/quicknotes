@@ -5,28 +5,60 @@ use JsonSerializable;
 
 use OCP\AppFramework\Db\Entity;
 
+/**
+ * @method string getUserId()
+ * @method void setUserId(string $userId)
+ * @method string getTitle()
+ * @method void setTitle(string $title)
+ * @method string getContent()
+ * @method void setContest(string $content)
+ * @method int getTimestamp()
+ * @method void setTimestamp(int $timestamp)
+ * @method int geColorId()
+ * @method void setColorId(int $colorId)
+ * @method bool getPinned()
+ * @method void setPinned(bool $pinned)
+ */
 class Note extends Entity implements JsonSerializable {
 
+	// Db Entity
+	protected $userId;
 	protected $title;
 	protected $content;
-	protected $pinned;
 	protected $timestamp;
 	protected $colorId;
-	protected $userId;
-	protected $sharedWith = [];
-	protected $sharedBy = [];
-	protected $tags;
-	protected $attachts;
+	protected $pinned;
 
+	// Extra info to API
 	protected $color;
 	protected $isPinned;
+	protected $sharedWith = [];
+	protected $sharedBy = [];
+	protected $tags = [];
+	protected $attachts = [];
 
-	public function setColor($color): void {
+	public function __construct() {
+		$this->addType('pinned', 'boolean');
+	}
+
+	public function setColor(string $color): void {
 		$this->color = $color;
 	}
 
-	public function setIsPinned($pinned): void {
+	public function setIsPinned(bool $pinned): void {
 		$this->isPinned = $pinned;
+	}
+
+	public function setSharedWith(array $sharedWith): void {
+		$this->sharedWith = $sharedWith;
+	}
+
+	public function setSharedBy(array $sharedBy): void {
+		$this->sharedBy = $sharedBy;
+	}
+
+	public function setTags(array $tags) {
+		$this->tags = $tags;
 	}
 
 	public function jsonSerialize() {
