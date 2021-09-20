@@ -11,10 +11,10 @@ use OCP\AppFramework\Db\Entity;
  * @method string getTitle()
  * @method void setTitle(string $title)
  * @method string getContent()
- * @method void setContest(string $content)
+ * @method void setContent(string $content)
  * @method int getTimestamp()
  * @method void setTimestamp(int $timestamp)
- * @method int geColorId()
+ * @method int getColorId()
  * @method void setColorId(int $colorId)
  * @method bool getPinned()
  * @method void setPinned(bool $pinned)
@@ -59,6 +59,10 @@ class Note extends Entity implements JsonSerializable {
 
 	public function setTags(array $tags) {
 		$this->tags = $tags;
+	}
+
+	public function setAttachts(array $attachts) {
+		$this->attachts = $attachts;
 	}
 
 	public function jsonSerialize() {
