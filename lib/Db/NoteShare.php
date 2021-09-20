@@ -19,12 +19,19 @@ class NoteShare extends Entity implements JsonSerializable {
 	protected $sharedUser;
 	protected $sharedGroup;
 
+	protected $userId;
+
+	public function setUserId (string $userId): void {
+		$this->userId = $userId;
+	}
+
 	public function jsonSerialize() {
 		return [
 			'id' => $this->id,
 			'note_id' => $this->noteId,
 			'shared_user' => $this->sharedUser,
-			'shared_group' => $this->sharedGroup
+			'shared_group' => $this->sharedGroup,
+			'user_id' => $this->userId
 		];
 	}
 

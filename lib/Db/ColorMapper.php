@@ -2,36 +2,42 @@
 namespace OCA\QuickNotes\Db;
 
 use OCP\IDBConnection;
-use OCP\AppFramework\Db\Mapper;
+use OCP\AppFramework\Db\QBMapper;
 use OCP\AppFramework\Db\DoesNotExistException;
+
+use OCP\DB\QueryBuilder\IQueryBuilder;
 
 use OCA\QuickNotes\Db\Color;
 
-class ColorMapper extends Mapper {
+class ColorMapper extends QBMapper {
 
 	public function __construct(IDBConnection $db) {
-		parent::__construct($db, 'quicknotes_colors', '\OCA\QuickNotes\Db\Color');
+		parent::__construct($db, 'quicknotes_colors', Color::class);
 	}
 
-	public function find($id): Color {
-		$sql = 'SELECT * FROM *PREFIX*quicknotes_colors WHERE id = ?';
-		return $this->findEntity($sql, [$id]);
-	}
-
-	public function findAll(): array {
-		$sql = 'SELECT * FROM *PREFIX*quicknotes_colors';
-		return $this->findEntities($sql, []);
+	public function find(int $id): Color {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')
+			->from($this->tableName)
+			->where(
+				$qb->expr()->eq('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT))
+			);
+		return $this->findEntity($qb);
 	}
 
 	public function findByColor(string $color): Color {
-		$sql = 'SELECT * FROM *PREFIX*quicknotes_colors WHERE color = ?';
-		return $this->findEntity($sql, [$color]);
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')
+			->from($this->tableName)
+			->where(
+				$qb->expr()->eq('color', $qb->createNamedParameter($color, IQueryBuilder::PARAM_STRING))
+			);
+		return $this->findEntity($qb);
 	}
 
 	public function colorExists(string $color): bool {
-		$sql = 'SELECT * FROM *PREFIX*quicknotes_colors WHERE color = ?';
 		try {
-			$this->findEntity($sql, [$color]);
+			$this->findByColor($color);
 		} catch (DoesNotExistException $e) {
 			return false;
 		}

@@ -5,6 +5,10 @@ use JsonSerializable;
 
 use OCP\AppFramework\Db\Entity;
 
+/**
+ * @method void setColor(string $color)
+ * @method strinf getColor()
+ */
 class Color extends Entity implements JsonSerializable {
 
 	protected $color;
