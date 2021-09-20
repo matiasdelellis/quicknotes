@@ -2,39 +2,37 @@
 namespace OCA\QuickNotes\Db;
 
 use OCP\IDBConnection;
-use OCP\AppFramework\Db\Mapper;
+use OCP\AppFramework\Db\QBMapper;
 use OCP\AppFramework\Db\DoesNotExistException;
+
+use OCP\DB\QueryBuilder\IQueryBuilder;
 
 use OCA\QuickNotes\Db\NoteTag;
 
-class NoteTagMapper extends Mapper {
+class NoteTagMapper extends QBMapper {
 
 	public function __construct(IDBConnection $db) {
-		parent::__construct($db, 'quicknotes_note_tags', '\OCA\QuickNotes\Db\NoteTag');
-	}
-
-	public function find($id, $userId): NoteTag {
-		$sql = 'SELECT * FROM *PREFIX*quicknotes_note_tags WHERE id = ? AND user_id = ?';
-		return $this->findEntity($sql, [$id, $userId]);
-	}
-
-	public function findAll($userId): array {
-		$sql = 'SELECT * FROM *PREFIX*quicknotes_note_tags WHERE user_id = ?';
-		return $this->findEntities($sql, [$userId]);
+		parent::__construct($db, 'quicknotes_note_tags', NoteTag::class);
 	}
 
 	public function findNoteTag(string $userId, int $noteId, $tagId): NoteTag {
-		$sql = 'SELECT * FROM *PREFIX*quicknotes_note_tags WHERE user_id = ? AND note_id = ? AND tag_id = ?';
-		return $this->findEntity($sql, [$userId, $noteId, $tagId]);
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')
+			->from($this->getTableName())
+			->where(
+				$qb->expr()->eq('user_id', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR)),
+				$qb->expr()->eq('note_id', $qb->createNamedParameter($note_id, IQueryBuilder::PARAM_INT)),
+				$qb->expr()->eq('tag_id', $qb->createNamedParameter($tag_id, IQueryBuilder::PARAM_INT))
+			);
+		return $this->findEntity($qb);
 	}
 
 	/**
 	 * @return bool
 	 */
 	public function noteTagExists(string $userId, int $noteId, int $tagId): bool {
-		$sql = 'SELECT * FROM *PREFIX*quicknotes_note_tags WHERE user_id = ? AND note_id = ? AND tag_id = ?';
 		try {
-			$this->findEntities($sql, [$userId, $noteId, $tagId]);
+			$this->findNoteTag($userId, $noteId, $tagId);
 		} catch (DoesNotExistException $e) {
 			return false;
 		}
