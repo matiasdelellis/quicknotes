@@ -21,11 +21,11 @@ class Note extends Entity implements JsonSerializable {
 	protected $color;
 	protected $isPinned;
 
-	public function setColor($color) {
+	public function setColor($color): void {
 		$this->color = $color;
 	}
 
-	public function setIsPinned($pinned) {
+	public function setIsPinned($pinned): void {
 		$this->isPinned = $pinned;
 	}
 

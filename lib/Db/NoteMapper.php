@@ -10,7 +10,7 @@ use OCP\DB\QueryBuilder\IQueryBuilder;
 class NoteMapper extends QBMapper {
 
 	public function __construct(IDBConnection $db) {
-		parent::__construct($db, 'quicknotes_notes');
+		parent::__construct($db, 'quicknotes_notes', 'OCA\QuickNotes\Db\Note');
 	}
 
 	/**
@@ -20,7 +20,7 @@ class NoteMapper extends QBMapper {
 	 * @throws \OCP\AppFramework\Db\MultipleObjectsReturnedException if more than one result
 	 * @return Note
 	 */
-	public function find($id, $userId) {
+	public function find($id, $userId): Note {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')
 			->from($this->tableName)
@@ -34,11 +34,15 @@ class NoteMapper extends QBMapper {
 	/**
 	 * @param string $userId
 	 * @param string $queryStr
+	 * @param int|null $offset
+	 * @param int|null $limit
+	 *
 	 * @throws \OCP\AppFramework\Db\DoesNotExistException if not found
 	 * @throws \OCP\AppFramework\Db\MultipleObjectsReturnedException if more than one result
+	 *
 	 * @return Note[]
 	 */
-	public function findLike($userId, $queryStr, $offset = null, $limit = null) {
+	public function findLike($userId, $queryStr, ?int $offset = null, ?int $limit = null): array {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')
 			->from($this->tableName)
@@ -65,7 +69,7 @@ class NoteMapper extends QBMapper {
 	 * @throws \OCP\AppFramework\Db\MultipleObjectsReturnedException if more than one result
 	 * @return Note
 	 */
-	public function findShared($id) {
+	public function findShared($id): Note {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')
 			->from($this->tableName)
@@ -75,7 +79,10 @@ class NoteMapper extends QBMapper {
 		return $this->findEntity($qb);
 	}
 
-	public function findAll($userId) {
+	/**
+	 * @return Note[]
+	 */
+	public function findAll(string $userId): array {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')
 			->from($this->tableName)
@@ -85,7 +92,10 @@ class NoteMapper extends QBMapper {
 		return $this->findEntities($qb);
 	}
 
-	public function colorIdCount($colorid) {
+	/**
+	 * @return int
+	 */
+	public function colorIdCount($colorid): int {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('id')
 			->from($this->tableName)
