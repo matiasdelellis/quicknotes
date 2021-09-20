@@ -5,6 +5,14 @@ use JsonSerializable;
 
 use OCP\AppFramework\Db\Entity;
 
+/**
+ * @method string getUserId()
+ * @method void setUserId(string $userId)
+ * @method int getNoteId()
+ * @method void setNoteId(int $noteId)
+ * @method int getTagId()
+ * @method void setTagId(int $tagId)
+ */
 class NoteTag extends Entity implements JsonSerializable {
 
 	protected $noteId;
