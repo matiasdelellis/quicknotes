@@ -3,6 +3,9 @@ namespace OCA\QuickNotes\Db;
 
 use OCP\IDBConnection;
 use OCP\AppFramework\Db\Mapper;
+use OCP\AppFramework\Db\DoesNotExistException;
+
+use OCA\QuickNotes\Db\Tag;
 
 class TagMapper extends Mapper {
 
@@ -10,17 +13,17 @@ class TagMapper extends Mapper {
 		parent::__construct($db, 'quicknotes_tags', '\OCA\QuickNotes\Db\Tag');
 	}
 
-	public function find($id, $userId) {
+	public function find($id, $userId): Tag {
 		$sql = 'SELECT * FROM *PREFIX*quicknotes_tags WHERE id = ? AND user_id = ?';
 		return $this->findEntity($sql, [$id, $userId]);
 	}
 
-	public function findAll($userId) {
+	public function findAll($userId): array {
 		$sql = 'SELECT * FROM *PREFIX*quicknotes_tags WHERE user_id = ?';
 		return $this->findEntities($sql, [$userId]);
 	}
 
-	public function getTagsForNote($userId, $noteId) {
+	public function getTagsForNote(string $userId, int $noteId): array {
 		$sql = 'SELECT T.id, T.name FROM *PREFIX*quicknotes_tags T ';
 		$sql.= 'INNER JOIN *PREFIX*quicknotes_note_tags NT ';
 		$sql.= 'ON T.id = NT.tag_id ';
@@ -28,15 +31,18 @@ class TagMapper extends Mapper {
 		return $this->findEntities($sql, [$userId, $noteId]);
 	}
 
-	public function getTag($userId, $name) {
+	public function getTag(string $userId, $name): Tag {
 		$sql = 'SELECT * FROM *PREFIX*quicknotes_tags WHERE user_id = ? AND name = ?';
 		return $this->findEntity($sql, [$userId, $name]);
 	}
 
-	public function tagExists($userId, $name) {
+	/**
+	 * @return bool
+	 */
+	public function tagExists(string $userId, $name): bool {
 		$sql = 'SELECT * FROM *PREFIX*quicknotes_tags WHERE user_id = ? AND name = ?';
 		try {
-			return $this->findEntities($sql, [$userId, $name]);
+			$this->findEntities($sql, [$userId, $name]);
 		} catch (DoesNotExistException $e) {
 			return false;
 		}
@@ -46,6 +52,6 @@ class TagMapper extends Mapper {
 	public function dropOld () {
 		$sql = 'DELETE FROM *PREFIX*quicknotes_tags WHERE ';
 		$sql.= 'id NOT IN (SELECT tag_id FROM *PREFIX*quicknotes_note_tags)';
-		return $this->execute($sql, []);
+		$this->execute($sql, []);
 	}
 }
