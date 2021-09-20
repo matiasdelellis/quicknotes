@@ -12,7 +12,7 @@ use OCA\QuickNotes\Db\Attach;
 class AttachMapper extends QBMapper {
 
 	public function __construct(IDBConnection $db) {
-		parent::__construct($db, 'quicknotes_attach');
+		parent::__construct($db, 'quicknotes_attach', Attach::class);
 	}
 
 	/**

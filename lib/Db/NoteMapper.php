@@ -10,7 +10,7 @@ use OCP\DB\QueryBuilder\IQueryBuilder;
 class NoteMapper extends QBMapper {
 
 	public function __construct(IDBConnection $db) {
-		parent::__construct($db, 'quicknotes_notes', 'OCA\QuickNotes\Db\Note');
+		parent::__construct($db, 'quicknotes_notes', Note::class);
 	}
 
 	/**
