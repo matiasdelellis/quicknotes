@@ -5,11 +5,23 @@ use JsonSerializable;
 
 use OCP\AppFramework\Db\Entity;
 
+/**
+ * @method string getUserId()
+ * @method void setUserId(string $userId)
+ * @method int getNoteId()
+ * @method void setNoteId(int $noteId)
+ * @method int getFileId()
+ * @method void setFileId(int $fileId)
+ * @method int getCreatedAt()
+ * @method void setCreatedAt(int $createdAt)
+ */
+
 class Attach extends Entity implements JsonSerializable {
 	protected $userId;
 	protected $noteId;
 	protected $fileId;
 	protected $createdAt;
+
 	protected $previewUrl;
 	protected $redirectUrl;
 	protected $deepLinkUrl;
