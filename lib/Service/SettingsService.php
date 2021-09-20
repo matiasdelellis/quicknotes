@@ -61,7 +61,7 @@ class SettingsService {
 		return $this->config->getUserValue($this->userId, Application::APP_ID, self::COLOR_FOR_NEW_NOTES_KEY, self::DEFAULT_COLOR_FOR_NEW_NOTES);
 	}
 
-	public function setColorForNewNotes(string $color) {
+	public function setColorForNewNotes(string $color): void {
 		$this->config->setUserValue($this->userId, Application::APP_ID, self::COLOR_FOR_NEW_NOTES_KEY, $color);
 	}
 
@@ -69,7 +69,7 @@ class SettingsService {
 		return $this->config->getUserValue($this->userId, Application::APP_ID, self::ATTACHMENTS_FOLDER_KEY, self::DEFAULT_ATTACHMENTS_FOLDER);
 	}
 
-	public function setAttachmentsFolder(string $folder) {
+	public function setAttachmentsFolder(string $folder): void {
 		$this->config->setUserValue($this->userId, Application::APP_ID, self::ATTACHMENTS_FOLDER_KEY, $folder);
 	}
 

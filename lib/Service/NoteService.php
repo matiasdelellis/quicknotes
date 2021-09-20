@@ -401,6 +401,8 @@ class NoteService {
 	/**
 	 * @param string $userId
 	 * @param int $id
+	 *
+	 * @return void
 	 */
 	public function destroy (string $userId, int $id) {
 		// Get Note and Color
