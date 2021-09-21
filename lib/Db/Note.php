@@ -57,11 +57,11 @@ class Note extends Entity implements JsonSerializable {
 		$this->sharedBy = $sharedBy;
 	}
 
-	public function setTags(array $tags) {
+	public function setTags(array $tags): void {
 		$this->tags = $tags;
 	}
 
-	public function setAttachts(array $attachts) {
+	public function setAttachts(array $attachts): void {
 		$this->attachts = $attachts;
 	}
 

@@ -15,7 +15,7 @@ class NoteTagMapper extends QBMapper {
 		parent::__construct($db, 'quicknotes_note_tags', NoteTag::class);
 	}
 
-	public function findNoteTag(string $userId, int $noteId, $tagId): NoteTag {
+	public function findNoteTag(string $userId, int $noteId, int $tagId): NoteTag {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')
 			->from($this->getTableName())

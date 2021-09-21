@@ -150,7 +150,7 @@ class NoteService {
 	public function get(string $userId, int $id): ?Note {
 		try {
 			return $this->notemapper->find($id, $userId);
-		} catch(Exception $e) {
+		} catch(DoesNotExistException $e) {
 			return null;
 		}
 	}

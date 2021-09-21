@@ -98,7 +98,7 @@ class NoteMapper extends QBMapper {
 	/**
 	 * @return int
 	 */
-	public function colorIdCount($colorid): int {
+	public function colorIdCount(int $colorid): int {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('id')
 			->from($this->tableName)
