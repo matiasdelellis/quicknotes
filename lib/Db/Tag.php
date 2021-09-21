@@ -5,16 +5,22 @@ use JsonSerializable;
 
 use OCP\AppFramework\Db\Entity;
 
+/**
+ * @method string getUserId()
+ * @method void setUserId(string $userId)
+ * @method string getName()
+ * @method void setName(string $name)
+ */
 class Tag extends Entity implements JsonSerializable {
 
-	protected $name;
 	protected $userId;
+	protected $name;
 
 	public function jsonSerialize() {
 		return [
 			'id' => $this->id,
-			'name' => $this->name,
-			'userid' => $this->userId
+			'userid' => $this->userId,
+			'name' => $this->name
 		];
 	}
 
