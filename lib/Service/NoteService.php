@@ -43,6 +43,7 @@ use OCA\QuickNotes\Db\TagMapper;
 use OCA\QuickNotes\Service\FileService;
 use OCA\QuickNotes\Service\SettingsService;
 
+use OCP\AppFramework\Db\DoesNotExistException;
 
 class NoteService {
 
@@ -408,7 +409,7 @@ class NoteService {
 		// Get Note and Color
 		try {
 			$note = $this->notemapper->find($id, $userId);
-		} catch(Exception $e) {
+		} catch(DoesNotExistException $e) {
 			return;
 		}
 		$oldcolorid = $note->getColorId();

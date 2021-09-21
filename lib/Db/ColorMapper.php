@@ -30,7 +30,7 @@ class ColorMapper extends QBMapper {
 		$qb->select('*')
 			->from($this->tableName)
 			->where(
-				$qb->expr()->eq('color', $qb->createNamedParameter($color, IQueryBuilder::PARAM_STRING))
+				$qb->expr()->eq('color', $qb->createNamedParameter($color, IQueryBuilder::PARAM_STR))
 			);
 		return $this->findEntity($qb);
 	}

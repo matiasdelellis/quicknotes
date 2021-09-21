@@ -7,7 +7,7 @@ use OCP\AppFramework\Db\Entity;
 
 /**
  * @method void setColor(string $color)
- * @method strinf getColor()
+ * @method string getColor()
  */
 class Color extends Entity implements JsonSerializable {
 

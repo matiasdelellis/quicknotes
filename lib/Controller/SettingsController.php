@@ -94,7 +94,7 @@ class SettingsController extends Controller {
 
 		switch ($type) {
 			case SettingsService::COLOR_FOR_NEW_NOTES_KEY:
-				$value = $this->settingsService->getColorForNewNotes($this->userId);
+				$value = $this->settingsService->getColorForNewNotes();
 				break;
 			default:
 				$status = self::STATE_FALSE;

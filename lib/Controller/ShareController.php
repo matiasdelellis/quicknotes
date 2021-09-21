@@ -31,6 +31,7 @@ use OCP\IRequest;
 use OCA\QuickNotes\Db\NoteShare;
 use OCA\QuickNotes\Db\NoteShareMapper;
 
+use OCP\AppFramework\Db\DoesNotExistException;
 
 class ShareController extends Controller {
 
