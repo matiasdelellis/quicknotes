@@ -7,6 +7,9 @@ use OCP\AppFramework\Db\QBMapper;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 
+/**
+ * @method Note update(Note $note)
+ */
 class NoteMapper extends QBMapper {
 
 	public function __construct(IDBConnection $db) {
