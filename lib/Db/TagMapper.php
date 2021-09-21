@@ -2,56 +2,61 @@
 namespace OCA\QuickNotes\Db;
 
 use OCP\IDBConnection;
-use OCP\AppFramework\Db\Mapper;
+use OCP\AppFramework\Db\QBMapper;
 use OCP\AppFramework\Db\DoesNotExistException;
+use OCP\DB\QueryBuilder\IQueryBuilder;
 
 use OCA\QuickNotes\Db\Tag;
 
-class TagMapper extends Mapper {
+class TagMapper extends QBMapper {
 
 	public function __construct(IDBConnection $db) {
-		parent::__construct($db, 'quicknotes_tags', '\OCA\QuickNotes\Db\Tag');
-	}
-
-	public function find($id, $userId): Tag {
-		$sql = 'SELECT * FROM *PREFIX*quicknotes_tags WHERE id = ? AND user_id = ?';
-		return $this->findEntity($sql, [$id, $userId]);
-	}
-
-	public function findAll($userId): array {
-		$sql = 'SELECT * FROM *PREFIX*quicknotes_tags WHERE user_id = ?';
-		return $this->findEntities($sql, [$userId]);
+		parent::__construct($db, 'quicknotes_tags', Tag::class);
 	}
 
 	public function getTagsForNote(string $userId, int $noteId): array {
-		$sql = 'SELECT T.id, T.name FROM *PREFIX*quicknotes_tags T ';
-		$sql.= 'INNER JOIN *PREFIX*quicknotes_note_tags NT ';
-		$sql.= 'ON T.id = NT.tag_id ';
-		$sql.= 'WHERE NT.user_id = ? AND NT.note_id = ?';
-		return $this->findEntities($sql, [$userId, $noteId]);
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('T.id', 'T.name')
+			->from($this->getTableName(), 'T')
+			->innerJoin('T', 'quicknotes_note_tags' ,'NT', $qb->expr()->eq('T.id', 'NT.tag_id'))
+			->where($qb->expr()->eq('NT.user_id', $qb->createParameter('user_id')))
+			->andWhere($qb->expr()->eq('NT.note_id', $qb->createParameter('note_id')))
+			->setParameter('user_id', $userId)
+			->setParameter('note_id', $noteId);
+		return $this->findEntities($qb);
 	}
 
-	public function getTag(string $userId, $name): Tag {
-		$sql = 'SELECT * FROM *PREFIX*quicknotes_tags WHERE user_id = ? AND name = ?';
-		return $this->findEntity($sql, [$userId, $name]);
+	public function getTag(string $userId, string $name): Tag {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')
+			->from($this->getTableName())
+			->where(
+				$qb->expr()->eq('user_id', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR)),
+				$qb->expr()->eq('name', $qb->createNamedParameter($id, IQueryBuilder::PARAM_STR))
+			);
+		return $this->findEntity($qb);
 	}
 
 	/**
 	 * @return bool
 	 */
-	public function tagExists(string $userId, $name): bool {
-		$sql = 'SELECT * FROM *PREFIX*quicknotes_tags WHERE user_id = ? AND name = ?';
+	public function tagExists(string $userId, string $name): bool {
 		try {
-			$this->findEntities($sql, [$userId, $name]);
+			$this->getTag($userId, $name);
 		} catch (DoesNotExistException $e) {
 			return false;
 		}
 		return true;
 	}
 
-	public function dropOld () {
-		$sql = 'DELETE FROM *PREFIX*quicknotes_tags WHERE ';
-		$sql.= 'id NOT IN (SELECT tag_id FROM *PREFIX*quicknotes_note_tags)';
-		$this->execute($sql, []);
+	public function dropOld (): void {
+		$sub = $this->db->getQueryBuilder();
+		$sub->select('tag_id')
+			->from('quicknotes_note_tags');
+
+		$qb = $this->db->getQueryBuilder();
+		$qb->delete($this->getTableName())
+			->where('id NOT IN (' . $sub->getSQL() . ')')
+			->execute();
 	}
 }
