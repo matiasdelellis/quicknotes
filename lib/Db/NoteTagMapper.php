@@ -21,8 +21,8 @@ class NoteTagMapper extends QBMapper {
 			->from($this->getTableName())
 			->where(
 				$qb->expr()->eq('user_id', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR)),
-				$qb->expr()->eq('note_id', $qb->createNamedParameter($note_id, IQueryBuilder::PARAM_INT)),
-				$qb->expr()->eq('tag_id', $qb->createNamedParameter($tag_id, IQueryBuilder::PARAM_INT))
+				$qb->expr()->eq('note_id', $qb->createNamedParameter($noteId, IQueryBuilder::PARAM_INT)),
+				$qb->expr()->eq('tag_id', $qb->createNamedParameter($tagId, IQueryBuilder::PARAM_INT))
 			);
 		return $this->findEntity($qb);
 	}

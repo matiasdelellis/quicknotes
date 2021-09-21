@@ -32,7 +32,7 @@ class TagMapper extends QBMapper {
 			->from($this->getTableName())
 			->where(
 				$qb->expr()->eq('user_id', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR)),
-				$qb->expr()->eq('name', $qb->createNamedParameter($id, IQueryBuilder::PARAM_STR))
+				$qb->expr()->eq('name', $qb->createNamedParameter($name, IQueryBuilder::PARAM_STR))
 			);
 		return $this->findEntity($qb);
 	}
