@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.7.3] 2021-12-03
+- Add where to translate into README. PR #71
+- Add lint and static-analysis using github workflows.
+- Convert database Mappers to QBMapper.
+- Fix impossible to change color of a note. Issue #74
+- Fix round of modal buttons..
+- New Czech translation thanks to Pavel Borecki
+- Enable to Nextcloud 23. Issue #75
+
 ## [0.7.2] 2021-08-03
 - Initial support for NC22.
 - Highlight the note or filter used in the side panel.
