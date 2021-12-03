@@ -512,6 +512,11 @@ View.prototype = {
             );
         });
 
+        // FIXME: Hack to sent click event to colorPicker.
+        $('#modal-note-div .icon-toggle-background').click(function (event) {
+            $(this).parent().click();
+        });
+
         // handle attach button.
         $('#modal-note-div #attach-button').click(function (event) {
             event.stopPropagation();
