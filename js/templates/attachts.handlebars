@@ -2,10 +2,10 @@
 	{{#each attachments}}
 		<div class='note-attach-grid'>
 			<a target="_blank" href="{{redirect_url}}">
-				<div class="attach-preview note-attach" attach-file-id="{{file_id}}" data-background-image="{{preview_url}}"/>
+				<div class="attach-preview note-attach" attach-file-id="{{file_id}}" data-background-image="{{preview_url}}"></div>
 			</a>
 			{{#if ../can_delete}}
-				<div class="attach-remove icon-delete" title="{{t "quicknotes" "Delete attachment"}}"/>
+				<div class="attach-remove icon-delete" title="{{t "quicknotes" "Delete attachment"}}"></div>
 			{{/if}}
 		</div>
 	{{/each}}
