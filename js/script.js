@@ -187,15 +187,18 @@ var View = function (notes) {
     this._notes = notes;
 
     this._editor = undefined;
+    this._isotope = undefined;
     this._changed = false;
 };
 
 View.prototype = {
     showAll: function () {
-        $('.notes-grid').isotope({ filter: '*'});
+        this._isotope.arrange({ filter: '*'});
+        setFilterUrl();
     },
     updateSort: function() {
-        $('.notes-grid').isotope('updateSortData').isotope();
+        this._isotope.updateSortData();
+        this._isotope.layout();
     },
     editNote: function (id) {
         // Get selected note and sync content
@@ -278,22 +281,24 @@ View.prototype = {
         lozad('.attach-preview').observe();
 
         // Init masonty grid to notes.
-        $('.notes-grid').isotope({
-            itemSelector: '.note-grid-item',
-            layoutMode: 'masonry',
-            masonry: {
-                isFitWidth: true,
-                fitWidth: true,
-                gutter: 14,
-            },
-            sortBy: 'pinnedNote',
-            getSortData: {
-                pinnedNote: function(itemElem) {
-                    var $item = $(itemElem);
-                    return $item.find('.icon-pinned').hasClass('fixed-header-icon') ? -1 : $item.index();
+        if (this._notes.isLoaded() && this._notes.length() > 0) {
+            this._isotope = new Isotope(document.querySelector('.notes-grid'), {
+                itemSelector: '.note-grid-item',
+                layoutMode: 'masonry',
+                masonry: {
+                    isFitWidth: true,
+                    fitWidth: true,
+                    gutter: 14,
+                },
+                sortBy: 'pinnedNote',
+                getSortData: {
+                    pinnedNote: function(itemElem) {
+                        var $item = $(itemElem);
+                        return $item.find('.icon-pinned').hasClass('fixed-header-icon') ? -1 : $item.index();
+                    }
                 }
-            }
-        });
+            });
+        }
 
         // Save instance of View
         var self = this;
@@ -343,8 +348,8 @@ View.prototype = {
                         if (!note.is_shared) {
                             self._notes.remove(note).done(function () {
                                 if (self._notes.length() > 0) {
-                                     $(".notes-grid").isotope('remove', gridnote.parent())
-                                                    .isotope('layout');
+                                    self._isotope.remove(gridnote.parent())
+                                    self._isotope.layout();
                                     self.showAll();
                                     self.renderNavigation();
                                 } else {
@@ -356,8 +361,8 @@ View.prototype = {
                         } else {
                             self._notes.forgetShare(note).done(function () {
                                 if (self._notes.length() > 0) {
-                                     $(".notes-grid").isotope('remove', gridnote.parent())
-                                                    .isotope('layout');
+                                    self._isotope.remove(gridnote.parent())
+                                    selg._isotope.layout();
                                     self.showAll();
                                     self.renderNavigation();
                                 } else {
@@ -390,7 +395,8 @@ View.prototype = {
                 icon.removeClass("icon-pin");
                 icon.addClass("icon-pinned");
                 icon.attr('title', t('quicknotes', 'Unpin note'));
-                $('.notes-grid').isotope('updateSortData').isotope();
+                self._isotope.updateSortData();
+                self._isotope.arrange();
             }).fail(function () {
                 alert('Could not pin note');
             });
@@ -406,14 +412,14 @@ View.prototype = {
 
             var note = self._notes.read(id);
             note.isPinned = false;
-
             self._notes.update(note).done(function () {
                 icon.removeClass("fixed-header-icon");
                 icon.addClass("hide-header-icon");
                 icon.removeClass("icon-pinned");
                 icon.addClass("icon-pin");
                 icon.attr('title', t('quicknotes', 'Pin note'));
-                $('.notes-grid').isotope('updateSortData').isotope();
+                self._isotope.updateSortData();
+                self._isotope.arrange();
             }).fail(function () {
                 alert('Could not unpin note');
             });
@@ -593,9 +599,9 @@ View.prototype = {
             self._notes.create(fakenote).done(function(note) {
                 if (self._notes.length() > 1) {
                     var $notehtml = $(Handlebars.templates['note-item'](note));
-                    $(".notes-grid").prepend($notehtml)
-                                    .isotope('prepended', $notehtml)
-                                    .isotope('layout');
+                    $('.notes-grid').prepend($notehtml);
+                    self._isotope.prepended($notehtml);
+                    self._isotope.layout();
                     self.showAll();
                     self.updateSort();
                     self.renderNavigation();
@@ -613,7 +619,7 @@ View.prototype = {
             event.preventDefault();
             self._cleanNavigation();
             $(this).addClass("active");
-            $('.notes-grid').isotope({ filter: '*'});
+            self._isotope.arrange({ filter: '*'});
             setFilterUrl();
         });
 
@@ -628,9 +634,11 @@ View.prototype = {
             event.stopPropagation();
             self._cleanNavigation();
             $(this).addClass("active");
-            $('.notes-grid').isotope({ filter: function() {
-                return $(this).children().hasClass('shared');
-            } });
+            self._isotope.arrange({
+                filter: function(elem) {
+                    return elem.querySelector('.shared') != null;
+                }
+            });
             setFilterUrl();
         });
 
@@ -639,9 +647,11 @@ View.prototype = {
             event.stopPropagation();
             self._cleanNavigation();
             $(this).addClass("active");
-            $('.notes-grid').isotope({ filter: function() {
-                return $(this).children().hasClass('shareowner');
-            } });
+            self._isotope.arrange({
+                filter: function(elem) {
+                    return elem.querySelector('.shareowner') != null;
+                }
+            });
             setFilterUrl();
         });
 
@@ -817,7 +827,8 @@ View.prototype = {
         if (color === undefined)
             return this._colorToHex($("#modal-note-div .quicknote").css("background-color"));
         else {
-            $("#color-button").colorPick({
+            $("#modal-note-div .quicknote").css("background-color", color);
+            /*$("#color-button").colorPick({
                 'initialColor': color,
                 'paletteLabel': t('quicknotes', 'Colors'),
                 'palette': ['#F7EB96', '#88B7E3', '#C1ECB0', '#BFA6E9', '#DAF188', '#FF96AC', '#FCF66F', '#F2F1EF', '#C1D756', '#CECECE'],
@@ -826,7 +837,7 @@ View.prototype = {
                 'onColorSelected': function() {
                     $("#modal-note-div .quicknote").css("background-color", this.color);
                 }
-            });
+            });*/
         }
     },
     _editableShares: function(shared_with) {
@@ -914,15 +925,19 @@ View.prototype = {
                     { name: 'removeFormat', aria: t('quicknotes', 'Clean format') }
                ]
             },
+            placeholder: {
+                text: 'Create a note…',
+                hideOnClick: false
+            },
             autoLink: true,
             targetBlank: true,
             paste: {
-                forcePlainText: false,
-                cleanPastedHTML: false
+                forcePlainText: true
             },
             extensions: {
                 'autolist': new AutoList()
-            }
+            },
+            imageDragging: false
         });
 
         var self = this;
@@ -1028,19 +1043,19 @@ View.prototype = {
         );
     },
     _filterNote: function (noteId) {
-        $('.notes-grid').isotope({
-            filter: function() {
-                return noteId == parseInt($(this).children().data('id'), 10);
+        this._isotope.arrange({
+            filter: function(elem) {
+                return noteId == elem.firstElementChild.getAttribute('data-id');
             }
         });
     },
     _filterTag: function (tagId) {
-        $('.notes-grid').isotope({
-            filter: function() {
+        this._isotope.arrange({
+            filter: function(elem) {
                 var match = false;
-                $(this).find(".slim-tag").siblings().addBack().each(function() {
-                    var id = parseInt($(this).attr('tag-id'), 10);
-                    if (tagId == id)
+                var tags = elem.querySelectorAll('.slim-tag');
+                tags.forEach (function(tagItem) {
+                    if (tagId == tagItem.getAttribute('tag-id'))
                         match = true;
                 });
                 return match;
@@ -1048,9 +1063,9 @@ View.prototype = {
         });
     },
     _filterColor: function (color) {
-        $('.notes-grid').isotope({
-            filter: function() {
-                return color == $(this).children().css("background-color");
+        this._isotope.arrange({
+            filter: function(elem) {
+                return color == elem.firstElementChild.style["background-color"];
             }
         });
     },
