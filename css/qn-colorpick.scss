@@ -1,0 +1,32 @@
+.colorPickWrapper {
+    position: relative;
+    width: 0;
+    height: 0;
+}
+
+#colorPick {
+  background: #fff;
+  -webkit-backdrop-filter: blur(15px);
+  position: absolute;
+  border-radius: 8px;
+  box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.2);
+  padding: 10px;
+  width: auto;
+  box-sizing: content-box;
+  z-index: 2500;
+  display: flex;
+}
+
+.colorPickButton {
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  margin: 0px 3px;
+  cursor: pointer;
+  display: inline-block;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.colorPickButton:hover {
+  transform: scale(1.1);
+}

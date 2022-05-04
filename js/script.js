@@ -188,6 +188,7 @@ var View = function (notes) {
 
     this._editor = undefined;
     this._isotope = undefined;
+    this._colorPick = undefined;
     this._changed = false;
 };
 
@@ -298,6 +299,10 @@ View.prototype = {
                     }
                 }
             });
+
+            this._colorPick = new QnColorPick(".modal-content", function (color) {
+                $("#modal-note-div .quicknote").css("background-color", color);
+            });
         }
 
         // Save instance of View
@@ -314,7 +319,7 @@ View.prototype = {
         // Open notes when clicking them.
         $("#notes-grid-div").on("click", ".quicknote", function (event) {
             event.stopPropagation();
-            var id = parseInt($(this).data('id'), 10);
+            var id = parseInt($(this).attr('data-id'), 10);
             self.editNote(id);
         });
 
@@ -337,7 +342,7 @@ View.prototype = {
             event.stopPropagation();
 
             var gridnote = $(this).parent().parent().parent();
-            var id = parseInt(gridnote.data('id'), 10);
+            var id = parseInt(gridnote.attr('data-id'), 10);
 
             var note = self._notes.read(id);
             OC.dialogs.confirm(
@@ -384,7 +389,7 @@ View.prototype = {
 
             var icon =  $(this);
             var gridNote = icon.parent().parent().parent();
-            var id = parseInt(gridNote.data('id'), 10);
+            var id = parseInt(gridNote.attr('data-id'), 10);
 
             var note = self._notes.read(id);
             note.isPinned = true;
@@ -408,7 +413,7 @@ View.prototype = {
 
             var icon =  $(this);
             var gridNote = icon.parent().parent().parent();
-            var id = parseInt(gridNote.data('id'), 10);
+            var id = parseInt(gridNote.attr('data-id'), 10);
 
             var note = self._notes.read(id);
             note.isPinned = false;
@@ -431,6 +436,10 @@ View.prototype = {
         // Cancel when click outside the modal.
         $('#div-content').on('click', '.modal-note-background', function (event) {
             event.stopPropagation();
+            if (self._colorPick.isVisible()) {
+                self._colorPick.close();
+                return;
+            }
             if (!self._changed) {
                 self.cancelEdit();
                 return;
@@ -499,13 +508,13 @@ View.prototype = {
         });
 
         // Handle tags on modal
-        $('#modal-note-div').on('click', '.slim-tag', function (event) {
+        $('#modal-note-div').on("click", ".slim-tag", function (event) {
             event.stopPropagation();
             $('#modal-note-div #tag-button').trigger( "click");
         });
 
         // handle tags button.
-        $('#modal-note-div #share-button').click(function (event) {
+        $('#modal-note-div').on("click", "#share-button", function (event) {
             event.stopPropagation();
             QnDialogs.shares(
                 self._notes.getUsersSharing(),
@@ -518,13 +527,13 @@ View.prototype = {
             );
         });
 
-        // FIXME: Hack to sent click event to colorPicker.
-        $('#modal-note-div .icon-toggle-background').click(function (event) {
-            $(this).parent().click();
+        $('#modal-note-div').on("click", "#color-button", function (event) {
+            event.stopPropagation();
+            self._colorPick.toggle();
         });
 
         // handle attach button.
-        $('#modal-note-div #attach-button').click(function (event) {
+        $('#modal-note-div').on("click", "#attach-button", function (event) {
             event.stopPropagation();
             OC.dialogs.filepicker(t('quicknotes', 'Select file to attach'), function(datapath, returntype) {
                 OC.Files.getClient().getFileInfo(datapath).then((status, fileInfo) => {
@@ -542,7 +551,7 @@ View.prototype = {
         });
 
         // handle tags button.
-        $('#modal-note-div #tag-button').click(function (event) {
+        $('#modal-note-div').on("click", "#tag-button", function (event) {
             event.stopPropagation();
             var noteTags = self._editableTags();
             QnDialogs.tags(
@@ -557,19 +566,19 @@ View.prototype = {
         });
 
         // handle cancel editing notes.
-        $('#modal-note-div #close-button').click(function (event) {
+        $('#modal-note-div').on("click", "#close-button", function (event) {
             event.stopPropagation();
             self.cancelEdit();
         });
 
         // handle cancel editing notes.
-        $('#modal-note-div #cancel-button').click(function (event) {
+        $('#modal-note-div').on("click", "#cancel-button", function (event) {
             event.stopPropagation();
             self.cancelEdit();
         });
 
         // Handle save note
-        $('#modal-note-div #save-button').click(function (event) {
+        $('#modal-note-div').on("click", "#save-button", function (event) {
             event.stopPropagation();
             self.saveNote();
         });
@@ -791,9 +800,9 @@ View.prototype = {
     },
     _editableId: function(id) {
         if (id === undefined)
-            return $("#modal-note-div .quicknote").data('id');
+            return $("#modal-note-div .quicknote").attr('data-id');
         else
-            $("#modal-note-div .quicknote").data('id', id);
+            $("#modal-note-div .quicknote").attr('data-id', id);
     },
     _editableTitle: function(title) {
         if (title === undefined)
@@ -828,16 +837,7 @@ View.prototype = {
             return this._colorToHex($("#modal-note-div .quicknote").css("background-color"));
         else {
             $("#modal-note-div .quicknote").css("background-color", color);
-            /*$("#color-button").colorPick({
-                'initialColor': color,
-                'paletteLabel': t('quicknotes', 'Colors'),
-                'palette': ['#F7EB96', '#88B7E3', '#C1ECB0', '#BFA6E9', '#DAF188', '#FF96AC', '#FCF66F', '#F2F1EF', '#C1D756', '#CECECE'],
-                'allowRecent': false,
-                'allowCustomColor': false,
-                'onColorSelected': function() {
-                    $("#modal-note-div .quicknote").css("background-color", this.color);
-                }
-            });*/
+            this._colorPick.select(color);
         }
     },
     _editableShares: function(shared_with) {

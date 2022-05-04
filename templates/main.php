@@ -6,12 +6,12 @@ vendor_script('quicknotes', 'medium-editor');
 vendor_style('quicknotes', 'medium-editor');
 vendor_script('quicknotes', 'autolist');
 vendor_script('quicknotes', 'lozad');
-//vendor_script('quicknotes', 'colorPick');
-//vendor_style('quicknotes', 'colorPick');
 script('quicknotes', 'qn-dialogs');
+script('quicknotes', 'qn-colorpick');
 script('quicknotes', 'script');
 style('quicknotes', 'style');
 style('quicknotes', 'medium');
+style('quicknotes', 'qn-colorpick');
 ?>
 
 	<div id="app-navigation">
