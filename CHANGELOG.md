@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.7.6] 2022-05-07
+- Enable NC24.
+- Removes lot use of jQuery, that inexplicably failing in NC24. Issue #84
+
 ## [0.7.3] 2021-12-03
 - Add where to translate into README. PR #71
 - Add lint and static-analysis using github workflows.
