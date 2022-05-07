@@ -361,19 +361,3 @@ div.select2-container {
     padding: 0px !important;
     border-radius: 50%;
 }
-
-/* Color Picker */
-
-#colorPick {
-    border-radius: 8px;
-    padding: 12px;
-    background-color: var(--color-background-dark);
-    opacity: 1.0 !important;
-    z-index: 2500;
-}
-
-#colorPick span {
-    color: var(--color-main-text);
-    font-size: 13px;
-    text-transform: initial;
-}

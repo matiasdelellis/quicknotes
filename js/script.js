@@ -187,15 +187,19 @@ var View = function (notes) {
     this._notes = notes;
 
     this._editor = undefined;
+    this._isotope = undefined;
+    this._colorPick = undefined;
     this._changed = false;
 };
 
 View.prototype = {
     showAll: function () {
-        $('.notes-grid').isotope({ filter: '*'});
+        this._isotope.arrange({ filter: '*'});
+        setFilterUrl();
     },
     updateSort: function() {
-        $('.notes-grid').isotope('updateSortData').isotope();
+        this._isotope.updateSortData();
+        this._isotope.layout();
     },
     editNote: function (id) {
         // Get selected note and sync content
@@ -278,22 +282,28 @@ View.prototype = {
         lozad('.attach-preview').observe();
 
         // Init masonty grid to notes.
-        $('.notes-grid').isotope({
-            itemSelector: '.note-grid-item',
-            layoutMode: 'masonry',
-            masonry: {
-                isFitWidth: true,
-                fitWidth: true,
-                gutter: 14,
-            },
-            sortBy: 'pinnedNote',
-            getSortData: {
-                pinnedNote: function(itemElem) {
-                    var $item = $(itemElem);
-                    return $item.find('.icon-pinned').hasClass('fixed-header-icon') ? -1 : $item.index();
+        if (this._notes.isLoaded() && this._notes.length() > 0) {
+            this._isotope = new Isotope(document.querySelector('.notes-grid'), {
+                itemSelector: '.note-grid-item',
+                layoutMode: 'masonry',
+                masonry: {
+                    isFitWidth: true,
+                    fitWidth: true,
+                    gutter: 14,
+                },
+                sortBy: 'pinnedNote',
+                getSortData: {
+                    pinnedNote: function(itemElem) {
+                        var $item = $(itemElem);
+                        return $item.find('.icon-pinned').hasClass('fixed-header-icon') ? -1 : $item.index();
+                    }
                 }
-            }
-        });
+            });
+
+            this._colorPick = new QnColorPick(".modal-content", function (color) {
+                $("#modal-note-div .quicknote").css("background-color", color);
+            });
+        }
 
         // Save instance of View
         var self = this;
@@ -309,7 +319,7 @@ View.prototype = {
         // Open notes when clicking them.
         $("#notes-grid-div").on("click", ".quicknote", function (event) {
             event.stopPropagation();
-            var id = parseInt($(this).data('id'), 10);
+            var id = parseInt($(this).attr('data-id'), 10);
             self.editNote(id);
         });
 
@@ -332,7 +342,7 @@ View.prototype = {
             event.stopPropagation();
 
             var gridnote = $(this).parent().parent().parent();
-            var id = parseInt(gridnote.data('id'), 10);
+            var id = parseInt(gridnote.attr('data-id'), 10);
 
             var note = self._notes.read(id);
             OC.dialogs.confirm(
@@ -343,8 +353,8 @@ View.prototype = {
                         if (!note.is_shared) {
                             self._notes.remove(note).done(function () {
                                 if (self._notes.length() > 0) {
-                                     $(".notes-grid").isotope('remove', gridnote.parent())
-                                                    .isotope('layout');
+                                    self._isotope.remove(gridnote.parent())
+                                    self._isotope.layout();
                                     self.showAll();
                                     self.renderNavigation();
                                 } else {
@@ -356,8 +366,8 @@ View.prototype = {
                         } else {
                             self._notes.forgetShare(note).done(function () {
                                 if (self._notes.length() > 0) {
-                                     $(".notes-grid").isotope('remove', gridnote.parent())
-                                                    .isotope('layout');
+                                    self._isotope.remove(gridnote.parent())
+                                    selg._isotope.layout();
                                     self.showAll();
                                     self.renderNavigation();
                                 } else {
@@ -379,7 +389,7 @@ View.prototype = {
 
             var icon =  $(this);
             var gridNote = icon.parent().parent().parent();
-            var id = parseInt(gridNote.data('id'), 10);
+            var id = parseInt(gridNote.attr('data-id'), 10);
 
             var note = self._notes.read(id);
             note.isPinned = true;
@@ -390,7 +400,8 @@ View.prototype = {
                 icon.removeClass("icon-pin");
                 icon.addClass("icon-pinned");
                 icon.attr('title', t('quicknotes', 'Unpin note'));
-                $('.notes-grid').isotope('updateSortData').isotope();
+                self._isotope.updateSortData();
+                self._isotope.arrange();
             }).fail(function () {
                 alert('Could not pin note');
             });
@@ -402,18 +413,18 @@ View.prototype = {
 
             var icon =  $(this);
             var gridNote = icon.parent().parent().parent();
-            var id = parseInt(gridNote.data('id'), 10);
+            var id = parseInt(gridNote.attr('data-id'), 10);
 
             var note = self._notes.read(id);
             note.isPinned = false;
-
             self._notes.update(note).done(function () {
                 icon.removeClass("fixed-header-icon");
                 icon.addClass("hide-header-icon");
                 icon.removeClass("icon-pinned");
                 icon.addClass("icon-pin");
                 icon.attr('title', t('quicknotes', 'Pin note'));
-                $('.notes-grid').isotope('updateSortData').isotope();
+                self._isotope.updateSortData();
+                self._isotope.arrange();
             }).fail(function () {
                 alert('Could not unpin note');
             });
@@ -425,6 +436,10 @@ View.prototype = {
         // Cancel when click outside the modal.
         $('#div-content').on('click', '.modal-note-background', function (event) {
             event.stopPropagation();
+            if (self._colorPick.isVisible()) {
+                self._colorPick.close();
+                return;
+            }
             if (!self._changed) {
                 self.cancelEdit();
                 return;
@@ -493,13 +508,13 @@ View.prototype = {
         });
 
         // Handle tags on modal
-        $('#modal-note-div').on('click', '.slim-tag', function (event) {
+        $('#modal-note-div').on("click", ".slim-tag", function (event) {
             event.stopPropagation();
             $('#modal-note-div #tag-button').trigger( "click");
         });
 
         // handle tags button.
-        $('#modal-note-div #share-button').click(function (event) {
+        $('#modal-note-div').on("click", "#share-button", function (event) {
             event.stopPropagation();
             QnDialogs.shares(
                 self._notes.getUsersSharing(),
@@ -512,13 +527,13 @@ View.prototype = {
             );
         });
 
-        // FIXME: Hack to sent click event to colorPicker.
-        $('#modal-note-div .icon-toggle-background').click(function (event) {
-            $(this).parent().click();
+        $('#modal-note-div').on("click", "#color-button", function (event) {
+            event.stopPropagation();
+            self._colorPick.toggle();
         });
 
         // handle attach button.
-        $('#modal-note-div #attach-button').click(function (event) {
+        $('#modal-note-div').on("click", "#attach-button", function (event) {
             event.stopPropagation();
             OC.dialogs.filepicker(t('quicknotes', 'Select file to attach'), function(datapath, returntype) {
                 OC.Files.getClient().getFileInfo(datapath).then((status, fileInfo) => {
@@ -536,7 +551,7 @@ View.prototype = {
         });
 
         // handle tags button.
-        $('#modal-note-div #tag-button').click(function (event) {
+        $('#modal-note-div').on("click", "#tag-button", function (event) {
             event.stopPropagation();
             var noteTags = self._editableTags();
             QnDialogs.tags(
@@ -551,19 +566,19 @@ View.prototype = {
         });
 
         // handle cancel editing notes.
-        $('#modal-note-div #close-button').click(function (event) {
+        $('#modal-note-div').on("click", "#close-button", function (event) {
             event.stopPropagation();
             self.cancelEdit();
         });
 
         // handle cancel editing notes.
-        $('#modal-note-div #cancel-button').click(function (event) {
+        $('#modal-note-div').on("click", "#cancel-button", function (event) {
             event.stopPropagation();
             self.cancelEdit();
         });
 
         // Handle save note
-        $('#modal-note-div #save-button').click(function (event) {
+        $('#modal-note-div').on("click", "#save-button", function (event) {
             event.stopPropagation();
             self.saveNote();
         });
@@ -593,9 +608,9 @@ View.prototype = {
             self._notes.create(fakenote).done(function(note) {
                 if (self._notes.length() > 1) {
                     var $notehtml = $(Handlebars.templates['note-item'](note));
-                    $(".notes-grid").prepend($notehtml)
-                                    .isotope('prepended', $notehtml)
-                                    .isotope('layout');
+                    $('.notes-grid').prepend($notehtml);
+                    self._isotope.prepended($notehtml);
+                    self._isotope.layout();
                     self.showAll();
                     self.updateSort();
                     self.renderNavigation();
@@ -613,7 +628,7 @@ View.prototype = {
             event.preventDefault();
             self._cleanNavigation();
             $(this).addClass("active");
-            $('.notes-grid').isotope({ filter: '*'});
+            self._isotope.arrange({ filter: '*'});
             setFilterUrl();
         });
 
@@ -628,9 +643,11 @@ View.prototype = {
             event.stopPropagation();
             self._cleanNavigation();
             $(this).addClass("active");
-            $('.notes-grid').isotope({ filter: function() {
-                return $(this).children().hasClass('shared');
-            } });
+            self._isotope.arrange({
+                filter: function(elem) {
+                    return elem.querySelector('.shared') != null;
+                }
+            });
             setFilterUrl();
         });
 
@@ -639,9 +656,11 @@ View.prototype = {
             event.stopPropagation();
             self._cleanNavigation();
             $(this).addClass("active");
-            $('.notes-grid').isotope({ filter: function() {
-                return $(this).children().hasClass('shareowner');
-            } });
+            self._isotope.arrange({
+                filter: function(elem) {
+                    return elem.querySelector('.shareowner') != null;
+                }
+            });
             setFilterUrl();
         });
 
@@ -781,9 +800,9 @@ View.prototype = {
     },
     _editableId: function(id) {
         if (id === undefined)
-            return $("#modal-note-div .quicknote").data('id');
+            return $("#modal-note-div .quicknote").attr('data-id');
         else
-            $("#modal-note-div .quicknote").data('id', id);
+            $("#modal-note-div .quicknote").attr('data-id', id);
     },
     _editableTitle: function(title) {
         if (title === undefined)
@@ -817,16 +836,8 @@ View.prototype = {
         if (color === undefined)
             return this._colorToHex($("#modal-note-div .quicknote").css("background-color"));
         else {
-            $("#color-button").colorPick({
-                'initialColor': color,
-                'paletteLabel': t('quicknotes', 'Colors'),
-                'palette': ['#F7EB96', '#88B7E3', '#C1ECB0', '#BFA6E9', '#DAF188', '#FF96AC', '#FCF66F', '#F2F1EF', '#C1D756', '#CECECE'],
-                'allowRecent': false,
-                'allowCustomColor': false,
-                'onColorSelected': function() {
-                    $("#modal-note-div .quicknote").css("background-color", this.color);
-                }
-            });
+            $("#modal-note-div .quicknote").css("background-color", color);
+            this._colorPick.select(color);
         }
     },
     _editableShares: function(shared_with) {
@@ -914,15 +925,19 @@ View.prototype = {
                     { name: 'removeFormat', aria: t('quicknotes', 'Clean format') }
                ]
             },
+            placeholder: {
+                text: 'Create a note…',
+                hideOnClick: false
+            },
             autoLink: true,
             targetBlank: true,
             paste: {
-                forcePlainText: false,
-                cleanPastedHTML: false
+                forcePlainText: true
             },
             extensions: {
                 'autolist': new AutoList()
-            }
+            },
+            imageDragging: false
         });
 
         var self = this;
@@ -944,10 +959,6 @@ View.prototype = {
         this._editableContent('');
         this._editablePinned(false);
         this._editableTags([]);
-
-        $.each($("#modal-note-div .circle-toolbar"), function(i, colortool) {
-            $(colortool).removeClass('icon-checkmark');
-        });
     },
     _showEditor: function(id) {
         var note = $('.notes-grid [data-id=' + id + ']').parent();
@@ -1028,19 +1039,19 @@ View.prototype = {
         );
     },
     _filterNote: function (noteId) {
-        $('.notes-grid').isotope({
-            filter: function() {
-                return noteId == parseInt($(this).children().data('id'), 10);
+        this._isotope.arrange({
+            filter: function(elem) {
+                return noteId == elem.firstElementChild.getAttribute('data-id');
             }
         });
     },
     _filterTag: function (tagId) {
-        $('.notes-grid').isotope({
-            filter: function() {
+        this._isotope.arrange({
+            filter: function(elem) {
                 var match = false;
-                $(this).find(".slim-tag").siblings().addBack().each(function() {
-                    var id = parseInt($(this).attr('tag-id'), 10);
-                    if (tagId == id)
+                var tags = elem.querySelectorAll('.slim-tag');
+                tags.forEach (function(tagItem) {
+                    if (tagId == tagItem.getAttribute('tag-id'))
                         match = true;
                 });
                 return match;
@@ -1048,9 +1059,9 @@ View.prototype = {
         });
     },
     _filterColor: function (color) {
-        $('.notes-grid').isotope({
-            filter: function() {
-                return color == $(this).children().css("background-color");
+        this._isotope.arrange({
+            filter: function(elem) {
+                return color == elem.firstElementChild.style["background-color"];
             }
         });
     },

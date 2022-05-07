@@ -5,7 +5,7 @@
     <name>Quick notes</name>
     <summary>Quick notes with a basic rich text</summary>
     <description>Quick notes with a basic rich text</description>
-    <version>0.7.3</version>
+    <version>0.7.6</version>
     <licence>agpl</licence>
     <author>Matias De lellis</author>
     <namespace>QuickNotes</namespace>
@@ -20,6 +20,6 @@
     <screenshot>https://raw.githubusercontent.com/matiasdelellis/quicknotes/master/doc/quicknotes-attachments.jpeg</screenshot>
     <screenshot>https://raw.githubusercontent.com/matiasdelellis/quicknotes/master/doc/quicknotes-shared-note.jpeg</screenshot>
     <dependencies>
-        <nextcloud min-version="21" max-version="23"/>
+        <nextcloud min-version="24" max-version="24"/>
     </dependencies>
 </info>
