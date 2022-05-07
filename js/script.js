@@ -959,10 +959,6 @@ View.prototype = {
         this._editableContent('');
         this._editablePinned(false);
         this._editableTags([]);
-
-        $.each($("#modal-note-div .circle-toolbar"), function(i, colortool) {
-            $(colortool).removeClass('icon-checkmark');
-        });
     },
     _showEditor: function(id) {
         var note = $('.notes-grid [data-id=' + id + ']').parent();
