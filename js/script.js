@@ -987,6 +987,15 @@ View.prototype = {
         note.css({"opacity": "0.1"});
         modal.css({"opacity": "0.1"});
 
+        /* Move caret to end of content */
+        var range = document.createRange();
+        range.selectNodeContents($('#content-editable')[0]);
+        range.collapse(false);
+
+        var sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+
         /* Animate to center */
 
         var windowWidth = $(window).width();
