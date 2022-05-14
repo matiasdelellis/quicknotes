@@ -461,6 +461,14 @@ View.prototype = {
             event.stopPropagation();
         });
 
+        $('#title-editable').on("keydown", function(event) {
+            if (event.keyCode == 13) {
+                event.preventDefault();
+                event.stopPropagation();
+                $('#content-editable').focus();
+            }
+        });
+
         // Handle hotkeys
         $(document).off("keyup");  // FIXME: This prevent exponential calls of save note.
         $(document).on("keyup", function(event) {
