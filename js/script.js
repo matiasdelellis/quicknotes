@@ -433,8 +433,20 @@ View.prototype = {
         /*
          * Modal actions.
          */
-        // Cancel when click outside the modal.
+
+        /**
+         * Save references of event target on mouse down to avoid manage click on
+         * next event handler when selecting outside text outside the content.
+         */
+        var _clickTarget = undefined;
+        $('#div-content').on('mousedown', function (event) {
+            _clickTarget = event.target;
+        });
+
+        // Cancel when explicit click outside the modal.
         $('#div-content').on('click', '.modal-note-background', function (event) {
+            if (_clickTarget != event.target)
+                return;
             event.stopPropagation();
             if (self._colorPick.isVisible()) {
                 self._colorPick.close();
