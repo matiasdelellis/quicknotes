@@ -1,3 +1,5 @@
+'use strict';
+
 function QnColorPick(parentSelector, onSelectColor) {
 
     this._parentSelector = parentSelector;
@@ -23,12 +25,12 @@ function QnColorPick(parentSelector, onSelectColor) {
 
     this.select = function (hexcolor) {
         this._color = hexcolor;
-    }
+    };
 
     this.close = function () {
         var picker = document.getElementById("colorPickWrapper");
         picker.remove();
-    }
+    };
 
     this.show = function (hexcolor) {
         var self = this;
@@ -47,7 +49,7 @@ function QnColorPick(parentSelector, onSelectColor) {
                 self.close ();
             });
         });
-    }
+    };
 
     this.isVisible = function () {
         var picker = document.getElementById("colorPickWrapper");
