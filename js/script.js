@@ -189,7 +189,8 @@ var View = function (notes) {
     this._editor = undefined;
     this._isotope = undefined;
     this._colorPick = undefined;
-    this._changed = false;
+
+    this._noteChanged = false;
 };
 
 View.prototype = {
@@ -259,7 +260,7 @@ View.prototype = {
     },
     cancelEdit: function () {
         var self = this;
-        if (!self._changed) {
+        if (!self._noteChanged) {
             self.closeEdit();
             return;
         }
@@ -298,6 +299,9 @@ View.prototype = {
         this._resizeAttachtsGrid();
         lozad('.attach-preview').observe();
 
+        // Save instance of View
+        var self = this;
+
         // Init masonty grid to notes.
         if (this._notes.isLoaded() && this._notes.length() > 0) {
             this._isotope = new Isotope(document.querySelector('.notes-grid'), {
@@ -319,11 +323,10 @@ View.prototype = {
 
             this._colorPick = new QnColorPick(".modal-content", function (color) {
                 $("#modal-note-div .quicknote").css("background-color", color);
+                self._noteChanged = true;
             });
         }
 
-        // Save instance of View
-        var self = this;
 
         // Show delete and pin icons when hover over the notes.
         $("#notes-grid-div").on("mouseenter", ".quicknote", function() {
@@ -505,18 +508,21 @@ View.prototype = {
             event.stopPropagation();
             $(this).parent().remove();
             self._resizeAttachtsModal();
+            self._noteChanged = true;
         });
 
         // Pin note in modal
         $('#modal-note-div').on("click", ".icon-pin", function (event) {
             event.stopPropagation();
             self._editablePinned(true);
+            self._noteChanged = true;
         });
 
         // Unpin note in modal
         $('#modal-note-div').on("click", ".icon-pinned", function (event) {
             event.stopPropagation();
             self._editablePinned(false);
+            self._noteChanged = true;
         });
 
         // Handle tags on modal
@@ -534,6 +540,7 @@ View.prototype = {
                 function(result, newShares) {
                     if (result === true) {
                         self._editableShares(newShares);
+                        self._noteChanged = true;
                     }
                 }
             );
@@ -556,6 +563,7 @@ View.prototype = {
                         redirect_url: OC.generateUrl('/apps/files/?dir={dir}&scrollto={scrollto}', {dir: fileInfo.path, scrollto: fileInfo.name})
                     });
                     self._editableAttachts(attachts, true);
+                    self._noteChanged = true;
                 }).fail(() => {
                     console.log("ERRORRR");
                 });
@@ -572,6 +580,7 @@ View.prototype = {
                 function(result, newTags) {
                     if (result === true) {
                         self._editableTags(newTags);
+                        self._noteChanged = true;
                     }
                 }
             );
@@ -980,9 +989,11 @@ View.prototype = {
 
         var self = this;
         editor.subscribe('editableInput', function(event, editorElement) {
-            self._changed = true;
+            self._noteChanged = true;
         });
-
+        $('#title-editable').on('input', function (event) {
+            self._noteChanged = true;
+        });
         this._editor = editor;
     },
     _destroyEditor: function() {
@@ -990,7 +1001,7 @@ View.prototype = {
             this._editor.destroy();
             this._editor = undefined;
         }
-        this._changed = false;
+        this._noteChanged = false;
 
         this._editableId(-1);
         this._editableTitle('');
