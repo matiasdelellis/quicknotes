@@ -252,10 +252,27 @@ View.prototype = {
             alert('DOh!. Could not update note!.');
         });
     },
-    cancelEdit: function () {
+    closeEdit: function () {
         // Hide modal editor and reset it.
         this._hideEditor(this._editableId());
         this._destroyEditor();
+    },
+    cancelEdit: function () {
+        var self = this;
+        if (!self._changed) {
+            self.closeEdit();
+            return;
+        }
+        OC.dialogs.confirm(
+            t('facerecognition', 'Do you want to discard the changes?'),
+            t('facerecognition', 'Unsaved changes'),
+            function(result) {
+                if (result) {
+                    self.closeEdit();
+                }
+            },
+            true
+        );
     },
     renderContent: function () {
         // Remove all event handlers to prevent double events.
@@ -452,20 +469,7 @@ View.prototype = {
                 self._colorPick.close();
                 return;
             }
-            if (!self._changed) {
-                self.cancelEdit();
-                return;
-            }
-            OC.dialogs.confirm(
-                t('facerecognition', 'Do you want to discard the changes?'),
-                t('facerecognition', 'Unsaved changes'),
-                function(result) {
-                    if (result) {
-                        self.cancelEdit();
-                    }
-                },
-                true
-            );
+            self.cancelEdit();
         });
 
         // But handles the click of modal within itself.
@@ -486,22 +490,10 @@ View.prototype = {
         $(document).on("keyup", function(event) {
             if (event.keyCode == 27) {
                 event.stopPropagation();
-                if (!self._changed) {
-                    self.cancelEdit();
-                    return;
-                }
-                OC.dialogs.confirm(
-                    t('facerecognition', 'Do you want to discard the changes?'),
-                    t('facerecognition', 'Unsaved changes'),
-                    function(result) {
-                        if (result) {
-                            self.cancelEdit();
-                        }
-                    },
-                    true
-                );
+                self.cancelEdit();
             }
-            else if (event.keyCode == 13 && event.altKey) {
+            else if ((event.keyCode == 13 && event.ctrlKey) ||
+                     (event.keyCode == 13 && event.altKey)) {
                 event.preventDefault();
                 event.stopPropagation();
                 self.saveNote();
@@ -585,10 +577,17 @@ View.prototype = {
             );
         });
 
-        // handle cancel editing notes.
+        // handle close editing notes.
         $('#modal-note-div').on("click", "#close-button", function (event) {
             event.stopPropagation();
-            self.cancelEdit();
+            if (!self._isEditable()) {
+                self.closeEdit();
+                return;
+            }
+            if (getExplicitSaveSetting())
+                self.closeEdit();
+            else
+                self.saveNote();
         });
 
         // handle cancel editing notes.
@@ -758,9 +757,16 @@ View.prototype = {
                 });
         });
 
+        $('#app-settings-content #explicit-save-notes').prop('checked', getExplicitSaveSetting());
+
         /* Settings */
 
         $("#app-settings-content").off();
+
+
+        $('#app-settings-content').on('click', '#explicit-save-notes', function (event) {
+              setExplicitSaveSetting($(this).is(':checked'));
+        });
 
         $('#app-settings-content').on('click', '.circle-toolbar', function (event) {
             event.stopPropagation();
@@ -801,20 +807,30 @@ View.prototype = {
     },
     _isEditable: function(editable) {
         if (editable === undefined)
-            return $('#title-editable').prop('contenteditable');
+            return ($('#title-editable').prop('contenteditable') === 'true');
         else {
             if (editable) {
                 $('#modal-note-div .icon-header-note').show();
                 $('#title-editable').prop('contenteditable', true);
-                $('#modal-note-div .note-options').show();
-                $('#modal-note-div .note-disable-options').hide();
+                $('#modal-note-div .note-editable-options').show();
+                $('#modal-note-div .note-noneditable-options').hide();
+                if (getExplicitSaveSetting()) {
+                    $('#modal-note-div #cancel-button').show();
+                    $('#modal-note-div #save-button').show();
+                    $('#modal-note-div #close-button').hide();
+                } else {
+                    $('#modal-note-div #cancel-button').hide();
+                    $('#modal-note-div #save-button').hide();
+                    $('#modal-note-div #close-button').show();
+                }
                 this._initEditor();
             } else {
                 $('#modal-note-div .icon-header-note').hide();
                 $('#title-editable').removeAttr("contentEditable");
                 $('#content-editable').removeAttr("contentEditable");
-                $('#modal-note-div .note-options').hide();
-                $('#modal-note-div .note-disable-options').show();
+                $('#modal-note-div .note-editable-options').hide();
+                $('#modal-note-div .note-noneditable-options').show();
+                $('#modal-note-div #close-button').show();
             }
         }
     },
@@ -1119,7 +1135,15 @@ View.prototype = {
     }
 };
 
+var getExplicitSaveSetting = function () {
+    var explicitSave = localStorage.getItem('explicit-save');
+    if (explicitSave === null) return true;
+    return (explicitSave === 'true');
+}
 
+var setExplicitSaveSetting = function (explicit) {
+    localStorage.setItem('explicit-save', explicit ? 'true' : 'false');
+}
 
 /**
  * Get the filter as URL parameter

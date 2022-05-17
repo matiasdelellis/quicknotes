@@ -64,10 +64,7 @@
 				<div class='note-shares'></div>
 				<div class='note-tags'></div>
 			</div>
-			<div class="note-options">
-				<!--
-				<select class="note-share-select" name="users[]" multiple="multiple"></select>
-				-->
+			<div class="note-editable-options">
 				<div class="colors-toolbar">
 					<button id='color-button' class='round-tool-button'>
 						<div class="icon-toggle-background" title="{{t "quicknotes" "Colors"}}"></div>
@@ -89,10 +86,11 @@
 					<button id='save-button'>
 						{{ saveTxt }}
 					</button>
+					<button id='close-button'>{{t "quicknotes" "Close"}}</button>
 				</div>
 				<div style="clear: both;"></div>
 			</div>
-			<div class="note-disable-options">
+			<div class="note-noneditable-options">
 				<div class="buttons-toolbar">
 					<button id='close-button'>{{t "quicknotes" "Close"}}</button>
 				</div>
