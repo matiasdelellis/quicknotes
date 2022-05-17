@@ -841,9 +841,11 @@ View.prototype = {
             $("#modal-note-div .quicknote").attr('data-id', id);
     },
     _editableTitle: function(title) {
-        if (title === undefined)
-            return $('#modal-note-div #title-editable').html().trim();
-        else
+        if (title === undefined) {
+            title = $('#modal-note-div #title-editable')[0].textContent ||
+                    $('#modal-note-div #title-editable')[0].innerText || "";
+            return title.trim();
+        } else
             $('#modal-note-div #title-editable').html(title);
     },
     _editableContent: function(content) {
