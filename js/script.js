@@ -265,8 +265,8 @@ View.prototype = {
             return;
         }
         OC.dialogs.confirm(
-            t('facerecognition', 'Do you want to discard the changes?'),
-            t('facerecognition', 'Unsaved changes'),
+            t('quicknotes', 'Do you want to discard the changes?'),
+            t('quicknotes', 'Unsaved changes'),
             function(result) {
                 if (result) {
                     self.closeEdit();
