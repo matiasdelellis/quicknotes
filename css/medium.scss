@@ -123,3 +123,12 @@ $medium-editor-placeholder-color: #f8f5f3;
     border-radius: $medium-editor-border-radius;
   }
 }
+
+.medium-editor-placeholder-relative:after,
+.medium-editor-placeholder:after {
+  font-style: inherit;
+}
+
+div[contenteditable="true"] {
+  font-size: inherit;
+}
