@@ -1231,6 +1231,9 @@ Handlebars.registerHelper('tSB', function(user) {
     return t('quicknotes', 'Shared by {user}', {user: user});
 });
 
+Handlebars.registerHelper('tNN', function(number) {
+    return t('quicknotes', 'Note {number}', {number: number});
+});
 
 /*
  * Create modules

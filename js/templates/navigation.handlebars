@@ -49,7 +49,11 @@
 	<ul>
 		{{#each notes}}
 			<li class="nav-note with-menu {{#if active}}active{{/if}}"  data-id="{{ id }}">
-				<a href="#">{{{ title }}}</a>
+				{{#if title}}
+					<a href="#">{{{ title }}}</a>
+				{{else}}
+					<a href="#">{{tNN id}}</a>
+				{{/if}}
 			</li>
 		{{/each}}
 	</ul>
