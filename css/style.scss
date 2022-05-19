@@ -38,7 +38,11 @@
 }
 
 .quicknote:hover {
-   box-shadow: 0px 0px 6px #808080;
+    box-shadow: 0px 0px 6px #808080;
+}
+
+#title-editable:empty:before {
+    content: attr(data-placeholder);
 }
 
 .quicknote ul {

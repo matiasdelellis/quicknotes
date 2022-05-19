@@ -327,7 +327,6 @@ View.prototype = {
             });
         }
 
-
         // Show delete and pin icons when hover over the notes.
         $("#notes-grid-div").on("mouseenter", ".quicknote", function() {
             $(this).find(".icon-header-note").addClass( "show-header-icon");
