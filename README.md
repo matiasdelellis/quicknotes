@@ -8,6 +8,15 @@ read-only to other users.
 
 ![Screenshot of Quick notes](/doc/quicknotes-grid-view.jpeg "App screenshot")
 
+## :heart: Support
+
+If you'd like to support the creation and maintenance of this software, consider
+donating.
+
+[![Donate](https://img.shields.io/badge/Donate-PayPal-blue)](https://github.com/matiasdelellis/quicknotes/wiki/Donate)
+[![Donate](https://img.shields.io/badge/Donate-Bitcoin-orange)](https://github.com/matiasdelellis/quicknotes/wiki/Donate)
+[![Donate](https://img.shields.io/badge/Donate-Ethereum-blueviolet)](https://github.com/matiasdelellis/quicknotes/wiki/Donate)
+
 ## :rocket: Installation
 
 Quick notes is available in the Nextcloud App Store and can be installed
