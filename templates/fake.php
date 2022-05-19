@@ -2,6 +2,7 @@
 /**
  * This is a fake script just to translate the strings inside handlebars.
  */
+p($l->t('Title'));
 p($l->t('Delete attachment'));
 p($l->t('Attach file'));
 p($l->t('Shared'));

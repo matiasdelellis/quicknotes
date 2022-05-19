@@ -972,7 +972,7 @@ View.prototype = {
                ]
             },
             placeholder: {
-                text: 'Create a note…',
+                text: t('quicknotes', 'Create a note…'),
                 hideOnClick: false
             },
             autoLink: true,
