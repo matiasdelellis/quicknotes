@@ -46,6 +46,7 @@ OC.L10N.register(
     "Shared" : "Compartidos",
     "Shared with others" : "Compartido con otros",
     "Shared with you" : "Compartido con usted",
+    "Leave this shared note" : "Abandonar esta nota compartida",
     "Close" : "Cerrar",
     "Default color for new notes" : "Color predeterminado para nuevas notas",
     "Settings" : "Ajustes"

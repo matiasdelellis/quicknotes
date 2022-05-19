@@ -15,8 +15,8 @@
 			<div class='note-body'>
 				<div>
 					{{#if sharedBy}}
-						<div class="icon-header-note icon-share" title="{{tSB sharedBy.user_id }}"></div>
-						<div class="icon-header-note icon-delete hide-header-icon icon-delete-note" title="{{t "quicknotes" "Delete shared note"}}"></div>
+						<div class="icon-header-note icon-share" title="{{tSB sharedBy.0.user_id}}"></div>
+						<div class="icon-header-note icon-delete hide-header-icon icon-delete-note" title="{{t "quicknotes" "Leave this shared note"}}"></div>
 					{{else}}
 						{{#if isPinned}}
 							<div class="icon-header-note icon-pinned fixed-header-icon" title="{{t "quicknotes" "Unpin note"}}"></div>

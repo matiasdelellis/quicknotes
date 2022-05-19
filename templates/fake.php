@@ -9,5 +9,6 @@ p($l->t('Shared'));
 p($l->t('Shared with others'));
 p($l->t('Shared with you'));
 p($l->t('Share note'));
+p($l->t('Leave this shared note'));
 p($l->t('Close'));
 p($l->t('Default color for new notes'));
