@@ -33,6 +33,12 @@ return ['resources' =>
 			'name' => 'settings#getUserValue',
 			'url' => '/getuservalue',
 			'verb' => 'GET'
+		],
+		[
+			'name' => 'noteApi#preflighted_cors',
+			'url' => '/api/v1/{path}',
+			'verb' => 'OPTIONS',
+			'requirements' => ['path' => '.+']
 		]
 	]
 ];
