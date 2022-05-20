@@ -1,5 +1,5 @@
 /*
- * @copyright 2016-2020 Matias De lellis <mati86dl@gmail.com>
+ * @copyright 2016-2022 Matias De lellis <mati86dl@gmail.com>
  *
  * @author 2016 Matias De lellis <mati86dl@gmail.com>
  *
@@ -169,10 +169,10 @@ Notes.prototype = {
         }).done(function (shares) {
             var users = [];
             $.each(shares.ocs.data.exact.users, function(index, user) {
-                users.push(user.value.shareWith);
+                users.push([user.value.shareWith, user.label]);
             });
             $.each(shares.ocs.data.users, function(index, user) {
-                users.push(user.value.shareWith);
+                users.push([user.value.shareWith, user.label]);
             });
             self._usersSharing = users;
         }).fail(function () {
@@ -233,6 +233,7 @@ View.prototype = {
             tags: this._editableTags(),
             sharedWith: this._editableShares()
         };
+
         var self = this;
         this._notes.update(fakeNote).done(function (note) {
             // Create an new note and replace in grid.
@@ -530,6 +531,12 @@ View.prototype = {
             $('#modal-note-div #tag-button').trigger( "click");
         });
 
+        // Handle shares on modal
+        $('#modal-note-div').on("click", ".slim-share", function (event) {
+            event.stopPropagation();
+            $('#modal-note-div #share-button').trigger( "click");
+        });
+
         // handle tags button.
         $('#modal-note-div').on("click", "#share-button", function (event) {
             event.stopPropagation();
@@ -545,6 +552,7 @@ View.prototype = {
             );
         });
 
+        // handle color button.
         $('#modal-note-div').on("click", "#color-button", function (event) {
             event.stopPropagation();
             self._colorPick.toggle();

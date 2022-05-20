@@ -1,5 +1,5 @@
 /*
- * @copyright 2019-2020 Matias De lellis <mati86dl@gmail.com>
+ * @copyright 2019-2022 Matias De lellis <mati86dl@gmail.com>
  *
  * @author 2019 Matias De lellis <mati86dl@gmail.com>
  *
@@ -159,7 +159,7 @@ const QnDialogs = {
 					var data = [];
 					availableUsers.forEach(function (item, index) {
 						// Select2 expect id, text.
-						data.push({id: item, text: item});
+						data.push({id: item[0], text: item[1]});
 					});
 					return data;
 				},
@@ -168,7 +168,7 @@ const QnDialogs = {
 				}
 			});
 
-			input.val(selectedUsers.map(function (value) { return value.shared_user }));
+			input.val(selectedUsers.map(function (value) { return value.id }));
 			input.trigger("change");
 
 			$('.select2-input').on("keyup", function (event) {
@@ -208,7 +208,9 @@ const QnDialogs = {
 						// Quicknotes shares expect id, shared_user
 						newUsers = input.select2("data");
 						newUsers.forEach(function (item) {
-							item['shared_user'] = item.text;
+							item['shared_user'] = item.id;
+							item['display_name'] = item.text;
+
 							users.push(item);
 						});
 						callback(true, users);

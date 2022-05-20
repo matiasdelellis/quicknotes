@@ -1,6 +1,6 @@
 <?php
 /*
- * @copyright 2016-2020 Matias De lellis <mati86dl@gmail.com>
+ * @copyright 2016-2022 Matias De lellis <mati86dl@gmail.com>
  *
  * @author 2016 Matias De lellis <mati86dl@gmail.com>
  *
@@ -45,6 +45,8 @@ use OCA\QuickNotes\Service\SettingsService;
 
 use OCP\AppFramework\Db\DoesNotExistException;
 
+use OCP\IUserManager;
+
 class NoteService {
 
 	private $notemapper;
@@ -56,6 +58,9 @@ class NoteService {
 	private $fileService;
 	private $settingsService;
 
+	/** @var IUserManager */
+	private $userManager;
+
 	public function __construct(NoteMapper      $notemapper,
 	                            NoteTagMapper   $notetagmapper,
 	                            NoteShareMapper $noteShareMapper,
@@ -63,7 +68,8 @@ class NoteService {
 	                            AttachMapper    $attachMapper,
 	                            TagMapper       $tagmapper,
 	                            FileService     $fileService,
-	                            SettingsService $settingsService)
+	                            SettingsService $settingsService,
+	                            IUserManager    $userManager)
 	{
 		$this->notemapper      = $notemapper;
 		$this->notetagmapper   = $notetagmapper;
@@ -73,6 +79,7 @@ class NoteService {
 		$this->tagmapper       = $tagmapper;
 		$this->fileService     = $fileService;
 		$this->settingsService = $settingsService;
+		$this->userManager     = $userManager;
 	}
 
 	/**
@@ -83,7 +90,19 @@ class NoteService {
 
 		// Set shares with others.
 		foreach($notes as $note) {
-			$note->setSharedWith($this->noteShareMapper->getSharesForNote($note->getId()));
+			$sharedWith = [];
+			$sharedEntries = $this->noteShareMapper->getSharesForNote($note->getId());
+			foreach ($sharedEntries as $sharedEntry) {
+				$sharedUid = $sharedEntry->getSharedUser();
+				$user = $this->userManager->get($sharedUid);
+				if (!$user) {
+					// TODO: Debug that...
+					continue;
+				}
+				$sharedEntry->setDisplayName($user->getDisplayName());
+				$sharedWith[] = $sharedEntry;
+			}
+			$note->setSharedWith($sharedWith);
 		}
 
 		// Get shares from others.
@@ -91,7 +110,15 @@ class NoteService {
 		$sharedEntries = $this->noteShareMapper->findForUser($userId);
 		foreach($sharedEntries as $sharedEntry) {
 			$sharedNote = $this->notemapper->findShared($sharedEntry->getNoteId());
-			$sharedEntry->setUserId($sharedNote->getUserId());
+
+			$uid = $sharedNote->getUserId();
+			$sharedEntry->setUserId($uid);
+			$user = $this->userManager->get($uid);
+			if (!$user) {
+				// TODO: Debug that...
+				continue;
+			}
+			$sharedEntry->setDisplayName($user->getDisplayName());
 			$sharedNote->setSharedBy([$sharedEntry]);
 			$shares[] = $sharedNote;
 		}
@@ -300,7 +327,7 @@ class NoteService {
 		foreach ($dbShares as $dbShare) {
 			$delete = true;
 			foreach ($sharedWith as $share) {
-				if ($dbShare->getSharedUser() === $share['shared_user']) {
+				if ($dbShare->getSharedUser() === $share['id']) {
 					$delete = false;
 					break;
 				}
@@ -312,10 +339,10 @@ class NoteService {
 
 		// Add new shares
 		foreach ($sharedWith as $share) {
-			if (!$this->noteShareMapper->existsByNoteAndUser($id, $share['shared_user'])) {
+			if (!$this->noteShareMapper->existsByNoteAndUser($id, $share['id'])) {
 				$hShare = new NoteShare();
 				$hShare->setNoteId($id);
-				$hShare->setSharedUser($share['shared_user']);
+				$hShare->setSharedUser($share['id']);
 				$this->noteShareMapper->insert($hShare);
 			}
 		}
@@ -384,7 +411,20 @@ class NoteService {
 		$newnote->setAttachts($attachts);
 
 		// Fill shared with with others
-		$newnote->setSharedWith($this->noteShareMapper->getSharesForNote($newnote->getId()));
+		$sharedWith = [];
+		$sharedEntries = $this->noteShareMapper->getSharesForNote($note->getId());
+		foreach ($sharedEntries as $sharedEntry) {
+			$sharedUid = $sharedEntry->getSharedUser();
+			$user = $this->userManager->get($sharedUid);
+			if (!$user) {
+				// TODO: Debug that...
+				continue;
+			}
+			$sharedEntry->setDisplayName($user->getDisplayName());
+
+			$sharedWith[] = $sharedEntry;
+		}
+		$note->setSharedWith($sharedWith);
 
 		//  Remove old color if necessary
 		if (($oldcolorid !== $hcolor->getId()) &&
