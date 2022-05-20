@@ -12,3 +12,4 @@ p($l->t('Share note'));
 p($l->t('Leave this shared note'));
 p($l->t('Close'));
 p($l->t('Default color for new notes'));
+p($l->t('When editing notes, show Save and Cancel buttons to save them explicitly'));
