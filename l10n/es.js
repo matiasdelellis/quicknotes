@@ -49,6 +49,7 @@ OC.L10N.register(
     "Leave this shared note" : "Abandonar esta nota compartida",
     "Close" : "Cerrar",
     "Default color for new notes" : "Color predeterminado para nuevas notas",
+    "When editing notes, show Save and Cancel buttons to save them explicitly" : "Al editar notas, muestre los botones Guardar y Cancelar para guardarlas explícitamente",
     "Settings" : "Ajustes"
 },
 "nplurals=2; plural=(n != 1);");
