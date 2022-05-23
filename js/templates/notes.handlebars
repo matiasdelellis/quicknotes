@@ -13,21 +13,19 @@
 				</div>
 			</div>
 			<div class='note-body'>
-				<div>
-					{{#if sharedBy}}
-						<div class="icon-header-note icon-share" title="{{tSB sharedBy.0.display_name}}"></div>
-						<div class="icon-header-note icon-delete hide-header-icon icon-delete-note" title="{{t "quicknotes" "Leave this shared note"}}"></div>
+				{{#if sharedBy}}
+					<div class="icon-header-note icon-share" title="{{tSB sharedBy.0.display_name}}"></div>
+					<div class="icon-header-note icon-delete hide-header-icon icon-delete-note" title="{{t "quicknotes" "Leave this shared note"}}"></div>
+				{{else}}
+					{{#if isPinned}}
+						<div class="icon-header-note icon-pinned fixed-header-icon" title="{{t "quicknotes" "Unpin note"}}"></div>
 					{{else}}
-						{{#if isPinned}}
-							<div class="icon-header-note icon-pinned fixed-header-icon" title="{{t "quicknotes" "Unpin note"}}"></div>
-						{{else}}
-							<div class="icon-header-note icon-pin hide-header-icon" title="{{t "quicknotes" "Pin note"}}"></div>
-						{{/if}}
-						<div class="icon-header-note icon-delete hide-header-icon icon-delete-note" title="{{t "quicknotes" "Delete note"}}"></div>
+						<div class="icon-header-note icon-pin hide-header-icon" title="{{t "quicknotes" "Pin note"}}"></div>
 					{{/if}}
-					<div class='note-title'>
-						{{{ title }}}
-					</div>
+					<div class="icon-header-note icon-delete hide-header-icon icon-delete-note" title="{{t "quicknotes" "Delete note"}}"></div>
+				{{/if}}
+				<div class='note-title'>
+					{{{ title }}}
 				</div>
 				<div class='note-content'>
 					{{{ content }}}
@@ -56,10 +54,8 @@
 				<div class='note-attachts'></div>
 			</div>
 			<div class='note-body'>
-				<div>
-					<div class="icon-header-note icon-pin fixed-header-icon" title="{{t "quicknotes" "Pin note"}}"></div>
-					<div contenteditable="true" id='title-editable' class='note-title' data-placeholder="{{t "quicknotes" "Title"}}"></div>
-				</div>
+				<div class="icon-header-note icon-pin fixed-header-icon" title="{{t "quicknotes" "Pin note"}}"></div>
+				<div contenteditable="true" id='title-editable' class='note-title' data-placeholder="{{t "quicknotes" "Title"}}"></div>
 				<div contenteditable="true" id='content-editable' class='note-content'></div>
 				<div class='note-shares'></div>
 				<div class='note-tags'></div>

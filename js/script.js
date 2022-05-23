@@ -361,7 +361,7 @@ View.prototype = {
         $('#notes-grid-div').on("click", ".icon-delete-note", function (event) {
             event.stopPropagation();
 
-            var gridnote = $(this).parent().parent().parent();
+            var gridnote = $(this).parent().parent();
             var id = parseInt(gridnote.attr('data-id'), 10);
 
             var note = self._notes.read(id);
@@ -408,7 +408,7 @@ View.prototype = {
             event.stopPropagation();
 
             var icon =  $(this);
-            var gridNote = icon.parent().parent().parent();
+            var gridNote = icon.parent().parent();
             var id = parseInt(gridNote.attr('data-id'), 10);
 
             var note = self._notes.read(id);
@@ -432,7 +432,7 @@ View.prototype = {
             event.stopPropagation();
 
             var icon =  $(this);
-            var gridNote = icon.parent().parent().parent();
+            var gridNote = icon.parent().parent();
             var id = parseInt(gridNote.attr('data-id'), 10);
 
             var note = self._notes.read(id);
