@@ -1,5 +1,29 @@
 # Changelog
 
+## [0.8.0] 2022-05-22
+- Just move focus to content when press Return key on title.
+- Jump to end of note content when open them. Issue #7
+- Fix close modal when select text and mouseup outside note. Issue #27
+- Implements automatic saving of notes. Issue #40
+- Also save the notes with Crl+Enter key.
+- Always save plain text for title on note.
+- Prevents closing notes when any part of the note is changed.
+- Fix some missing semicolon on colorPicker.
+- D'Oh!. Fix use of two translations (Introduced at least two years ago).
+- Add 'Title' as placeholder for empty notes.
+- Increase the size of un/pin notes and remove icons.
+- In the list of notes shows 'Note #' when the title is empty.
+- Don´t shrink the size of the note text.
+- Translate placeholders of empty notes.
+- New Greek translation thanks to Theodoros Bousios.
+- Update Spanish translation.
+- Fix Shared with 'user' tooltip.
+- Improves the tooltip to leaving a shared note.
+- Add support info to readme.
+- Handle OPTION(CORS) calls to use the API in web apps. Issue #80
+- Use display name of users to share dialog and notes. See issue #49
+- Don't trim long titles, and show them in more lines.
+
 ## [0.7.6] 2022-05-07
 - Enable NC24.
 - Removes lot use of jQuery, that inexplicably failing in NC24. Issue #84
