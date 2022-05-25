@@ -1,0 +1,7 @@
+.icon-quicknotes {
+    @include icon-color('app', 'quicknotes', $color-black);
+}
+
+.icon-pinned {
+    @include icon-color('pinned', 'quicknotes', $color-black);
+}

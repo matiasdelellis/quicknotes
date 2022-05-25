@@ -69,6 +69,41 @@ class NoteController extends Controller {
 
 	/**
 	 * @NoAdminRequired
+	 */
+	public function dashboard(): JSONResponse {
+		$notes = $this->noteService->getAll($this->userId);
+		if (count($notes) === 0) {
+			return new JSONResponse([
+				'notes' => []
+			]);
+		}
+
+		$items = array_map(function ($note) {
+			return [
+				'id' => $note->getId(),
+				'title' => strip_tags($note->getTitle()),
+				'content' => strip_tags($note->getContent()),
+				'pinned' => $note->getIsPinned(),
+				'timestamp' => $note->getTimestamp(),
+			];
+		}, $notes);
+
+		usort($items, function ($a, $b) {
+			if ($a['pinned'] == $b['pinned'])
+				return $b['timestamp'] - $a['timestamp'];
+			if ($a['pinned'] && !$b['pinned'])
+				return -1;
+			if (!$a['pinned'] && $b['pinned'])
+				return 1;
+		});
+
+		return new JSONResponse([
+			'notes' => array_slice($items, 0, 7)
+		]);
+	}
+
+	/**
+	 * @NoAdminRequired
 	 *
 	 * @param int $id
 	 */

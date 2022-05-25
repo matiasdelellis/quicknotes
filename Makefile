@@ -26,8 +26,8 @@ package_name=$(app_name)
 cert_dir=$(HOME)/.nextcloud/certificates
 
 # building the javascript
+
 all: build
-build: deps
 
 # L10N Rules
 
@@ -77,9 +77,19 @@ depsmin:
 	cp node_modules/medium-editor-autolist/dist/autolist.min.js vendor/autolist.js
 	cp node_modules/lozad/dist/lozad.min.js vendor/lozad.js
 
+
+# Build Rules
+build-vue:
+	npm run build
+
 js-templates:
 	node_modules/handlebars/bin/handlebars js/templates -f js/templates.js
 
+build: depsmin js-templates build-vue
+	@echo ""
+	@echo "Build done. You can enable the application in Nextcloud."
+
+# Clean
 clean:
 	rm -rf $(build_dir)
 
@@ -91,7 +101,7 @@ distclean: clean
 
 dist:  appstore
 
-appstore: distclean depsmin
+appstore: distclean build
 	mkdir -p $(sign_dir)
 	rsync -a \
 	    --exclude='.*' \
@@ -107,8 +117,11 @@ appstore: distclean depsmin
 	    --exclude=vendor/bin \
 	    --exclude=node_modules \
 	    --exclude=js/templates \
+	    --exclude=src \
 	    --exclude=templates/fake.php \
 	    --exclude=translation* \
+	    --exclude=webpack*.js \
+	    --exclude=psalm.xml \
 	$(project_dir) $(sign_dir)
 	@echo "Signing…"
 	php ../../occ integrity:sign-app \

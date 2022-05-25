@@ -11,6 +11,12 @@ return ['resources' =>
 			'url' => '/',
 			'verb' => 'GET'
 		],
+		// Dashboard
+		[
+			'name' => 'note#dashboard',
+			'url' => '/notes/dashboard',
+			'verb' => 'GET',
+		],
 		// Share
 		[
 			'name' => 'share#destroy',

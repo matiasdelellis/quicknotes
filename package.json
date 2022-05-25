@@ -1,30 +1,43 @@
 {
-  "name": "quicknotes",
-  "version": "0.1.9",
-  "description": "Quick notes with a basic rich text",
-  "main": "script.js",
-  "directories": {
-    "doc": "doc",
-    "test": "tests"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/matiasdelellis/quicknotes.git"
-  },
-  "author": "Matias De lellis <mati86dl@gmail.com>",
-  "license": "AGPL-3.0-or-later",
-  "bugs": {
-    "url": "https://github.com/matiasdelellis/quicknotes/issues"
-  },
-  "homepage": "https://github.com/matiasdelellis/quicknotes#readme",
-  "dependencies": {
-    "handlebars": "^4.5.1",
-    "isotope-layout": "^3.0.6",
-    "lozad": "^1.15.0",
-    "medium-editor": "^5.23.3",
-    "medium-editor-autolist": "^1.0.1"
-  }
+	"name": "quicknotes",
+	"version": "0.8.1",
+	"description": "Quick notes with a basic rich text",
+	"main": "script.js",
+	"directories": {
+		"doc": "doc",
+		"test": "tests"
+	},
+	"scripts": {
+		"build": "webpack --node-env production --progress"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/matiasdelellis/quicknotes.git"
+	},
+	"author": "Matias De lellis <mati86dl@gmail.com>",
+	"license": "AGPL-3.0-or-later",
+	"bugs": {
+		"url": "https://github.com/matiasdelellis/quicknotes/issues"
+	},
+	"homepage": "https://github.com/matiasdelellis/quicknotes#readme",
+	"dependencies": {
+		"handlebars": "^4.5.1",
+		"isotope-layout": "^3.0.6",
+		"lozad": "^1.15.0",
+		"medium-editor": "^5.23.3",
+		"medium-editor-autolist": "^1.0.1",
+		"@nextcloud/axios": "^1.9.0",
+		"@nextcloud/dialogs": "^3.1.2",
+		"@nextcloud/router": "^2.0.0",
+		"@nextcloud/vue": "^5.3.1",
+		"@nextcloud/vue-dashboard": "^2.0.1",
+		"vue": "^2.6.14"
+	},
+	"devDependencies": {
+		"@nextcloud/babel-config": "^1.0.0",
+		"@nextcloud/browserslist-config": "^2.2.0",
+		"@nextcloud/eslint-config": "^7.0.2",
+		"@nextcloud/stylelint-config": "^2.1.2",
+		"@nextcloud/webpack-vue-config": "^5.1.0"
+	}
 }

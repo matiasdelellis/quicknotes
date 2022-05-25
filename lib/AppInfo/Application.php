@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 /*
- * @copyright 2016-2021 Matias De lellis <mati86dl@gmail.com>
+ * @copyright 2016-2022 Matias De lellis <mati86dl@gmail.com>
  *
  * @author 2016 Matias De lellis <mati86dl@gmail.com>
  *
@@ -27,6 +27,8 @@ use OCP\AppFramework\Bootstrap\IBootstrap;
 use OCP\AppFramework\Bootstrap\IBootContext;
 use OCP\AppFramework\Bootstrap\IRegistrationContext;
 
+use OCP\AppFramework\Http\Events\BeforeTemplateRenderedEvent;
+
 use OCP\IL10N;
 use OCP\IURLGenerator;
 use OCP\IServerContainer;
@@ -48,6 +50,11 @@ class Application extends App implements IBootstrap {
 	public function register(IRegistrationContext $context): void {
 		$context->registerSearchProvider(NoteSearchProvider::class);
 		$context->registerCapability(Capabilities::class);
+		$context->registerDashboardWidget(DashboardWidget::class);
+		$context->registerEventListener(
+			BeforeTemplateRenderedEvent::class,
+			BeforeTemplateRenderedListener::class
+		);
 	}
 
 	public function boot(IBootContext $context): void {
