@@ -121,6 +121,7 @@ appstore: distclean build
 	    --exclude=templates/fake.php \
 	    --exclude=translation* \
 	    --exclude=webpack*.js \
+	    --exclude=*.js.map \
 	    --exclude=psalm.xml \
 	$(project_dir) $(sign_dir)
 	@echo "Signing…"

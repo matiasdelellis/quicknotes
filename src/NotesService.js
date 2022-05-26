@@ -15,7 +15,23 @@ export const getDashboardData = () => {
 		})
 		.catch(err => {
 			console.error(err)
-			showError(t('notes', 'Fetching notes for dashboard has failed.'))
+			showError(t('quicknotes', 'There was an error fetching your notes for the dashboard'))
+			throw err
+		})
+}
+
+export const postNewNote = (title, content) => {
+	return axios
+		.post(url('/notes'), {
+			title: title,
+			content: content,
+		})
+		.then(response => {
+			return response.data
+		})
+		.catch(err => {
+			console.error(err)
+			showError(t('quicknotes', 'There was an error saving the note'))
 			throw err
 		})
 }

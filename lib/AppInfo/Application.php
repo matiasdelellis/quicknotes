@@ -34,6 +34,7 @@ use OCP\IURLGenerator;
 use OCP\IServerContainer;
 
 use OCA\QuickNotes\Search\NoteSearchProvider;
+use OCA\QuickNotes\Listeners\BeforeTemplateRenderedListener;
 
 class Application extends App implements IBootstrap {
 

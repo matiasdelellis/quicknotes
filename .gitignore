@@ -1,6 +1,7 @@
 build
 js/templates.js
 js/quicknotes-dashboard.js*
+js/quicknotes-talk.js*
 node_modules
 vendor
 translationfiles/
