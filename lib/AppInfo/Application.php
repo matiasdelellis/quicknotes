@@ -33,8 +33,9 @@ use OCP\IL10N;
 use OCP\IURLGenerator;
 use OCP\IServerContainer;
 
-use OCA\QuickNotes\Search\NoteSearchProvider;
+use OCA\QuickNotes\Dashboard\NotesWidget;
 use OCA\QuickNotes\Listeners\BeforeTemplateRenderedListener;
+use OCA\QuickNotes\Search\NoteSearchProvider;
 
 class Application extends App implements IBootstrap {
 
@@ -51,7 +52,7 @@ class Application extends App implements IBootstrap {
 	public function register(IRegistrationContext $context): void {
 		$context->registerSearchProvider(NoteSearchProvider::class);
 		$context->registerCapability(Capabilities::class);
-		$context->registerDashboardWidget(DashboardWidget::class);
+		$context->registerDashboardWidget(NotesWidget::class);
 		$context->registerEventListener(
 			BeforeTemplateRenderedEvent::class,
 			BeforeTemplateRenderedListener::class

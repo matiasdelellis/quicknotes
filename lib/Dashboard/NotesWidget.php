@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace OCA\QuickNotes\AppInfo;
+namespace OCA\QuickNotes\Dashboard;
 
 use OCP\Dashboard\IWidget;
 use OCP\IL10N;
 use OCP\IURLGenerator;
 
-class DashboardWidget implements IWidget {
+class NotesWidget implements IWidget {
 
 	private IURLGenerator $url;
 	private IL10N $l10n;
