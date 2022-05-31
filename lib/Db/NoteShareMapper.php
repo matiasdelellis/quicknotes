@@ -14,7 +14,7 @@ class NoteShareMapper extends QBMapper {
 		parent::__construct($db, 'quicknotes_shares', NoteShare::class);
 	}
 
-	public function findForUser(string $userId): array {
+	public function findSharesForUserId(string $userId): array {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')
 			->from($this->getTableName())
@@ -24,7 +24,7 @@ class NoteShareMapper extends QBMapper {
 		return $this->findEntities($qb);
 	}
 
-	public function findForGroup(string $groupId): array {
+	public function findSharesForGroupId(string $groupId): array {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')
 			->from($this->getTableName())
@@ -34,7 +34,7 @@ class NoteShareMapper extends QBMapper {
 		return $this->findEntities($qb);
 	}
 
-	public function findByNoteAndUser(int $noteId, string $userId): NoteShare {
+	public function findSharesByNoteIsAndSharedUser(int $noteId, string $userId): NoteShare {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')
 			->from($this->getTableName())
@@ -45,7 +45,7 @@ class NoteShareMapper extends QBMapper {
 		return $this->findEntity($qb);
 	}
 
-	public function findByNoteAndGroup(int $noteId, string $groupId): NoteShare {
+	public function findSharesByNoteIdAndGroupId(int $noteId, string $groupId): NoteShare {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')
 			->from($this->getTableName())
@@ -56,7 +56,7 @@ class NoteShareMapper extends QBMapper {
 		return $this->findEntity($qb);
 	}
 
-	public function getSharesForNote(int $noteId): array {
+	public function findSharesForNoteId(int $noteId): array {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')
 			->from($this->getTableName())
@@ -66,19 +66,29 @@ class NoteShareMapper extends QBMapper {
 		return $this->findEntities($qb);
 	}
 
-	public function deleteByNoteId(int $noteId): void {
+	public function forgetSharesByNoteId(int $noteId): void {
 		$qb = $this->db->getQueryBuilder();
 		$qb->delete($this->getTableName())
 			->where($qb->expr()->eq('note_id', $qb->createNamedParameter($noteId)))
 			->execute();
 	}
 
+	public function forgetShareByNoteIdAndSharedUser(int $noteId, string $userId) {
+		try {
+			$noteShare = $this->findSharesByNoteIsAndSharedUser($noteId, $userId);
+		} catch (DoesNotExistException $e) {
+			return false;
+		}
+		$this->delete($noteShare);
+		return true;
+	}
+
 	/**
 	 * @return bool
 	 */
-	public function existsByNoteAndUser(int $noteId, string $userId) {
+	public function existsByNoteAndSharedUser(int $noteId, string $userId) {
 		try {
-			$this->findByNoteAndUser($noteId, $userId);
+			$this->findSharesByNoteIsAndSharedUser($noteId, $userId);
 		} catch (DoesNotExistException $e) {
 			return false;
 		}

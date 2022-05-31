@@ -91,7 +91,7 @@ class NoteService {
 		// Set shares with others.
 		foreach($notes as $note) {
 			$sharedWith = [];
-			$sharedEntries = $this->noteShareMapper->getSharesForNote($note->getId());
+			$sharedEntries = $this->noteShareMapper->findSharesForNoteId($note->getId());
 			foreach ($sharedEntries as $sharedEntry) {
 				$sharedUid = $sharedEntry->getSharedUser();
 				$user = $this->userManager->get($sharedUid);
@@ -107,7 +107,7 @@ class NoteService {
 
 		// Get shares from others.
 		$shares = [];
-		$sharedEntries = $this->noteShareMapper->findForUser($userId);
+		$sharedEntries = $this->noteShareMapper->findSharesForUserId($userId);
 		foreach($sharedEntries as $sharedEntry) {
 			$sharedNote = $this->notemapper->findShared($sharedEntry->getNoteId());
 
@@ -323,7 +323,7 @@ class NoteService {
 		}
 
 		// Delete old shares
-		$dbShares = $this->noteShareMapper->getSharesForNote($id);
+		$dbShares = $this->noteShareMapper->findSharesForNoteId($id);
 		foreach ($dbShares as $dbShare) {
 			$delete = true;
 			foreach ($sharedWith as $share) {
@@ -339,7 +339,7 @@ class NoteService {
 
 		// Add new shares
 		foreach ($sharedWith as $share) {
-			if (!$this->noteShareMapper->existsByNoteAndUser($id, $share['id'])) {
+			if (!$this->noteShareMapper->existsByNoteAndSharedUser($id, $share['id'])) {
 				$hShare = new NoteShare();
 				$hShare->setNoteId($id);
 				$hShare->setSharedUser($share['id']);
@@ -412,7 +412,7 @@ class NoteService {
 
 		// Fill shared with with others
 		$sharedWith = [];
-		$sharedEntries = $this->noteShareMapper->getSharesForNote($note->getId());
+		$sharedEntries = $this->noteShareMapper->findSharesForNoteId($note->getId());
 		foreach ($sharedEntries as $sharedEntry) {
 			$sharedUid = $sharedEntry->getSharedUser();
 			$user = $this->userManager->get($sharedUid);
@@ -454,7 +454,7 @@ class NoteService {
 		}
 		$oldcolorid = $note->getColorId();
 
-		$this->noteShareMapper->deleteByNoteId($note->getId());
+		$this->noteShareMapper->forgetSharesByNoteId($note->getId());
 
 		// Delete note.
 		$this->notemapper->delete($note);

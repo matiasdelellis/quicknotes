@@ -370,7 +370,7 @@ View.prototype = {
                 t('quicknotes', 'Delete note'),
                 function(result) {
                     if (result) {
-                        if (!note.is_shared) {
+                        if (!note.sharedBy.length) {
                             self._notes.remove(note).done(function () {
                                 if (self._notes.length() > 0) {
                                     self._isotope.remove(gridnote.parent())
