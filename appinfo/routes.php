@@ -19,7 +19,7 @@ return ['resources' =>
 		],
 		// Share
 		[
-			'name' => 'share#destroy',
+			'name' => 'share#forget',
 			'url' => '/share/{noteId}',
 			'verb' => 'DELETE'
 		],

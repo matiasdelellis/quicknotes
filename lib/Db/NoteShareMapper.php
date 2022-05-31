@@ -73,7 +73,7 @@ class NoteShareMapper extends QBMapper {
 			->execute();
 	}
 
-	public function forgetShareByNoteIdAndSharedUser(int $noteId, string $userId) {
+	public function forgetShareByNoteIdAndSharedUser(int $noteId, string $userId): bool {
 		try {
 			$noteShare = $this->findSharesByNoteIsAndSharedUser($noteId, $userId);
 		} catch (DoesNotExistException $e) {
@@ -86,7 +86,7 @@ class NoteShareMapper extends QBMapper {
 	/**
 	 * @return bool
 	 */
-	public function existsByNoteAndSharedUser(int $noteId, string $userId) {
+	public function existsByNoteAndSharedUser(int $noteId, string $userId): bool {
 		try {
 			$this->findSharesByNoteIsAndSharedUser($noteId, $userId);
 		} catch (DoesNotExistException $e) {

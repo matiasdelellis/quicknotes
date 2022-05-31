@@ -54,12 +54,9 @@ class ShareController extends Controller {
 	 *
 	 * @param int $noteId
 	 */
-	public function destroy(int $noteId): JSONResponse {
-		if ($this->noteShareMapper->forgetShareByNoteIdAndSharedUser($noteId, $this->userId)) {
-			return new JSONResponse([], Http::STATUS_OK);
-		} else {
-			return new JSONResponse([], Http::STATUS_NOT_FOUND);
-		}
+	public function forget(int $noteId): JSONResponse {
+		$this->noteShareMapper->forgetShareByNoteIdAndSharedUser($noteId, $this->userId);
+		return new JSONResponse([]);
 	}
 
 }

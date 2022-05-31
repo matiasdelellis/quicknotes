@@ -387,7 +387,7 @@ View.prototype = {
                             self._notes.forgetShare(note).done(function () {
                                 if (self._notes.length() > 0) {
                                     self._isotope.remove(gridnote.parent())
-                                    selg._isotope.layout();
+                                    self._isotope.layout();
                                     self.showAll();
                                     self.renderNavigation();
                                 } else {

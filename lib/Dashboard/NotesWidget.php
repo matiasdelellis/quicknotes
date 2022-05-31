@@ -10,8 +10,8 @@ use OCP\IURLGenerator;
 
 class NotesWidget implements IWidget {
 
-	private IURLGenerator $url;
-	private IL10N $l10n;
+	private $url;
+	private $l10n;
 
 	public function __construct(IURLGenerator $url,
 	                            IL10N         $l10n)
