@@ -49,6 +49,7 @@ OC.L10N.register(
     "Leave this shared note" : "Αποχωρήστε από αυτήν την κοινόχρηστη σημείωση",
     "Close" : "Κλείσιμο",
     "Default color for new notes" : "Προεπιλεγμένο χρώμα για νέες σημειώσεις",
+    "When editing notes, show Save and Cancel buttons to save them explicitly" : "Κατά την επεξεργασία σημειώσεων, εμφάνιση των κουμπιών Αποθήκευση και Ακύρωση για την άμεση αποθήκευση",
     "Settings" : "Ρυθμίσεις"
 },
 "nplurals=2; plural=(n != 1);");
