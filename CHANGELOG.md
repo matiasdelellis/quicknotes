@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.1] 2022-08-02
+- Add dashboard widget to show the latest notes. Issue #51
+- Integration with Talk. You can save a message as a note to remind yourself.
+- Fix unable to forget a shared note. Part of issue #72
+- Fix unable to forget a shared note already deleted by the owner. Issue #72
+- Update translations, add danish and turkish. Many thanks to all contributors.
+
 ## [0.8.0] 2022-05-22
 - Just move focus to content when press Return key on title.
 - Jump to end of note content when open them. Issue #7
