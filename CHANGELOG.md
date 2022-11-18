@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.8.5] 2022-11-18
+- Updates to fix NC25 and enable it.
+- New Ukrainian translation thanks to Денис Семенюк
+- Update other translations. Thank you very much to all!.
+
 ## [0.8.1] 2022-08-02
 - Add dashboard widget to show the latest notes. Issue #51
 - Integration with Talk. You can save a message as a note to remind yourself.
