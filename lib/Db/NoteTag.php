@@ -19,7 +19,7 @@ class NoteTag extends Entity implements JsonSerializable {
 	protected $tagId;
 	protected $userId;
 
-	public function jsonSerialize() {
+	public function jsonSerialize(): array {
 		return [
 			'id' => $this->id,
 			'noteid' => $this->noteId,

@@ -38,7 +38,7 @@ class Attach extends Entity implements JsonSerializable {
 		$this->deepLinkUrl = $deepLinkUrl;
 	}
 
-	public function jsonSerialize() {
+	public function jsonSerialize(): array {
 		return [
 			'id'            => $this->id,
 			'note_id'       => $this->noteId,

@@ -30,7 +30,7 @@ class NoteShare extends Entity implements JsonSerializable {
 		$this->displayName = $displayName;
 	}
 
-	public function jsonSerialize() {
+	public function jsonSerialize(): array {
 		return [
 			'id' => $this->id,
 			'note_id' => $this->noteId,

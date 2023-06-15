@@ -16,7 +16,7 @@ class Tag extends Entity implements JsonSerializable {
 	protected $userId;
 	protected $name;
 
-	public function jsonSerialize() {
+	public function jsonSerialize(): array {
 		return [
 			'id' => $this->id,
 			'userid' => $this->userId,

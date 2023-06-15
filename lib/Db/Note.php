@@ -65,7 +65,7 @@ class Note extends Entity implements JsonSerializable {
 		$this->attachts = $attachts;
 	}
 
-	public function jsonSerialize() {
+	public function jsonSerialize(): array {
 		return [
 			'id'          => $this->id,
 			'title'       => $this->title,

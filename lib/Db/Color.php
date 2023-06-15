@@ -13,7 +13,7 @@ class Color extends Entity implements JsonSerializable {
 
 	protected $color;
 
-	public function jsonSerialize() {
+	public function jsonSerialize(): array {
 		return [
 			'id' => $this->id,
 			'color' => $this->color
