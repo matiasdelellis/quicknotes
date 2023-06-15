@@ -147,13 +147,18 @@
    float: left;
 }
 
+Button.circle-toolbar {
+  padding: 14px;
+  min-height: 20px;
+}
+
 .colorPickButton,
 .circle-toolbar {
    display:inline-block;
    width:20px;
    height:20px;
    min-width: 20px;
-   min-height: 16px;
+   min-height: 20px;
    padding: unset;
    border-radius:10px;
    border: 1px solid rgba(0, 0, 0, 0.2);
