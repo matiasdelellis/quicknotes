@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.8.10] 2023-06-14
+- Enable Nextcloud 26. Issue #100
+- Enable support to NC27 for early testing.
+- Implement the option to sort the notes. Issue #85
+- Fix some static analisys reports and some css styles.
+
 ## [0.8.5] 2022-11-18
 - Updates to fix NC25 and enable it.
 - New Ukrainian translation thanks to Денис Семенюк
