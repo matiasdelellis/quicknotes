@@ -1,5 +1,5 @@
 <div class="note-grid-item">
-	<div class="quicknote noselect {{#if sharedBy.length}}shared{{/if}} {{#if sharedWith.length}}shareowner{{/if}}" style="background-color: {{color}}" data-id="{{ id }}" data-timestamp="{{ timestamp }}" >
+	<div class="quicknote noselect {{#if sharedBy.length}}shared{{/if}} {{#if sharedWith.length}}shareowner{{/if}}" style="background-color: {{color}}" data-id="{{ id }}" data-pinned={{#if isPinned}}1{{else}}0{{/if}} data-timestamp="{{ timestamp }}" >
 		<div class='note-header'>
 			<div class='note-attachts'>
 				{{#each attachments}}

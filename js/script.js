@@ -201,6 +201,7 @@ View.prototype = {
     updateSort: function() {
         this._isotope.updateSortData();
         this._isotope.layout();
+        this._isotope.arrange({sortBy: ['pinned', getSortBy()]})
     },
     editNote: function (id) {
         // Get selected note and sync content
@@ -306,20 +307,35 @@ View.prototype = {
         // Init masonty grid to notes.
         if (this._notes.isLoaded() && this._notes.length() > 0) {
             this._isotope = new Isotope(document.querySelector('.notes-grid'), {
-                itemSelector: '.note-grid-item',
                 layoutMode: 'masonry',
                 masonry: {
                     isFitWidth: true,
                     fitWidth: true,
                     gutter: 14,
                 },
-                sortBy: 'pinnedNote',
+                itemSelector: '.note-grid-item',
                 getSortData: {
-                    pinnedNote: function(itemElem) {
+                    pinned: function(itemElem) {
+                        return itemElem.firstElementChild.getAttribute('data-pinned');
+                    },
+                    title: function(itemElem) {
                         var $item = $(itemElem);
-                        return $item.find('.icon-pinned').hasClass('fixed-header-icon') ? -1 : $item.index();
+                        return $item.find('.note-title').text().trim();
+                    },
+                    created: function(itemElem) {
+                        return itemElem.firstElementChild.getAttribute('data-id');
+                    },
+                    updated: function(itemElem) {
+                        return itemElem.firstElementChild.getAttribute('data-timestamp');
                     }
-                }
+                },
+                sortAscending: {
+                    pinned: false,
+                    title: true,
+                    created: true,
+                    updated: false
+                },
+                sortBy: ['pinned', getSortBy()]
             });
 
             this._colorPick = new QnColorPick(".modal-content", function (color) {
@@ -407,7 +423,7 @@ View.prototype = {
         $('#notes-grid-div').on("click", ".icon-pin", function (event) {
             event.stopPropagation();
 
-            var icon =  $(this);
+            var icon = $(this);
             var gridNote = icon.parent().parent();
             var id = parseInt(gridNote.attr('data-id'), 10);
 
@@ -420,6 +436,7 @@ View.prototype = {
                 icon.removeClass("icon-pin");
                 icon.addClass("icon-pinned");
                 icon.attr('title', t('quicknotes', 'Unpin note'));
+                gridNote.attr('data-pinned', 1);
                 self._isotope.updateSortData();
                 self._isotope.arrange();
             }).fail(function () {
@@ -431,7 +448,7 @@ View.prototype = {
         $('#notes-grid-div').on("click", ".icon-pinned", function (event) {
             event.stopPropagation();
 
-            var icon =  $(this);
+            var icon = $(this);
             var gridNote = icon.parent().parent();
             var id = parseInt(gridNote.attr('data-id'), 10);
 
@@ -443,6 +460,7 @@ View.prototype = {
                 icon.removeClass("icon-pinned");
                 icon.addClass("icon-pin");
                 icon.attr('title', t('quicknotes', 'Pin note'));
+                gridNote.attr('data-pinned', 0);
                 self._isotope.updateSortData();
                 self._isotope.arrange();
             }).fail(function () {
@@ -761,7 +779,9 @@ View.prototype = {
         /* Render view */
         var html = Handlebars.templates['settings']({});
         $('#app-settings-content').html(html);
+
         var self = this;
+
         $.get(OC.generateUrl('apps/quicknotes/getuservalue'), {'type': 'default_color'})
         .done(function (response) {
                 var color = response.value;;
@@ -773,6 +793,9 @@ View.prototype = {
                 });
         });
 
+        let sortBy = getSortBy();
+        $("#sort-select option[value='" + sortBy + "']").attr("selected", true);
+
         $('#app-settings-content #explicit-save-notes').prop('checked', getExplicitSaveSetting());
 
         /* Settings */
@@ -782,6 +805,12 @@ View.prototype = {
 
         $('#app-settings-content').on('click', '#explicit-save-notes', function (event) {
               setExplicitSaveSetting($(this).is(':checked'));
+        });
+
+        $('#app-settings-content').on( "change", "#sort-select", function() {
+            let sortBy = $("#sort-select option:selected")[0].value
+            self._isotope.arrange({sortBy: ['pinned', sortBy]});
+            setSortBy(sortBy);
         });
 
         $('#app-settings-content').on('click', '.circle-toolbar', function (event) {
@@ -1163,6 +1192,16 @@ var getExplicitSaveSetting = function () {
 
 var setExplicitSaveSetting = function (explicit) {
     localStorage.setItem('explicit-save', explicit ? 'true' : 'false');
+}
+
+var getSortBy = function () {
+    var sortBy = localStorage.getItem('quicknotes-sort-by');
+    if (sortBy === null) return 'title';
+    return sortBy;
+}
+
+var setSortBy = function (sortBy) {
+    localStorage.setItem('quicknotes-sort-by', sortBy);
 }
 
 /**
