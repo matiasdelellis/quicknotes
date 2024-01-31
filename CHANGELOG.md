@@ -1,5 +1,8 @@
 # Changelog
 
+## [0.8.21] 2024-01-30
+- Fix attachment selection, broken since NC27 due internal changes. Issue #104
+
 ## [0.8.20] 2024-01-30
 - Enable and migrate to NC28. Issues #105, #106 and #108
 

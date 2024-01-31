@@ -592,7 +592,7 @@ View.prototype = {
                 }).fail(() => {
                     console.log("ERRORRR");
                 });
-            }, false, '*', true, OC.dialogs.FILEPICKER_TYPE_CHOOSE)
+            }, false, null, true, OC.dialogs.FILEPICKER_TYPE_CHOOSE)
         });
 
         // handle tags button.
