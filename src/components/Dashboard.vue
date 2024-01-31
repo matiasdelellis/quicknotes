@@ -11,7 +11,7 @@
 				<template #avatar>
 					<div
 						class="note-item"
-						:class="{ 'icon-pinned': item.pinned, 'note-item-no-pinned': !hasPinned }"
+						:class="{ 'dashboard-pinned-icon': item.pinned, 'note-item-no-pinned': !hasPinned }"
 					/>
 				</template>
 			</DashboardWidgetItem>

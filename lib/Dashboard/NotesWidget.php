@@ -45,7 +45,7 @@ class NotesWidget implements IWidget {
 	 * @inheritDoc
 	 */
 	public function getIconClass(): string {
-		return 'icon-quicknotes';
+		return 'dashboard-quicknotes-icon';
 	}
 
 	/**
