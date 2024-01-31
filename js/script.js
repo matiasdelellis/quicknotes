@@ -1236,36 +1236,6 @@ var setFilterUrl = function (filterParam, filter) {
     document.title = title;
 };
 
-
-/**
- * Filter notes.
- */
-function search (query) {
-    if (query) {
-        query = query.toLowerCase();
-        $('.notes-grid').isotope({
-            filter: function() {
-                var title = $(this).find(".note-title").html().toLowerCase();
-                if (title.search(query) >= 0)
-                    return true;
-
-                var content = $(this).find(".note-content").html().toLowerCase();
-                if (content.search(query) >= 0)
-                    return true;
-
-                return false;
-            }
-        });
-    } else {
-        $('.notes-grid').isotope({ filter: '*'});
-    }
-};
-
-new OCA.Search(search, function() {
-    search('');
-});
-
-
 /**
  * Add Helpers to handlebars
  */
