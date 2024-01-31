@@ -1,5 +1,8 @@
 # Changelog
 
+## [0.8.20] 2024-01-30
+- Enable and migrate to NC28. Issues #105, #106 and #108
+
 ## [0.8.10] 2023-06-14
 - Enable Nextcloud 26. Issue #100
 - Enable support to NC27 for early testing.
