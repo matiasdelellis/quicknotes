@@ -1,6 +1,6 @@
 <div id="new-note-fixed">
 	<div>
-		<button type="button" id="new-note" class="icon-add">{{newNoteTxt}}</button>
+		<button type="button" id="new-note" class="icon-button-add">{{newNoteTxt}}</button>
 	</div>
 </div>
 <li id="all-notes">
@@ -24,8 +24,8 @@
 	<button class="collapse"></button>
 	<a href="#" class="icon-search svg">{{colorsTxt}}</a>
 	<ul>
-		<li style="display: flex; justify-content: center;">
-			<button class="circle-toolbar icon-checkmark any-color"></button>
+		<li class="color-filter">
+			<button class="circle-toolbar icon-filter-checkmark any-color-filter"></button>
 			{{#each colors}}
 				<button class="circle-toolbar" style="background-color: {{color}} "></button>
 			{{/each}}

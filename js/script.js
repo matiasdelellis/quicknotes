@@ -730,9 +730,9 @@ View.prototype = {
         $('#colors-folder .circle-toolbar').click(function (event) {
             event.stopPropagation();
             self._cleanNavigation();
-            $(this).addClass('icon-checkmark');
+            $(this).addClass('icon-filter-checkmark');
 
-            if (!$(this).hasClass("any-color")) {
+            if (!$(this).hasClass("any-color-filter")) {
                 var color = $(this).css("background-color");
                 self._filterColor(color);
                 setFilterUrl('c', color);
@@ -788,7 +788,7 @@ View.prototype = {
                 var colors = $("#setting-defaul-color")[0].getElementsByClassName("circle-toolbar");
                 $.each(colors, function(i, c) {
                     if (color === self._colorToHex(c.style.backgroundColor)) {
-                        c.className += " icon-checkmark";
+                        c.className += " icon-filter-checkmark";
                     }
                 });
         });
@@ -827,8 +827,8 @@ View.prototype = {
                     'value': color
                 },
                 success: function (response) {
-                    $('#setting-defaul-color .circle-toolbar').removeClass('icon-checkmark');
-                    currentColor.addClass('icon-checkmark');
+                    $('#setting-defaul-color .circle-toolbar').removeClass('icon-filter-checkmark');
+                    currentColor.addClass('icon-filter-checkmark');
                 }
             });
         });
@@ -1163,7 +1163,7 @@ View.prototype = {
         var circles = $("#colors-folder")[0].getElementsByClassName("circle-toolbar");
         $.each(circles, function(i, c) {
             if (color == c.style.backgroundColor) {
-                c.className += " icon-checkmark";
+                c.className += " icon-filter-checkmark";
             }
         });
     },
@@ -1172,9 +1172,9 @@ View.prototype = {
         $.each(navItems, function(i, item) {
             $(item).removeClass('active');
         });
-        var oldColorTool = $('#app-navigation .circle-toolbar.icon-checkmark');
+        var oldColorTool = $('#app-navigation .circle-toolbar.icon-filter-checkmark');
         $.each(oldColorTool, function(i, oct) {
-            $(oct).removeClass('icon-checkmark');
+            $(oct).removeClass('icon-filter-checkmark');
         });
     },
     render: function () {

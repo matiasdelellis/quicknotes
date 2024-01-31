@@ -15,18 +15,42 @@
 }
 
 #new-note {
+    background-color: var(--color-primary-element);
+    color: var(--color-primary-element-text);
     width: 100%;
-    padding: 10px;
-    padding-left: 34px;
-    background-position: 10px center;
+    min-height: 44px;
     text-align: left;
     margin: 0;
+    padding-left: 44px;
+    background-position: 16px center;
+}
+
+.icon-button-add {
+    background-image: var(--original-icon-add-white);
 }
 
 #new-note-fixed {
     z-index: 111; /* navigation menu is 110 ;-) */
-    padding: 10px;
+    line-height: 44px;
+    min-height: 44px;
+    margin-bottom: 4px;
     position: relative;
+}
+
+#app-navigation:not(.vue) > ul > li > ul > .color-filter {
+    display: flex;
+    min-height: 44px;
+    justify-content: center;
+    padding-top: 4px;
+    padding-left: unset;
+}
+
+.icon-filter-checkmark {
+    background-image: var(--original-icon-checkmark-dark);
+}
+
+.color-filter > .any-color-filter {
+    background-color: var(--color-primary-element-text);
 }
 
 .quicknote {
@@ -166,10 +190,6 @@ Button.circle-toolbar {
 
 .circle-toolbar:hover {
    border-color: var(--color-primary-element);
-}
-
-.any-color {
-  background-color: transparent;
 }
 
 /* Isotope Grid */

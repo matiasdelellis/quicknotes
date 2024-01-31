@@ -112,3 +112,17 @@
   width: 100%;
   margin-bottom: 3px;
 }
+
+#app-navigation:not(.vue) > ul > li > ul > li:hover, #app-navigation:not(.vue) > ul > li > ul > li:hover > a, #app-navigation:not(.vue) > ul > li > ul > li:focus, #app-navigation:not(.vue) > ul > li > ul > li:focus > a {
+  border-radius: var(--border-radius-pill);
+  background-color: var(--color-background-hover);
+}
+
+#app-navigation:not(.vue) > ul > li a:hover, #app-navigation:not(.vue) > ul > li a:hover > a, #app-navigation:not(.vue) > ul > li a:focus, #app-navigation:not(.vue) > ul > li a:focus > a {
+  background-color: var(--color-background-hover);
+}
+
+#app-navigation:not(.vue) > ul > li > ul > li.active, #app-navigation:not(.vue) > ul > li > ul > li.active > a, #app-navigation:not(.vue) > ul > li > ul > li a.selected, #app-navigation:not(.vue) > ul > li > ul > li a.selected > a {
+  border-radius: var(--border-radius-pill);
+  background-color: var(--color-primary-light);
+}
