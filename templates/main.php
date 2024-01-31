@@ -9,6 +9,7 @@ vendor_script('quicknotes', 'lozad');
 script('quicknotes', 'qn-dialogs');
 script('quicknotes', 'qn-colorpick');
 script('quicknotes', 'script');
+style('quicknotes', 'not-vue');
 style('quicknotes', 'style');
 style('quicknotes', 'medium');
 style('quicknotes', 'qn-colorpick');
