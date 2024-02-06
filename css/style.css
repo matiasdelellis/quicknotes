@@ -21,10 +21,6 @@
     background-position: 16px center;
 }
 
-.icon-button-add {
-    background-image: var(--original-icon-add-white);
-}
-
 #new-note-fixed {
     z-index: 111; /* navigation menu is 110 ;-) */
     line-height: 44px;
@@ -123,6 +119,18 @@
     margin: 4px;
     overflow-wrap: break-word;
     min-height: 75px;
+}
+
+.icon-button-add {
+    background-image: var(--original-icon-add-white);
+}
+
+.icon-delete-note {
+    background-image: var(--original-icon-delete-dark);
+}
+
+.icon-delete-note:hover {
+    background-image: var(--icon-delete-color-red);
 }
 
 .icon-header-note {
@@ -283,6 +291,7 @@ box-shadow: 0 0 0 2px var(--color-primary);
 
 .slim-share,
 .slim-tag {
+    background-repeat: no-repeat;
     display: inline-block;
     cursor: pointer;
     padding: 0px 6px 0 24px;
@@ -303,6 +312,13 @@ box-shadow: 0 0 0 2px var(--color-primary);
     margin-top: 5px;
 }
 
+.slim-share {
+    background-image: var(--original-icon-user-dark);
+}
+
+.slim-tag {
+    background-image: var(--original-icon-tag-dark);
+}
 
 /* Restore defaults select2 rules */
 

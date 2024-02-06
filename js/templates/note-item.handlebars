@@ -15,7 +15,7 @@
 			{{else}}
 				<div class="icon-header-note icon-pin hide-header-icon" title="{{t "quicknotes" "Pin note"}}"></div>
 			{{/if}}
-			<div class="icon-header-note icon-delete hide-header-icon icon-delete-note" title="{{t "quicknotes" "Delete note"}}"></div>
+			<div class="icon-header-note hide-header-icon icon-delete-note" title="{{t "quicknotes" "Delete note"}}"></div>
 			<div class='note-title'>
 				{{{ title }}}
 			</div>
@@ -24,12 +24,12 @@
 			</div>
 			<div class='note-shares'>
 				{{#each sharedWith}}
-					<div class="icon-user slim-share" share-id="{{ shared_user }}" title="Shared with {{ display_name }}">{{{ display_name }}}</div>
+					<div class="slim-share" share-id="{{ shared_user }}" title="Shared with {{ display_name }}">{{{ display_name }}}</div>
 				{{/each}}
 			</div>
 			<div class='note-tags'>
 				{{#each tags}}
-					<div class="icon-tag slim-tag" tag-id="{{ id }}">{{{ name }}}</div>
+					<div class="slim-tag" tag-id="{{ id }}">{{{ name }}}</div>
 				{{/each}}
 			</div>
 		<div>
