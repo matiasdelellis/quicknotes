@@ -126,3 +126,56 @@
   border-radius: var(--border-radius-pill);
   background-color: var(--color-primary-light);
 }
+
+#app-navigation:not(.vue) > ul > li.deleted > ul, #app-navigation:not(.vue) > ul > li.collapsible:not(.open) > ul {
+  display: none;
+}
+
+#app-navigation:not(.vue) .collapsible.open::before {
+  -webkit-transform: rotate(0);
+  -ms-transform: rotate(0);
+  transform: rotate(0);
+}
+
+#app-navigation:not(.vue) .collapsible::before {
+  position: absolute;
+  height: 44px;
+  width: 44px;
+  margin: 0;
+  padding: 0;
+  background: none;
+  background-image: var(--icon-triangle-s-dark);
+  background-size: 16px;
+  background-repeat: no-repeat;
+  background-position: center;
+  border: none;
+  border-radius: 0;
+  outline: none !important;
+  box-shadow: none;
+  content: " ";
+  opacity: 0;
+  -webkit-transform: rotate(-90deg);
+  -ms-transform: rotate(-90deg);
+  transform: rotate(-90deg);
+  z-index: 105;
+  border-radius: 50%;
+  transition: opacity 100ms ease-in-out;
+}
+
+#app-navigation:not(.vue) .collapsible:hover::before, #app-navigation:not(.vue) .collapsible:focus::before {
+  opacity: 1;
+}
+
+#app-navigation:not(.vue) .collapsible .collapse {
+  opacity: 0;
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  margin: 0;
+  z-index: 110;
+  left: 0;
+}
+
+#app-navigation:not(.vue) .collapsible:hover > a, #app-navigation:not(.vue) .collapsible:focus > a {
+  background-image: none;
+}
