@@ -27,7 +27,7 @@ class BeforeTemplateRenderedListener implements IEventListener {
 			return;
 		}
 
-		Util::addStyle('quicknotes', 'global');
+		Util::addStyle('quicknotes', 'icons');
 
 		$pathInfo = $this->request->getPathInfo();
 		if (strpos($pathInfo, '/call/') === 0 || strpos($pathInfo, '/apps/spreed') === 0) {

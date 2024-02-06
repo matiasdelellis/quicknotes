@@ -1,9 +1,0 @@
-.dashboard-quicknotes-icon {
-    background-image: url(../img/app-dark.svg);
-    filter: var(--background-invert-if-dark);
-}
-
-.dashboard-pinned-icon {
-    background-image: url(../img/pinned.svg);
-    filter: var(--background-invert-if-dark);
-}
