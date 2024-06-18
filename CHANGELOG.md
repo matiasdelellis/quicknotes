@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.23] 2024-06-18
+- Enable NC29
+
+## [0.8.22] 2024-02-06
+- Fix some pending regressions from NC28. Issue #109
+- Lots of improvements to dark theme support.
+
 ## [0.8.21] 2024-01-30
 - Fix attachment selection, broken since NC27 due internal changes. Issue #104
 
