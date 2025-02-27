@@ -244,10 +244,6 @@ div[contenteditable="true"] {
     box-shadow: none;
 }
 
-div.select2-drop .select2-search input:not(:disabled):not(.primary):focus-visible, select:not(:disabled):not(.primary):focus-visible, button:not(.button-vue):not(:disabled):not(.primary):focus-visible, .button:not(:disabled):not(.primary):focus-visible, input:not([type="range"]):not(:disabled):not(.primary):focus-visible, textarea:not(:disabled):not(.primary):focus-visible, div[contenteditable="true"]:not(:disabled):not(.primary):focus-visible, .pager li a:not(:disabled):not(.primary):focus-visible {
-box-shadow: 0 0 0 2px var(--color-primary);
-}
-
 #content-editable {
     width: 100%;
     padding: 4px;
@@ -322,33 +318,37 @@ box-shadow: 0 0 0 2px var(--color-primary);
 
 /* Restore defaults select2 rules */
 
-.select2-container-multi
-.select2-choices
+#select2-drop {
+    z-index: 100001;
+}
+
+.select2-container {
+    width: 100%;
+}
+
 .select2-search-choice {
-    padding: 3px 5px 3px 18px !important;
-    margin: 3px 0 3px 5px !important;
+    padding-right: 18px !important;
 }
 
 .select2-search-choice-close {
     display: block !important;
-    top: 6px !important;
+    right: 3px !important;
+    left: unset !important;
+    top: 8px !important;
 }
 
-.select2-results .select2-selected {
-    display: none !important;
+.select2-container-multi .select2-choices .select2-search-choice {
+    padding: 3px 18px 3px 18px;
 }
 
-.select2-container {
-    min-width: 200px;
+.select2-input {
+    margin-top: 4px !important;
 }
 
-#select2-drop {
-    z-index: 10000;
+div.select2-container-multi .select2-choices, div.select2-container-multi.select2-container-active .select2-choices {
+    min-height: 26px;
 }
 
-div.select2-container {
-    width: 100%;
-}
 
 /* Modal Content */
 
