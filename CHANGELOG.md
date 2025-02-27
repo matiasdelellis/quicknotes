@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.8.30] 2025-02-27
+- Add support to NC30 and NC31
+- Fix tags selection.. Issue #112
+
 ## [0.8.23] 2024-06-18
 - Enable NC29
 
