@@ -32,6 +32,7 @@ use OCP\AppFramework\Http\Events\BeforeTemplateRenderedEvent;
 use OCP\IL10N;
 use OCP\IURLGenerator;
 use OCP\IServerContainer;
+use OCP\INavigationManager;
 
 use OCA\QuickNotes\Dashboard\NotesWidget;
 use OCA\QuickNotes\Listeners\BeforeTemplateRenderedListener;
@@ -65,7 +66,7 @@ class Application extends App implements IBootstrap {
 	}
 
 	private function registerNavigationEntry(IServerContainer $server): void {
-		$server->getNavigationManager()->add(static function () use ($server) {
+		$server->get(INavigationManager::class)->add(static function () use ($server) {
 			$urlGenerator = $server->getURLGenerator();
 			$l10n = $server->getL10N(self::APP_ID);
 			return [

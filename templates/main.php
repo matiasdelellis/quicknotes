@@ -1,14 +1,13 @@
 <?php
-vendor_script('quicknotes', 'handlebars');
 script('quicknotes', 'templates');
-vendor_script('quicknotes', 'isotope.pkgd');
-vendor_script('quicknotes', 'medium-editor');
-vendor_style('quicknotes', 'medium-editor');
-vendor_script('quicknotes', 'autolist');
-vendor_script('quicknotes', 'lozad');
-script('quicknotes', 'qn-dialogs');
-script('quicknotes', 'qn-colorpick');
-script('quicknotes', 'script');
+\OCP\Util::addScript('quicknotes', 'vendor/handlebars');
+\OCP\Util::addScript('quicknotes', 'vendor/isotope.pkgd');
+\OCP\Util::addScript('quicknotes', 'vendor/medium-editor');
+\OCP\Util::addScript('quicknotes', 'vendor/autolist');
+\OCP\Util::addScript('quicknotes', 'vendor/lozad');
+\OCP\Util::addScript('quicknotes', 'qn-dialogs');
+\OCP\Util::addScript('quicknotes', 'qn-colorpick');
+\OCP\Util::addScript('quicknotes', 'script');
 style('quicknotes', 'not-vue');
 style('quicknotes', 'style');
 style('quicknotes', 'medium');
