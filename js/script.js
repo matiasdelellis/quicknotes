@@ -697,7 +697,7 @@ View.prototype = {
             self._cleanNavigation();
             $(this).addClass("active");
             self._isotope.arrange({
-                filter: function(elem) {
+                filter: function(index, elem) {
                     return elem.querySelector('.shared') != null;
                 }
             });
@@ -710,7 +710,7 @@ View.prototype = {
             self._cleanNavigation();
             $(this).addClass("active");
             self._isotope.arrange({
-                filter: function(elem) {
+                filter: function(index, elem) {
                     return elem.querySelector('.shareowner') != null;
                 }
             });
@@ -1134,14 +1134,14 @@ View.prototype = {
     },
     _filterNote: function (noteId) {
         this._isotope.arrange({
-            filter: function(elem) {
+            filter: function(index, elem) {
                 return noteId == elem.firstElementChild.getAttribute('data-id');
             }
         });
     },
     _filterTag: function (tagId) {
         this._isotope.arrange({
-            filter: function(elem) {
+            filter: function(index, elem) {
                 var match = false;
                 var tags = elem.querySelectorAll('.slim-tag');
                 tags.forEach (function(tagItem) {
@@ -1154,7 +1154,7 @@ View.prototype = {
     },
     _filterColor: function (color) {
         this._isotope.arrange({
-            filter: function(elem) {
+            filter: function(index, elem) {
                 return color == elem.firstElementChild.style["background-color"];
             }
         });
