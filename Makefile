@@ -57,25 +57,27 @@ l10n-deps:
 # general
 deps:
 	mkdir -p vendor
-	rm -rf vendor/*
+	mkdir -p js/vendor
+	rm -rf js/vendor/*
 	npm i
-	cp node_modules/handlebars/dist/handlebars.js vendor/
-	cp node_modules/isotope-layout/dist/isotope.pkgd.js vendor/
-	cp node_modules/medium-editor/dist/js/medium-editor.js vendor/
+	cp node_modules/handlebars/dist/handlebars.js js/vendor/
+	cp node_modules/isotope-layout/dist/isotope.pkgd.js js/vendor/
+	cp node_modules/medium-editor/dist/js/medium-editor.js js/vendor/
 	cp node_modules/medium-editor/dist/css/medium-editor.css vendor/
-	cp node_modules/medium-editor-autolist/dist/autolist.js vendor/
-	cp node_modules/lozad/dist/lozad.js vendor/
+	cp node_modules/medium-editor-autolist/dist/autolist.js js/vendor/
+	cp node_modules/lozad/dist/lozad.js js/vendor/
 
 depsmin:
 	mkdir -p vendor
-	rm -rf vendor/*
+	mkdir -p js/vendor
+	rm -rf js/vendor/*
 	npm i
-	cp node_modules/handlebars/dist/handlebars.min.js vendor/handlebars.js
-	cp node_modules/isotope-layout/dist/isotope.pkgd.min.js vendor/isotope.pkgd.js
-	cp node_modules/medium-editor/dist/js/medium-editor.min.js vendor/medium-editor.js
+	cp node_modules/handlebars/dist/handlebars.min.js js/vendor/handlebars.js
+	cp node_modules/isotope-layout/dist/isotope.pkgd.min.js js/vendor/isotope.pkgd.js
+	cp node_modules/medium-editor/dist/js/medium-editor.min.js js/vendor/medium-editor.js
 	cp node_modules/medium-editor/dist/css/medium-editor.min.css vendor/medium-editor.css
-	cp node_modules/medium-editor-autolist/dist/autolist.min.js vendor/autolist.js
-	cp node_modules/lozad/dist/lozad.min.js vendor/lozad.js
+	cp node_modules/medium-editor-autolist/dist/autolist.min.js js/vendor/autolist.js
+	cp node_modules/lozad/dist/lozad.min.js js/vendor/lozad.js
 
 
 # Build Rules
