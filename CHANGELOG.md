@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.8.40] 2026-02-12
+- Add support to NC32. Thanks Marius Knüppel
+- Update deprecated APIs for Nextcloud 32 compatibility. Thanks JanGross
+
 ## [0.8.30] 2025-02-27
 - Add support to NC30 and NC31
 - Fix tags selection.. Issue #112
