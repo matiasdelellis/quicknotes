@@ -46,14 +46,14 @@
 }
 
 .quicknote {
-    color: #202124;
+    color: var(--color-main-text);
     min-height: 150px;
     width: 250px;
     border-radius: 8px;
 }
 
 .quicknote:hover {
-    box-shadow: 0px 0px 4px #808080;
+    box-shadow: 0px 0px 4px var(--color-box-shadow);
 }
 
 #title-editable:empty:before {
@@ -76,7 +76,7 @@
 }
 
 .quicknote a {
-    color: #15c;
+    color: var(--color-primary-element);
 }
 
 .note-active {
@@ -138,7 +138,7 @@
     float: right;
     margin-left: 2px;
     padding: 12px;
-    background-color: rgba(0,0,0,0.08);
+    background-color: var(--color-background-hover);
     background-size: 22px;
     min-width: 28px;
     min-height: 28px;
@@ -148,7 +148,7 @@
 }
 
 .icon-header-note:hover {
-    background-color: rgba(0,0,0,0.12);
+    background-color: var(--color-background-dark);
     opacity: 0.87;
 }
 
@@ -291,7 +291,7 @@ div[contenteditable="true"] {
     display: inline-block;
     cursor: pointer;
     padding: 0px 6px 0 24px;
-    background-color: rgba(0,0,0,0.08);
+    background-color: var(--color-background-hover);
     background-position: 8px center;
     opacity: 0.87;
     border-radius: 10px;
@@ -300,7 +300,7 @@ div[contenteditable="true"] {
 
 .slim-share:hover,
 .slim-tag:hover {
-    background-color: rgba(0,0,0,0.12);
+    background-color: var(--color-background-dark);
 }
 
 .note-shares > .slim-share,
