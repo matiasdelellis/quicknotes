@@ -203,6 +203,9 @@ const QnDialogs = {
 				},
 				formatSearching: function () {
 					return t('quicknotes', 'Searching…');
+				},
+				formatInputTooShort: function () {
+					return t('quicknotes', 'Type to search users');
 				}
 			});
 

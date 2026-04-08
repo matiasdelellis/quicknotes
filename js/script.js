@@ -163,10 +163,15 @@ Notes.prototype = {
     _loadUsersSharing: function () {
         var self = this;
         self._usersSharing = [];
+        self._loadUsersSharingPage(1);
+    },
+    _loadUsersSharingPage: function (page) {
+        var self = this;
         $.get(OC.linkToOCS('apps/files_sharing/api/v1/', 2) + 'sharees', {
             format: 'json',
             search: '',
             perPage: 200,
+            page: page,
             itemType: 0
         }).done(function (shares) {
             if (shares.ocs && shares.ocs.data) {
@@ -1090,7 +1095,7 @@ View.prototype = {
             "left"     : note.offset().left,
             "top"      : note.offset().top,
             "width"    : note.width(),
-            "height:"  : "auto"
+            "height"   : "auto"
         });
 
         $('#modal-note-div').removeClass("hide-modal-note");
