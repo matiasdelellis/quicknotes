@@ -213,15 +213,14 @@ Button.circle-toolbar {
 
 .modal-note-background {
     position: fixed; /* Stay in place */
-    z-index: 1051; /* Sit on top */
+    z-index: 9998; /* Match NC33 NcModal .modal-mask z-index */
     padding-top: 100px; /* Location of the box */
     left: 0;
     top: 0;
     width: 100%; /* Full width */
     height: 100%; /* Full height */
-    overflow: auto; /* Enable scroll if needed */
-    background-color: rgb(0,0,0); /* Fallback color */
-    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    overflow: visible; /* Match NC33 .modal-mask (no scroll restriction) */
+    background-color: rgba(0,0,0,0.5);
 }
 
 .hide-modal-note {
@@ -407,4 +406,29 @@ div.select2-container-multi .select2-choices, div.select2-container-multi.select
     height: 32px;
     padding: 0px !important;
     border-radius: 50%;
+}
+
+/**
+ * NC33 Modal Fix — Full-viewport overlay (CSS-only, attempt 15)
+ *
+ * Problem 1: #content has position:fixed → creates a stacking context.
+ *   .modal-note-background (z-index:9998) can never exceed #header (z-index:2000).
+ *   Fix: position:relative removes #content's stacking context.
+ *
+ * Problem 2: #app-content is a flex item with z-index:1000.
+ *   Per CSS spec, flex items with z-index (even position:static) create
+ *   a stacking context. .modal-note-background is trapped inside.
+ *   Fix: z-index:auto removes #app-content's stacking context.
+ *
+ * Result: .modal-note-background (position:fixed, z-index:9998) participates
+ * in the ROOT stacking context — above #header (2000), #app-content (auto),
+ * and #app-navigation (500). Semi-transparent overlay covers entire viewport.
+ */
+body:has(#modal-note-div.show-modal-note) #content {
+    position: relative !important;
+    overflow: visible !important;
+}
+
+body:has(#modal-note-div.show-modal-note) #app-content {
+    z-index: auto !important;
 }
