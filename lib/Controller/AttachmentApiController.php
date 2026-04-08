@@ -37,10 +37,10 @@ class AttachmentApiController extends ApiController {
 	private $fileService;
 	private $userId;
 
-	public function __construct($AppName,
+	public function __construct(string $AppName,
 	                            IRequest    $request,
 	                            FileService $fileService,
-	                            $userId)
+	                            ?string $userId)
 	{
 		parent::__construct($AppName, $request);
 

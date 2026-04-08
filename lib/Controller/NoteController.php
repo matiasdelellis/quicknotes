@@ -36,10 +36,10 @@ class NoteController extends Controller {
 	private $noteService;
 	private $userId;
 
-	public function __construct($AppName,
+	public function __construct(string $AppName,
 	                            IRequest    $request,
 	                            NoteService $noteService,
-	                            $userId)
+	                            ?string $userId)
 	{
 		parent::__construct($AppName, $request);
 
@@ -136,7 +136,7 @@ class NoteController extends Controller {
 	 */
 	public function create(string $title,
 		               string $content,
-		               string $color = null,
+		               ?string $color = null,
 		               bool   $isPinned = false,
 		               array  $sharedWith = [],
 		               array  $tags = [],

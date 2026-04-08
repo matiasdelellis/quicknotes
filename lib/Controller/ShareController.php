@@ -38,10 +38,10 @@ class ShareController extends Controller {
 	private $noteShareMapper;
 	private $userId;
 
-	public function __construct($AppName,
+	public function __construct(string $AppName,
 	                            IRequest        $request,
 	                            NoteShareMapper $noteShareMapper,
-	                            $userId)
+	                            ?string $userId)
 	{
 		parent::__construct($AppName, $request);
 

@@ -53,7 +53,7 @@ class FileService {
 	/** @var SettingsService */
 	private $settingsService;
 
-	public function __construct($userId,
+	public function __construct(?string $userId,
 	                            IRootFolder     $rootFolder,
 	                            IURLGenerator   $urlGenerator,
 	                            ITimeFactory    $timeFactory,

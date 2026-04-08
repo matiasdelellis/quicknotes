@@ -20,6 +20,6 @@
     <screenshot>https://raw.githubusercontent.com/matiasdelellis/quicknotes/master/doc/quicknotes-attachments.jpeg</screenshot>
     <screenshot>https://raw.githubusercontent.com/matiasdelellis/quicknotes/master/doc/quicknotes-shared-note.jpeg</screenshot>
     <dependencies>
-        <nextcloud min-version="32" max-version="32"/>
+        <nextcloud min-version="32" max-version="33"/>
     </dependencies>
 </info>

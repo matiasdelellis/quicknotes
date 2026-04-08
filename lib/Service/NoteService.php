@@ -195,7 +195,7 @@ class NoteService {
 	public function create(string $userId,
 	                       string $title,
 	                       string $content,
-	                       string $color = null,
+	                       ?string $color = null,
 	                       bool   $isPinned = false,
 	                       array  $sharedWith = [],
 	                       array  $tags = [],

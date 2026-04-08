@@ -70,7 +70,7 @@ class NoteShareMapper extends QBMapper {
 		$qb = $this->db->getQueryBuilder();
 		$qb->delete($this->getTableName())
 			->where($qb->expr()->eq('note_id', $qb->createNamedParameter($noteId)))
-			->execute();
+			->executeStatement();
 	}
 
 	public function forgetShareByNoteIdAndSharedUser(int $noteId, string $userId): bool {

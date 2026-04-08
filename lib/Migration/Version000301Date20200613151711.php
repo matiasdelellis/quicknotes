@@ -28,7 +28,6 @@ class Version000301Date20200613151711 extends SimpleMigrationStep {
 			$table->addColumn('id', 'bigint', [
 				'autoincrement' => true,
 				'notnull' => true,
-				'length' => 8,
 				'unsigned' => true,
 			]);
 			$table->addColumn('user_id', 'string', [
@@ -38,16 +37,13 @@ class Version000301Date20200613151711 extends SimpleMigrationStep {
 			]);
 			$table->addColumn('note_id', 'bigint', [
 				'notnull' => true,
-				'length' => 8,
 				'unsigned' => true,
 			]);
 			$table->addColumn('file_id', 'bigint', [
 				'notnull' => true,
-				'length' => 10,
 			]);
 			$table->addColumn('created_at', 'bigint', [
 				'notnull' => false,
-				'length' => 8,
 				'default' => 0,
 				'unsigned' => true,
 			]);

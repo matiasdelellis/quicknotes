@@ -39,7 +39,6 @@ class Version000204Date20200530211356 extends SimpleMigrationStep {
 			$table->addColumn('id', 'bigint', [
 				'autoincrement' => true,
 				'notnull' => true,
-				'length' => 8,
 				'unsigned' => true,
 			]);
 			$table->addColumn('user_id', 'string', [
@@ -58,12 +57,10 @@ class Version000204Date20200530211356 extends SimpleMigrationStep {
 			]);
 			$table->addColumn('timestamp', 'integer', [
 				'notnull' => true,
-				'length' => 4,
 				'default' => 0,
 			]);
 			$table->addColumn('color_id', 'bigint', [
 				'notnull' => true,
-				'length' => 8,
 			]);
 			$table->setPrimaryKey(['id']);
 		}
@@ -73,7 +70,6 @@ class Version000204Date20200530211356 extends SimpleMigrationStep {
 			$table->addColumn('id', 'bigint', [
 				'autoincrement' => true,
 				'notnull' => true,
-				'length' => 8,
 				'unsigned' => true,
 			]);
 			$table->addColumn('color', 'string', [
@@ -87,7 +83,6 @@ class Version000204Date20200530211356 extends SimpleMigrationStep {
 			$table->addColumn('id', 'bigint', [
 				'autoincrement' => true,
 				'notnull' => true,
-				'length' => 8,
 				'unsigned' => true,
 			]);
 			$table->addColumn('user_id', 'string', [
@@ -108,7 +103,6 @@ class Version000204Date20200530211356 extends SimpleMigrationStep {
 			$table->addColumn('id', 'bigint', [
 				'autoincrement' => true,
 				'notnull' => true,
-				'length' => 8,
 				'unsigned' => true,
 			]);
 			$table->addColumn('user_id', 'string', [
@@ -118,12 +112,10 @@ class Version000204Date20200530211356 extends SimpleMigrationStep {
 			]);
 			$table->addColumn('note_id', 'bigint', [
 				'notnull' => true,
-				'length' => 8,
 				'unsigned' => true,
 			]);
 			$table->addColumn('tag_id', 'bigint', [
 				'notnull' => true,
-				'length' => 8,
 				'unsigned' => true,
 			]);
 			$table->setPrimaryKey(['id']);
@@ -134,12 +126,10 @@ class Version000204Date20200530211356 extends SimpleMigrationStep {
 			$table->addColumn('id', 'bigint', [
 				'autoincrement' => true,
 				'notnull' => true,
-				'length' => 8,
 				'unsigned' => true,
 			]);
 			$table->addColumn('note_id', 'bigint', [
 				'notnull' => true,
-				'length' => 8,
 				'unsigned' => true,
 			]);
 			$table->addColumn('shared_user', 'string', [
