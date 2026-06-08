@@ -1,17 +1,17 @@
 # Quick notes
 
-The Quick notes application, is an application to take quick notes -Forgive the
-redundancy :sweat_smile:- on small cards, organizedby colors and tags. It allows
-a basic rich text as **Bold**, *italic*, and numbered or bullet list to improve
-the notes. Also it allows attaching files, and the notes can be shared as
-read-only to other users.
+The Quick notes application is a tool to take quick notes (forgive the
+redundancy :sweat_smile:) on small cards, organized by colors and tags. It
+supports basic rich text formatting such as **bold**, *italic*, and numbered or
+bullet lists to enhance your notes. It also allows attaching files, and the
+notes can be shared as read-only with other users.
 
 ![Screenshot of Quick notes](/doc/quicknotes-grid-view.jpeg "App screenshot")
 
 ## :heart: Support
 
-If you'd like to support the creation and maintenance of this software, consider
-donating.
+If you'd like to support the creation and maintenance of this software, please
+consider donating.
 
 [![Donate](https://img.shields.io/badge/Donate-PayPal-blue)](https://github.com/matiasdelellis/quicknotes/wiki/Donate)
 [![Donate](https://img.shields.io/badge/Donate-Bitcoin-orange)](https://github.com/matiasdelellis/quicknotes/wiki/Donate)
@@ -20,25 +20,31 @@ donating.
 ## :rocket: Installation
 
 Quick notes is available in the Nextcloud App Store and can be installed
-directly from your Nextcloud installation looking in the category Office.
+directly from your Nextcloud instance by browsing to the Office category.
 
-Nextcloud will notify you about possible updates. Please have a look at
+Nextcloud will notify you about available updates. Please have a look at
 [CHANGELOG.md](CHANGELOG.md) for details about changes.
 
 ## :exclamation: Bugs
 
 Before reporting bugs:
 
-* Get the newest version of the Quick notes app
-* Please consider also installing the [latest development version](https://github.com/matiasdelellis/quicknotes.git)
-* [Check if they have already been reported](https://github.com/matiasdelellis/quicknotes/issues)
+* Make sure you are running the latest version of the Quick notes app.
+* Consider also installing the [latest development version](https://github.com/matiasdelellis/quicknotes.git).
+* [Check whether the issue has already been reported](https://github.com/matiasdelellis/quicknotes/issues).
 
 ## Building the app
 
-1. Clone this into your `apps` folder of your Nextcloud: `git clone https://github.com/matiasdelellis/quicknotes.git`
-2. In a terminal, just run the command `make` to install the dependencies and build the aplication.
-3. Enable the app through the app management of your Nextcloud.
+1. Clone this repository into your Nextcloud `apps` folder: `git clone https://github.com/matiasdelellis/quicknotes.git`.
+2. In a terminal, run `make` to install the dependencies and build the application.
+3. Enable the app from the Apps management page of your Nextcloud instance.
+
+## Local development with Docker
+
+A self-contained Docker environment is provided under the [`docker/`](docker/)
+folder. See [docker/README.md](docker/README.md) for details on how to spin up
+a Nextcloud + MariaDB stack with this app mounted as `custom_apps/quicknotes`.
 
 ## Translating
 
-Join project on https://www.transifex.com/matias/quicknotes/
+Join the project on https://www.transifex.com/matias/quicknotes/

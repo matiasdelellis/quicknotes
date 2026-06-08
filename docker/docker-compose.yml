@@ -1,10 +1,15 @@
+# Local development stack for the Quick notes Nextcloud app.
+# See ../docker/README.md for usage instructions.
 name: quicknotes
 
 services:
+  # MariaDB 11.4 — backing store for Nextcloud.
   db:
     image: mariadb:11.4
     container_name: quicknotes-db
     restart: unless-stopped
+    # READ-COMMITTED + ROW-based binlog are the settings recommended by Nextcloud
+    # for use with MariaDB / MySQL.
     command: --transaction-isolation=READ-COMMITTED --log-bin=binlog --binlog-format=ROW
     environment:
       MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
@@ -19,6 +24,9 @@ services:
       timeout: 5s
       retries: 10
 
+  # Nextcloud 32 — the application server. The repository is bind-mounted into
+  # custom_apps/quicknotes so changes to the code are picked up live. The
+  # `:z` SELinux relabeling option is required when SELinux is in Enforcing mode.
   app:
     image: nextcloud:32
     container_name: quicknotes-app
@@ -39,6 +47,9 @@ services:
       NEXTCLOUD_OVERWRITEPROTOCOL: ${NEXTCLOUD_OVERWRITEPROTOCOL}
     volumes:
       - nc:/var/www/html
+      # Mount the parent directory (the repository root) into the Nextcloud
+      # custom_apps folder. The leading `../` steps out of this `docker/`
+      # directory so the whole project ends up in the right place.
       - ../:/var/www/html/custom_apps/quicknotes:z
     healthcheck:
       test: ["CMD", "curl", "-fsS", "http://localhost/status.php"]
@@ -46,6 +57,10 @@ services:
       timeout: 10s
       retries: 5
 
+  # Node 20 — used solely to build the front-end assets. Trigger the build
+  # with `docker/scripts/build.sh`. The container stays idle (`sleep infinity`)
+  # between builds; dependencies and the npm cache are persisted via the
+  # `npm_cache` volume.
   builder:
     image: node:20-bookworm
     container_name: quicknotes-builder
