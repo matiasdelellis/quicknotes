@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Brings up Nextcloud 32 + MariaDB and mounts this repo as custom_apps/quicknotes.
+# Brings up Nextcloud 33 + MariaDB and mounts this repo as custom_apps/quicknotes.
 set -euo pipefail
 
 cd "$(dirname "$0")/.."          # -> docker/
