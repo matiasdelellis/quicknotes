@@ -128,7 +128,7 @@ const QnDialogs = {
 			$('.select2-input').focus();
 		});
 	},
-	shares: function (availableUsers, selectedUsers, callback) {
+	shares: function (availableUsers, selectedUsers, searchFn, callback) {
 		return $.when(this._getMessageTemplate()).then(function ($tmpl) {
 			var dialogName = 'qn-dialog-content';
 			var dialogId = '#' + dialogName;
@@ -147,29 +147,77 @@ const QnDialogs = {
 			$dlg.append(input);
 			$('body').append($dlg);
 
+			// Build initial data from cached users + already selected
+			var cachedMap = {};
+			availableUsers.forEach(function (item) {
+				cachedMap[item[0]] = item[1];
+			});
+
 			input.select2({
 				placeholder: t('quicknotes', 'Select the users to share'),
 				multiple: true,
 				allowClear: true,
-				toggleSelect: true,
-				createSearchChoice: function(params) {
-					return undefined;
+				minimumInputLength: 0,
+				query: function (options) {
+					var term = options.term || '';
+					if (term.length === 0) {
+						// No search term: show cached users
+						var data = [];
+						availableUsers.forEach(function (item) {
+							data.push({id: item[0], text: item[1]});
+						});
+						options.callback({ results: data });
+					} else {
+						// Search via API
+						searchFn(term, function (results) {
+							// Merge with cached to avoid duplicates
+							var seen = {};
+							var merged = [];
+							results.forEach(function (u) {
+								if (!seen[u.id]) {
+									seen[u.id] = true;
+									merged.push(u);
+								}
+							});
+							// Also include cached matches
+							availableUsers.forEach(function (item) {
+								if (!seen[item[0]] && item[1].toLowerCase().indexOf(term.toLowerCase()) !== -1) {
+									seen[item[0]] = true;
+									merged.push({id: item[0], text: item[1]});
+								}
+							});
+							options.callback({ results: merged });
+						});
+					}
 				},
-				tags: function () {
-					var data = [];
-					availableUsers.forEach(function (item, index) {
-						// Select2 expect id, text.
-						data.push({id: item[0], text: item[1]});
+				initSelection: function (element, callback) {
+					var data = selectedUsers.map(function (u) {
+						var uid = u.id || u.shared_user;
+						var name = u.display_name || cachedMap[uid] || uid;
+						return { id: uid, text: name };
 					});
-					return data;
+					callback(data);
 				},
-				formatNoMatches: function() {
+				formatNoMatches: function () {
 					return t('quicknotes', 'No user found');
+				},
+				formatSearching: function () {
+					return t('quicknotes', 'Searching…');
+				},
+				formatInputTooShort: function () {
+					return t('quicknotes', 'Type to search users');
 				}
 			});
 
-			input.val(selectedUsers.map(function (value) { return value.id }));
-			input.trigger("change");
+			// Set initial selection
+			if (selectedUsers.length > 0) {
+				var initData = selectedUsers.map(function (u) {
+					var uid = u.id || u.shared_user;
+					var name = u.display_name || cachedMap[uid] || uid;
+					return { id: uid, text: name };
+				});
+				input.select2('data', initData);
+			}
 
 			$('.select2-input').on("keyup", function (event) {
 				if (event.keyCode === 27) {

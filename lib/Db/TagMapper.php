@@ -57,6 +57,6 @@ class TagMapper extends QBMapper {
 		$qb = $this->db->getQueryBuilder();
 		$qb->delete($this->getTableName())
 			->where('id NOT IN (' . $sub->getSQL() . ')')
-			->execute();
+			->executeStatement();
 	}
 }

@@ -30,7 +30,7 @@ use OCP\IRequest;
 class PageController extends Controller {
 	protected $appName;
 
-	public function __construct($appName,
+	public function __construct(string $appName,
 	                            IRequest $request) {
 		parent::__construct($appName, $request);
 

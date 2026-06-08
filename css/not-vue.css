@@ -124,7 +124,7 @@
 
 #app-navigation:not(.vue) > ul > li > ul > li.active, #app-navigation:not(.vue) > ul > li > ul > li.active > a, #app-navigation:not(.vue) > ul > li > ul > li a.selected, #app-navigation:not(.vue) > ul > li > ul > li a.selected > a {
   border-radius: var(--border-radius-pill);
-  background-color: var(--color-primary-light);
+  background-color: var(--color-primary-element-light);
 }
 
 #app-navigation:not(.vue) > ul > li.deleted > ul, #app-navigation:not(.vue) > ul > li.collapsible:not(.open) > ul {

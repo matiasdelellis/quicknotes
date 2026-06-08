@@ -44,10 +44,10 @@ class SettingsController extends Controller {
 	const STATE_SUCCESS = 2;
 	const STATE_ERROR = 3;
 
-	public function __construct ($appName,
+	public function __construct (string $appName,
 	                             IRequest        $request,
 	                             SettingsService $settingsService,
-	                             $userId)
+	                             ?string $userId)
 	{
 		parent::__construct($appName, $request);
 

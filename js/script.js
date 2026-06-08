@@ -162,21 +162,60 @@ Notes.prototype = {
     // Get the users to share in the notes
     _loadUsersSharing: function () {
         var self = this;
-        $.get(OC.linkToOCS('apps/files_sharing/api/v1/', 1) + 'sharees', {
+        self._usersSharing = [];
+        self._loadUsersSharingPage(1);
+    },
+    _loadUsersSharingPage: function (page) {
+        var self = this;
+        $.get(OC.linkToOCS('apps/files_sharing/api/v1/', 2) + 'sharees', {
             format: 'json',
-            perPage: 50,
-            itemType: 1
+            search: '',
+            perPage: 200,
+            page: page,
+            itemType: 0
         }).done(function (shares) {
-            var users = [];
-            $.each(shares.ocs.data.exact.users, function(index, user) {
-                users.push([user.value.shareWith, user.label]);
-            });
-            $.each(shares.ocs.data.users, function(index, user) {
-                users.push([user.value.shareWith, user.label]);
-            });
-            self._usersSharing = users;
+            if (shares.ocs && shares.ocs.data) {
+                var d = shares.ocs.data;
+                if (d.exact && d.exact.users) {
+                    $.each(d.exact.users, function(index, user) {
+                        self._usersSharing.push([user.value.shareWith, user.label]);
+                    });
+                }
+                if (d.users) {
+                    $.each(d.users, function(index, user) {
+                        self._usersSharing.push([user.value.shareWith, user.label]);
+                    });
+                }
+            }
         }).fail(function () {
             console.error("Could not get users to share.");
+        });
+    },
+    // Search users dynamically via sharees API
+    searchUsersSharing: function (query, callback) {
+        $.get(OC.linkToOCS('apps/files_sharing/api/v1/', 2) + 'sharees', {
+            format: 'json',
+            search: query,
+            perPage: 200,
+            itemType: 0
+        }).done(function (shares) {
+            var users = [];
+            if (shares.ocs && shares.ocs.data) {
+                var d = shares.ocs.data;
+                if (d.exact && d.exact.users) {
+                    $.each(d.exact.users, function(i, u) {
+                        users.push({id: u.value.shareWith, text: u.label});
+                    });
+                }
+                if (d.users) {
+                    $.each(d.users, function(i, u) {
+                        users.push({id: u.value.shareWith, text: u.label});
+                    });
+                }
+            }
+            callback(users);
+        }).fail(function () {
+            callback([]);
         });
     }
 };
@@ -561,6 +600,7 @@ View.prototype = {
             QnDialogs.shares(
                 self._notes.getUsersSharing(),
                 self._editableShares(),
+                function(query, cb) { self._notes.searchUsersSharing(query, cb); },
                 function(result, newShares) {
                     if (result === true) {
                         self._editableShares(newShares);
@@ -1063,7 +1103,7 @@ View.prototype = {
             "left"     : note.offset().left,
             "top"      : note.offset().top,
             "width"    : note.width(),
-            "height:"  : "auto"
+            "height"   : "auto"
         });
 
         $('#modal-note-div').removeClass("hide-modal-note");
