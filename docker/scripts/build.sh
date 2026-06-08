@@ -26,12 +26,12 @@ docker compose exec -T builder sh -c '
   npm ci --no-audit --no-fund || npm install --no-audit --no-fund
 
   echo "[2/3] copy deps (depsmin) + precompilar templates handlebars..."
-  mkdir -p vendor js/vendor
+  mkdir -p vendor js/vendor css/vendor
   rm -rf js/vendor/*
   cp node_modules/handlebars/dist/handlebars.min.js          js/vendor/handlebars.js
   cp node_modules/isotope-layout/dist/isotope.pkgd.min.js    js/vendor/isotope.pkgd.js
   cp node_modules/medium-editor/dist/js/medium-editor.min.js js/vendor/medium-editor.js
-  cp node_modules/medium-editor/dist/css/medium-editor.min.css vendor/medium-editor.css
+  cp node_modules/medium-editor/dist/css/medium-editor.min.css css/vendor/medium-editor.css
   cp node_modules/medium-editor-autolist/dist/autolist.min.js js/vendor/autolist.js
   cp node_modules/lozad/dist/lozad.min.js                    js/vendor/lozad.js
 

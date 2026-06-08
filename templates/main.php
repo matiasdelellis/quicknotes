@@ -10,6 +10,7 @@ script('quicknotes', 'templates');
 \OCP\Util::addScript('quicknotes', 'script');
 style('quicknotes', 'not-vue');
 style('quicknotes', 'style');
+\OCP\Util::addStyle('quicknotes', 'vendor/medium-editor');
 style('quicknotes', 'medium');
 style('quicknotes', 'qn-colorpick');
 ?>

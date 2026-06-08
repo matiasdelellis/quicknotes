@@ -3,6 +3,7 @@ js/templates.js
 js/quicknotes-dashboard.js*
 js/quicknotes-talk.js*
 js/vendor
+css/vendor
 node_modules
 vendor
 translationfiles/
