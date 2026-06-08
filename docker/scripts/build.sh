@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
-# Compila los assets de la app (vendors JS, templates Handlebars, bundles Vue).
-# Requiere el servicio `builder` del docker-compose (node:20).
+# Builds the app assets (JS vendors, precompiled Handlebars templates, Vue bundles).
+# Requires the `builder` service from docker-compose (node:20).
 set -euo pipefail
 
 cd "$(dirname "$0")/.."  # -> docker/
 
 if ! docker compose ps builder --status running >/dev/null 2>&1; then
-  echo ">> El servicio 'builder' no está corriendo. Levantando..."
+  echo ">> The 'builder' service is not running. Starting it..."
   docker compose up -d builder
-  echo ">> Esperando a que 'builder' esté listo..."
+  echo ">> Waiting for 'builder' to be ready..."
   for i in {1..30}; do
     if docker compose ps builder --status running >/dev/null 2>&1; then
       break
@@ -17,15 +17,15 @@ if ! docker compose ps builder --status running >/dev/null 2>&1; then
   done
 fi
 
-echo ">> Ejecutando make build dentro del contenedor builder..."
+echo ">> Running the build inside the builder container..."
 docker compose exec -T builder sh -c '
   set -e
   cd /app
 
-  echo "[1/3] npm install (puede tardar varios minutos la primera vez)..."
+  echo "[1/3] npm install (may take several minutes the first time)..."
   npm ci --no-audit --no-fund || npm install --no-audit --no-fund
 
-  echo "[2/3] copy deps (depsmin) + precompilar templates handlebars..."
+  echo "[2/3] Copy vendors (depsmin) + precompile Handlebars templates..."
   mkdir -p vendor js/vendor css/vendor
   rm -rf js/vendor/*
   cp node_modules/handlebars/dist/handlebars.min.js          js/vendor/handlebars.js
@@ -37,7 +37,7 @@ docker compose exec -T builder sh -c '
 
   node_modules/.bin/handlebars js/templates -f js/templates.js
 
-  echo "[3/3] webpack build (vue + js principal)..."
+  echo "[3/3] Webpack build (Vue + main JS)..."
   npm run build
 
   echo ""
