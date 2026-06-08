@@ -24,11 +24,11 @@ services:
       timeout: 5s
       retries: 10
 
-  # Nextcloud 32 — the application server. The repository is bind-mounted into
+  # Nextcloud — the application server. The repository is bind-mounted into
   # custom_apps/quicknotes so changes to the code are picked up live. The
   # `:z` SELinux relabeling option is required when SELinux is in Enforcing mode.
   app:
-    image: nextcloud:32
+    image: nextcloud:33
     container_name: quicknotes-app
     restart: unless-stopped
     depends_on:

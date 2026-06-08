@@ -1,6 +1,6 @@
 # Local development environment (Docker)
 
-Spins up a Nextcloud 32 + MariaDB stack and mounts this repository into
+Spins up a Nextcloud 33 + MariaDB stack and mounts this repository into
 `custom_apps/quicknotes`, so you can try the app without installing
 Nextcloud manually.
 
@@ -97,7 +97,7 @@ docker logs -f quicknotes-db
 ## How it works
 
 - `docker-compose.yml` defines three services: `db` (MariaDB 11.4),
-  `app` (Nextcloud 32) and `builder` (Node 20, used to build assets).
+  `app` (Nextcloud 33) and `builder` (Node 20, used to build assets).
 - The repository root is bind-mounted into
   `/var/www/html/custom_apps/quicknotes` (the compose volumes use
   `../` to step out of `docker/` and mount the whole project).
@@ -107,9 +107,9 @@ docker logs -f quicknotes-db
 
 ## Limitations
 
-- `info.xml` declares the app for Nextcloud 32. If you need a different
+- `info.xml` declares the app for Nextcloud 32–33. To pin a different
   version, change the image tag in `docker-compose.yml` (e.g.
-  `nextcloud:31`).
+  `nextcloud:32`).
 - SELinux in Enforcing mode requires the `:z` suffix on the bind mounts
   (already configured). If your distribution does not use SELinux, you
   can remove it.
