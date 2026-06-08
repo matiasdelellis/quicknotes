@@ -24,203 +24,9 @@
 
 $(document).ready(function () {
 
-// this notes object holds all our notes
-var Notes = function (baseUrl) {
-    this._baseUrl = baseUrl;
-    this._notes = [];
-    this._loaded = false;
-
-    this._usersSharing = [];
-    this._loadUsersSharing();
-};
-
-Notes.prototype = {
-    // Load notes from backend.
-    load: function () {
-        var self = this;
-        var deferred = $.Deferred();
-        $.get(this._baseUrl).done(function (notes) {
-            self._notes = notes.reverse();
-            self._loaded = true;
-            deferred.resolve();
-        }).fail(function () {
-            deferred.reject();
-        });
-        return deferred.promise();
-    },
-    // Check that all the notes were loaded.
-    isLoaded: function () {
-        return this._loaded;
-    },
-    // Get the amount of notes.
-    length: function () {
-        return this._notes.length;
-    },
-    // Get all notes.
-    getAll: function () {
-        return this._notes;
-    },
-    // Get the colors used in the notes
-    getColors: function () {
-        var colors = [];
-        var Ccolors = [];
-        $.each(this._notes, function(index, value) {
-            if ($.inArray(value.color, colors) == -1) {
-                colors.push(value.color);
-            }
-        });
-        $.each(colors, function(index, value) {
-            Ccolors.push({color: value});
-        });
-        return Ccolors;
-    },
-    getUsersSharing: function () {
-        return this._usersSharing;
-    },
-    // Get the tags used in the notes
-    getTags: function () {
-        var tags = [];
-        $.each(this._notes, function(index, note) {
-            $.each(note.tags, function(index, tag) {
-                if (tags.findIndex(item => item.id == tag.id) === -1)
-                    tags.push(tag);
-            });
-        });
-        return tags;
-    },
-    // CRUD Create: Need an note template to have the translated title.
-    create: function (noteTemplate) {
-        var self = this;
-        var deferred = $.Deferred();
-        $.ajax({
-            url: this._baseUrl,
-            method: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify(noteTemplate)
-        }).done(function (note) {
-            self._notes.unshift(note);
-            deferred.resolve(note);
-        }).fail(function () {
-            deferred.reject();
-        });
-        return deferred.promise();
-    },
-    // CRUD Read: Load a note to edit.
-    read: function (id) {
-        return this._notes.find((note) => note.id === id);
-    },
-    // CRUD Update
-    update: function (note) {
-        var self = this;
-        var deferred = $.Deferred();
-        $.ajax({
-            url: this._baseUrl + '/' + note.id,
-            method: 'PUT',
-            contentType: 'application/json',
-            data: JSON.stringify(note)
-        }).done(function (dbnote) {
-            var index = self._notes.findIndex((aNote) => aNote.id === dbnote.id);
-            self._notes.splice(index, 1, dbnote);
-            deferred.resolve(dbnote);
-        }).fail(function () {
-            deferred.reject();
-        });
-        return deferred.promise();
-    },
-    // CRUD Delete
-    remove: function (note) {
-        var self = this;
-        var deferred = $.Deferred();
-        $.ajax({
-            url: this._baseUrl + '/' + note.id,
-            method: 'DELETE'
-        }).done(function () {
-            var index = self._notes.findIndex((aNote) => aNote.id === note.id);
-            self._notes.splice(index, 1);
-            deferred.resolve();
-        }).fail(function () {
-            deferred.reject();
-        });
-        return deferred.promise();
-    },
-    // Delete shared note.
-    forgetShare: function (note) {
-        var self = this;
-        var deferred = $.Deferred();
-        $.ajax({
-            url: OC.generateUrl('/apps/quicknotes/share') + '/' + note.id,
-            method: 'DELETE'
-        }).done(function () {
-            var index = self._notes.findIndex((aNote) => aNote.id === note.id);
-            self._notes.splice(index, 1);
-            deferred.resolve();
-        }).fail(function () {
-            deferred.reject();
-        });
-        return deferred.promise();
-    },
-    // Get the users to share in the notes
-    _loadUsersSharing: function () {
-        var self = this;
-        self._usersSharing = [];
-        self._loadUsersSharingPage(1);
-    },
-    _loadUsersSharingPage: function (page) {
-        var self = this;
-        $.get(OC.linkToOCS('apps/files_sharing/api/v1/', 2) + 'sharees', {
-            format: 'json',
-            search: '',
-            perPage: 200,
-            page: page,
-            itemType: 0
-        }).done(function (shares) {
-            if (shares.ocs && shares.ocs.data) {
-                var d = shares.ocs.data;
-                if (d.exact && d.exact.users) {
-                    $.each(d.exact.users, function(index, user) {
-                        self._usersSharing.push([user.value.shareWith, user.label]);
-                    });
-                }
-                if (d.users) {
-                    $.each(d.users, function(index, user) {
-                        self._usersSharing.push([user.value.shareWith, user.label]);
-                    });
-                }
-            }
-        }).fail(function () {
-            console.error("Could not get users to share.");
-        });
-    },
-    // Search users dynamically via sharees API
-    searchUsersSharing: function (query, callback) {
-        $.get(OC.linkToOCS('apps/files_sharing/api/v1/', 2) + 'sharees', {
-            format: 'json',
-            search: query,
-            perPage: 200,
-            itemType: 0
-        }).done(function (shares) {
-            var users = [];
-            if (shares.ocs && shares.ocs.data) {
-                var d = shares.ocs.data;
-                if (d.exact && d.exact.users) {
-                    $.each(d.exact.users, function(i, u) {
-                        users.push({id: u.value.shareWith, text: u.label});
-                    });
-                }
-                if (d.users) {
-                    $.each(d.users, function(i, u) {
-                        users.push({id: u.value.shareWith, text: u.label});
-                    });
-                }
-            }
-            callback(users);
-        }).fail(function () {
-            callback([]);
-        });
-    }
-};
-
-
+// The Notes API is defined in notes-api.js, loaded before this script.
+// It is exposed on window as QuickNotesNotes.
+//
 // this will be the view that is used to update the html
 var View = function (notes) {
     this._notes = notes;
@@ -235,6 +41,7 @@ var View = function (notes) {
     // user interaction, so a single binding per instance is safe.
     this._$doc = $(document);
     this._$modal = $('#modal-note-div');
+    this._$modalContent = $('.modal-content');
     this._$notesGrid = $('.notes-grid');
 };
 
@@ -302,7 +109,8 @@ View.prototype = {
             self.renderNavigation();
             self.updateSort();
         }).fail(function () {
-            alert('DOh!. Could not update note!.');
+            OC.dialogs.alert(t('quicknotes', 'DOh!. Could not update note!.'),
+                t('quicknotes', 'Quick notes'));
         });
     },
     closeEdit: function () {
@@ -349,6 +157,7 @@ View.prototype = {
 
         // Re-cache jQuery selectors that point into the re-rendered DOM.
         this._$modal = $('#modal-note-div');
+        this._$modalContent = $('.modal-content');
         this._$notesGrid = $('.notes-grid');
 
         // TODO: Move within handlebars template
@@ -451,7 +260,8 @@ View.prototype = {
                                     self.render();
                                 }
                             }).fail(function () {
-                                 alert('Could not delete note, not found');
+                                 OC.dialogs.alert(t('quicknotes', 'Could not delete note, not found'),
+                                     t('quicknotes', 'Quick notes'));
                             });
                         } else {
                             self._notes.forgetShare(note).done(function () {
@@ -464,7 +274,8 @@ View.prototype = {
                                     self.render();
                                 }
                             }).fail(function () {
-                                 alert('Could not delete note, not found');
+                                 OC.dialogs.alert(t('quicknotes', 'Could not delete note, not found'),
+                                     t('quicknotes', 'Quick notes'));
                             });
                         }
                     }
@@ -494,7 +305,8 @@ View.prototype = {
                 self._isotope.updateSortData();
                 self._isotope.arrange();
             }).fail(function () {
-                alert('Could not pin note');
+                OC.dialogs.alert(t('quicknotes', 'Could not pin note'),
+                    t('quicknotes', 'Quick notes'));
             });
         });
 
@@ -518,7 +330,8 @@ View.prototype = {
                 self._isotope.updateSortData();
                 self._isotope.arrange();
             }).fail(function () {
-                alert('Could not unpin note');
+                OC.dialogs.alert(t('quicknotes', 'Could not unpin note'),
+                    t('quicknotes', 'Quick notes'));
             });
         });
 
@@ -645,7 +458,8 @@ View.prototype = {
                     self._editableAttachts(attachts, true);
                     self._noteChanged = true;
                 }).fail(() => {
-                    console.log("ERRORRR");
+                    OC.dialogs.alert(t('quicknotes', 'Could not attach the file.'),
+                        t('quicknotes', 'Quick notes'));
                 });
             }, false, null, true, OC.dialogs.FILEPICKER_TYPE_CHOOSE)
         });
@@ -726,7 +540,8 @@ View.prototype = {
                     self.render();
                 }
             }).fail(function () {
-                alert('Could not create note');
+                OC.dialogs.alert(t('quicknotes', 'Could not create note'),
+                    t('quicknotes', 'Quick notes'));
             });
         });
 
@@ -1111,10 +926,10 @@ View.prototype = {
     _showEditor: function(id) {
         var self = this;
         var note = this._$notesGrid.find("[data-id='" + id + "']").parent();
-        var modal = $(".modal-content");
+        var modal = this._$modalContent;
 
         /* Positioning the modal to the original size */
-        $(".modal-content").css({
+        modal.css({
             "position" : "absolute",
             "left"     : note.offset().left,
             "top"      : note.offset().top,
@@ -1171,7 +986,7 @@ View.prototype = {
     _hideEditor: function(id) {
         var self = this;
         var note = this._$notesGrid.find("[data-id='" + id + "']").parent();
-        var modal = $(".modal-content");
+        var modal = this._$modalContent;
 
         var noteLeft = note.offset().left;
         var noteTop = note.offset().top;
@@ -1320,7 +1135,7 @@ Handlebars.registerHelper('tNN', function(number) {
 /*
  * Create modules
  */
-var notes = new Notes(OC.generateUrl('/apps/quicknotes/notes'));
+var notes = new window.QuickNotesNotes(OC.generateUrl('/apps/quicknotes/notes'));
 var view = new View(notes);
 
 /*
@@ -1348,7 +1163,8 @@ notes.load().done(function () {
         view._filterColor(color);
     }
 }).fail(function () {
-    alert('Could not load notes');
+    OC.dialogs.alert(t('quicknotes', 'Could not load notes'),
+        t('quicknotes', 'Quick notes'));
 });
 
 

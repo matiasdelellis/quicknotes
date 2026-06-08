@@ -7,6 +7,7 @@
 \OCP\Util::addScript('quicknotes', 'vendor/lozad');
 \OCP\Util::addScript('quicknotes', 'qn-dialogs');
 \OCP\Util::addScript('quicknotes', 'qn-colorpick');
+\OCP\Util::addScript('quicknotes', 'notes-api');
 \OCP\Util::addScript('quicknotes', 'script');
 \OCP\Util::addStyle('quicknotes', 'not-vue');
 \OCP\Util::addStyle('quicknotes', 'style');
