@@ -12,6 +12,7 @@
 \OCP\Util::addStyle('quicknotes', 'style');
 \OCP\Util::addStyle('quicknotes', 'medium');
 \OCP\Util::addStyle('quicknotes', 'qn-colorpick');
+\OCP\Util::addStyle('quicknotes', 'vendor/medium-editor');
 ?>
 
 	<div id="app-navigation">

@@ -1035,6 +1035,14 @@ View.prototype = {
     },
     _initEditor: function() {
         var modalcontent = $('#modal-note-div #content-editable');
+        if (modalcontent.length === 0) {
+            console.error('[quicknotes] _initEditor: #content-editable not found in DOM');
+            return;
+        }
+        if (this._editor) {
+            this._editor.destroy();
+            this._editor = undefined;
+        }
         var editor = new MediumEditor(modalcontent, {
             toolbar: {
                 buttons: [
