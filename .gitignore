@@ -2,7 +2,12 @@ build
 js/templates.js
 js/quicknotes-dashboard.js*
 js/quicknotes-talk.js*
+js/vendor
 node_modules
 vendor
 translationfiles/
 translationtool.phar
+
+# Docker dev environment
+.env
+*.log
