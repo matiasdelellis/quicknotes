@@ -539,6 +539,8 @@ View.prototype = {
                 } else {
                     self.render();
                 }
+                // Open the freshly created note for editing.
+                self.editNote(note.id);
             }).fail(function () {
                 OC.dialogs.alert(t('quicknotes', 'Could not create note'),
                     t('quicknotes', 'Quick notes'));
