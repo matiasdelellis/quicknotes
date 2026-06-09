@@ -23,6 +23,7 @@ A Nextcloud app (app id `quicknotes`, namespace `OCA\QuickNotes`) that provides 
   - `npm install` then `cp node_modules/handlebars/dist/handlebars.min.js js/vendor/handlebars.js` (and the other 5 libs in `Makefile:77‑82`).
   - `node_modules/handlebars/bin/handlebars js/templates -f js/templates.js` — **must** be re‑run after editing any `js/templates/*.handlebars`.
   - `npm run build` (webpack via `@nextcloud/webpack-vue-config`).
+  - If `node` / `npm` is not installed on the host, use `./docker/scripts/build.sh` — it runs the whole front‑end build (Handlebars precompile, vendor copy, webpack) inside the `builder` container using its Node 20 toolchain. Don't try to run `node` or `npm` directly on the host.
 - Generated/ignored artifacts (do not edit by hand, they are gitignored):
   `js/templates.js`, `js/quicknotes-*.js*`, `js/vendor/*`, `css/vendor/*`, `vendor/`, `node_modules/`, `translationfiles/`, `translationtool.phar`, `build/`.
 
