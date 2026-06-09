@@ -10,12 +10,23 @@
 			</div>
 		</div>
 		<div class='note-body'>
-			{{#if isPinned}}
-				<div class="icon-header-note icon-pinned fixed-header-icon" title="{{t "quicknotes" "Unpin note"}}"></div>
+			{{#unless trashView}}
+				{{#if isPinned}}
+					<div class="icon-header-note icon-pinned fixed-header-icon" title="{{t "quicknotes" "Unpin note"}}"></div>
+				{{else}}
+					<div class="icon-header-note icon-pin hide-header-icon" title="{{t "quicknotes" "Pin note"}}"></div>
+				{{/if}}
+				{{#if archivedAt}}
+					<div class="icon-header-note icon-archived fixed-header-icon" title="{{t "quicknotes" "Unarchive"}}"></div>
+				{{else}}
+					<div class="icon-header-note hide-header-icon icon-archived" title="{{t "quicknotes" "Archive note"}}"></div>
+				{{/if}}
+			{{/unless}}
+			{{#if deletedAt}}
+				<div class="icon-header-note icon-delete-note fixed-header-icon" title="{{t "quicknotes" "Restore"}}"></div>
 			{{else}}
-				<div class="icon-header-note icon-pin hide-header-icon" title="{{t "quicknotes" "Pin note"}}"></div>
+				<div class="icon-header-note hide-header-icon icon-delete-note" title="{{t "quicknotes" "Move to trash"}}"></div>
 			{{/if}}
-			<div class="icon-header-note hide-header-icon icon-delete-note" title="{{t "quicknotes" "Delete note"}}"></div>
 			<div class='note-title'>
 				{{{ title }}}
 			</div>

@@ -29,6 +29,7 @@ $(document).ready(function () {
 //
 // this will be the view that is used to update the html
 var View = function (notes) {
+    var self = this;
     this._notes = notes;
 
     this._editor = undefined;
@@ -36,6 +37,11 @@ var View = function (notes) {
     this._colorPick = undefined;
 
     this._noteChanged = false;
+
+    // Which bucket is currently shown in the grid: 'all' (active notes),
+    // 'archived' or 'trash'. Drives which list is rendered and which
+    // navigation entry is marked active.
+    this._currentView = 'all';
 
     // Cached jQuery selectors. Re-rendered by renderContent() before any
     // user interaction, so a single binding per instance is safe.
@@ -140,16 +146,36 @@ View.prototype = {
         $("#div-content").off();
         $("#note-grid-dev").off();
 
+        // Pick the bucket to render based on the active view.
+        var currentNotes;
+        var emptyMsg;
+        switch (this._currentView) {
+            case 'archived':
+                currentNotes = this._notes.getArchived();
+                emptyMsg = t('quicknotes', 'No archived notes');
+                break;
+            case 'trash':
+                currentNotes = this._notes.getDeleted();
+                emptyMsg = t('quicknotes', 'Trash is empty');
+                break;
+            case 'all':
+            default:
+                currentNotes = this._notes.getAll();
+                emptyMsg = t('quicknotes', 'Nothing here. Take your first quick notes');
+                break;
+        }
+
         // Draw notes.
         var html = Handlebars.templates['notes']({
             loaded: this._notes.isLoaded(),
-            notes: this._notes.getAll(),
+            notes: currentNotes,
+            trashView: this._currentView === 'trash',
             tagTxt: t('quicknotes', 'Tags'),
             cancelTxt: t('quicknotes', 'Cancel'),
             saveTxt: t('quicknotes', 'Save'),
             loadingMsg: t('quicknotes', 'Looking for your notes'),
             loadingIcon: OC.imagePath('core', 'loading.gif'),
-            emptyMsg: t('quicknotes', 'Nothing here. Take your first quick notes'),
+            emptyMsg: emptyMsg,
             emptyIcon: OC.imagePath('quicknotes', 'app'),
         });
 
@@ -168,7 +194,7 @@ View.prototype = {
         var self = this;
 
         // Init masonty grid to notes.
-        if (this._notes.isLoaded() && this._notes.length() > 0) {
+        if (this._notes.isLoaded() && currentNotes.length > 0 && this._$notesGrid[0]) {
             this._isotope = new Isotope(this._$notesGrid[0], {
                 layoutMode: 'masonry',
                 masonry: {
@@ -215,9 +241,18 @@ View.prototype = {
             $(this).find(".icon-header-note").removeClass("show-header-icon");
         });
 
-        // Open notes when clicking them.
+        // Open notes when clicking them. Ignore clicks on header
+        // icons (pin, delete, ...) — they have their own handlers
+        // registered as delegated handlers on the same parent, which
+        // would otherwise also fire and open the edit modal.
         $("#notes-grid-div").on("click", ".quicknote", function (event) {
+            if ($(event.target).closest('.icon-header-note').length) {
+                return;
+            }
             event.stopPropagation();
+            // Notes in the trash can only be restored or purged; the
+            // edit modal must not open for them.
+            if (self._currentView === 'trash') return;
             var id = parseInt($(this).attr('data-id'), 10);
             self.editNote(id);
         });
@@ -236,57 +271,68 @@ View.prototype = {
             setFilterUrl('t', tagId);
         });
 
-        // Remove note when click icon
+        // Archive or unarchive the note. The fixed-header-icon variant
+        // is rendered on already-archived notes, so it triggers an
+        // unarchive instead of a fresh archive. Inside the trash view
+        // the icon is shown only as a state indicator — no action.
+        $('#notes-grid-div').on("click", ".icon-archived", function (event) {
+            event.stopPropagation();
+
+            if (self._currentView === 'trash') return;
+
+            var icon = $(this);
+            var gridnote = icon.parent().parent();
+            var id = parseInt(gridnote.attr('data-id'), 10);
+            var note = self._notes.read(id);
+            if (!note) return;
+
+            if (note.sharedBy && note.sharedBy.length) return;
+
+            if (icon.hasClass('fixed-header-icon')) {
+                self._unarchiveNote(note, gridnote);
+            } else if (self._currentView !== 'archived') {
+                self._archiveNote(note, gridnote);
+            }
+        });
+
+        // Move the note to trash, restore it, or purge it depending
+        // on the current view and whether the icon is the fixed
+        // "in trash" indicator.
         $('#notes-grid-div').on("click", ".icon-delete-note", function (event) {
             event.stopPropagation();
 
-            var gridnote = $(this).parent().parent();
+            var icon = $(this);
+            var gridnote = icon.parent().parent();
             var id = parseInt(gridnote.attr('data-id'), 10);
-
             var note = self._notes.read(id);
-            OC.dialogs.confirm(
-                t('quicknotes', 'Are you sure you want to delete the note?'),
-                t('quicknotes', 'Delete note'),
-                function(result) {
-                    if (result) {
-                        if (!note.sharedBy.length) {
-                            self._notes.remove(note).done(function () {
-                                if (self._notes.length() > 0) {
-                                    self._isotope.remove(gridnote.parent())
-                                    self._isotope.layout();
-                                    self.showAll();
-                                    self.renderNavigation();
-                                } else {
-                                    self.render();
-                                }
-                            }).fail(function () {
-                                 OC.dialogs.alert(t('quicknotes', 'Could not delete note, not found'),
-                                     t('quicknotes', 'Quick notes'));
-                            });
-                        } else {
-                            self._notes.forgetShare(note).done(function () {
-                                if (self._notes.length() > 0) {
-                                    self._isotope.remove(gridnote.parent())
-                                    self._isotope.layout();
-                                    self.showAll();
-                                    self.renderNavigation();
-                                } else {
-                                    self.render();
-                                }
-                            }).fail(function () {
-                                 OC.dialogs.alert(t('quicknotes', 'Could not delete note, not found'),
-                                     t('quicknotes', 'Quick notes'));
-                            });
-                        }
-                    }
-                },
-                true
-            );
+            if (!note) return;
+
+            if (note.sharedBy && note.sharedBy.length) {
+                self._forgetSharedNote(note, gridnote);
+                return;
+            }
+
+            if (icon.hasClass('fixed-header-icon')) {
+                // Icon is rendered as the permanent "in trash" badge.
+                self._restoreNote(note, gridnote);
+                return;
+            }
+
+            if (self._currentView === 'trash') {
+                self._purgeNote(note, gridnote);
+                return;
+            }
+
+            self._trashNote(note, gridnote);
         });
 
         // Pin note when click icon
         $('#notes-grid-div').on("click", ".icon-pin", function (event) {
             event.stopPropagation();
+
+            // Pin is not allowed inside the trash; the icon is
+            // rendered as a state indicator only.
+            if (self._currentView === 'trash') return;
 
             var icon = $(this);
             var gridNote = icon.parent().parent();
@@ -313,6 +359,13 @@ View.prototype = {
         // Unpin note when click icon
         $('#notes-grid-div').on("click", ".icon-pinned", function (event) {
             event.stopPropagation();
+
+            if (self._currentView === 'trash') return;
+
+            // Archived notes can only be edited from the modal, so the
+            // pin icon is rendered as a state indicator only and must
+            // not toggle the pin state from the grid.
+            if (self._currentView === 'archived') return;
 
             var icon = $(this);
             var gridNote = icon.parent().parent();
@@ -508,16 +561,24 @@ View.prototype = {
     renderNavigation: function () {
         var html = Handlebars.templates['navigation']({
             colors: this._notes.getColors(),
-            notes: this._notes.getAll(),
             tags: this._notes.getTags(),
             newNoteTxt: t('quicknotes', 'New note'),
             allNotesTxt: t('quicknotes', 'All notes'),
+            archivedTxt: t('quicknotes', 'Archived'),
+            trashTxt: t('quicknotes', 'Trash'),
             colorsTxt: t('quicknotes', 'Colors'),
-            notesTxt: t('quicknotes', 'Notes'),
             tagsTxt: t('quicknotes', 'Tags'),
         });
 
         $('#app-navigation ul').html(html);
+
+        /* Mark the entry matching the current view as active. */
+        switch (this._currentView) {
+            case 'archived': $('#archived-notes').addClass('active'); break;
+            case 'trash':    $('#trash-notes').addClass('active');    break;
+            case 'all':
+            default:         $('#all-notes').addClass('active');      break;
+        }
 
         /* Create a new note */
 
@@ -528,6 +589,7 @@ View.prototype = {
                 content: ''
             };
             self._notes.create(fakenote).done(function(note) {
+                self._currentView = 'all';
                 if (self._notes.length() > 1) {
                     var $notehtml = $(Handlebars.templates['note-item'](note));
                     self._$notesGrid.prepend($notehtml);
@@ -549,11 +611,35 @@ View.prototype = {
 
         /* Show all notes */
 
-        $('#all-notes').click(function () {
+        $('#all-notes').click(function (event) {
             event.preventDefault();
+            self._currentView = 'all';
             self._cleanNavigation();
             $(this).addClass("active");
-            self._isotope.arrange({ filter: '*'});
+            self.renderContent();
+            self.updateSort();
+            setFilterUrl();
+        });
+
+        /* Show archived notes */
+
+        $('#archived-notes').click(function (event) {
+            event.preventDefault();
+            self._currentView = 'archived';
+            self._cleanNavigation();
+            $(this).addClass("active");
+            self.renderContent();
+            setFilterUrl();
+        });
+
+        /* Show trash */
+
+        $('#trash-notes').click(function (event) {
+            event.preventDefault();
+            self._currentView = 'trash';
+            self._cleanNavigation();
+            $(this).addClass("active");
+            self.renderContent();
             setFilterUrl();
         });
 
@@ -613,22 +699,6 @@ View.prototype = {
             else {
                 self.showAll();
             }
-        });
-
-        /* Notes Navigation */
-
-        $('#notes-folder').click(function () {
-            $(this).toggleClass("open");
-        });
-
-        $('#app-navigation .nav-note > a').click(function (event) {
-            event.preventDefault();
-            event.stopPropagation();
-            var id = parseInt($(this).parent().data('id'), 10);
-            self._cleanNavigation();
-            $(this).addClass("active");
-            self._filterNote(id);
-            setFilterUrl('n', id);
         });
 
         /* Tags Navigation */
@@ -1058,6 +1128,118 @@ View.prototype = {
         $.each(oldColorTool, function(i, oct) {
             $(oct).removeClass('icon-filter-checkmark');
         });
+    },
+    // Soft-delete the note and re-render the view.
+    _trashNote: function (note, gridnote) {
+        var self = this;
+        this._notes.trash(note).done(function () {
+            if (self._currentView === 'all' && self._notes.getAll().length > 0) {
+                self._isotope.remove(gridnote.parent());
+                self._isotope.layout();
+                self.renderNavigation();
+            } else {
+                self.render();
+            }
+        }).fail(function () {
+            OC.dialogs.alert(t('quicknotes', 'Could not move note to trash'),
+                t('quicknotes', 'Quick notes'));
+        });
+    },
+    // Archive the note and re-render the view.
+    _archiveNote: function (note, gridnote) {
+        var self = this;
+        this._notes.archive(note).done(function () {
+            if (self._currentView === 'all' && self._notes.getAll().length > 0) {
+                self._isotope.remove(gridnote.parent());
+                self._isotope.layout();
+                self.renderNavigation();
+            } else {
+                self.render();
+            }
+        }).fail(function () {
+            OC.dialogs.alert(t('quicknotes', 'Could not archive note'),
+                t('quicknotes', 'Quick notes'));
+        });
+    },
+    // Unarchive the note and re-render the view.
+    _unarchiveNote: function (note, gridnote) {
+        var self = this;
+        this._notes.unarchive(note).done(function () {
+            if (self._currentView === 'archived' && self._notes.getArchived().length > 0) {
+                self._isotope.remove(gridnote.parent());
+                self._isotope.layout();
+                self.renderNavigation();
+            } else {
+                self.render();
+            }
+        }).fail(function () {
+            OC.dialogs.alert(t('quicknotes', 'Could not unarchive note'),
+                t('quicknotes', 'Quick notes'));
+        });
+    },
+    // Restore the note from trash and re-render the view.
+    _restoreNote: function (note, gridnote) {
+        var self = this;
+        this._notes.restore(note).done(function () {
+            if (self._currentView === 'trash' && self._notes.getDeleted().length > 0) {
+                self._isotope.remove(gridnote.parent());
+                self._isotope.layout();
+                self.renderNavigation();
+            } else {
+                self.render();
+            }
+        }).fail(function () {
+            OC.dialogs.alert(t('quicknotes', 'Could not restore note'),
+                t('quicknotes', 'Quick notes'));
+        });
+    },
+    // Hard-delete a soft-deleted note (only used from the trash view).
+    _purgeNote: function (note, gridnote) {
+        var self = this;
+        OC.dialogs.confirm(
+            t('quicknotes', 'Permanently delete this note? This cannot be undone.'),
+            t('quicknotes', 'Delete permanently'),
+            function (result) {
+                if (!result) return;
+                self._notes.remove(note).done(function () {
+                    if (self._notes.getDeleted().length > 0) {
+                        self._isotope.remove(gridnote.parent());
+                        self._isotope.layout();
+                        self.renderNavigation();
+                    } else {
+                        self.render();
+                    }
+                }).fail(function () {
+                    OC.dialogs.alert(t('quicknotes', 'Could not delete note, not found'),
+                        t('quicknotes', 'Quick notes'));
+                });
+            },
+            true
+        );
+    },
+    // Forget a note shared with the current user.
+    _forgetSharedNote: function (note, gridnote) {
+        var self = this;
+        OC.dialogs.confirm(
+            t('quicknotes', 'Leave this shared note?'),
+            t('quicknotes', 'Leave shared note'),
+            function (result) {
+                if (!result) return;
+                self._notes.forgetShare(note).done(function () {
+                    if (self._notes.getAll().length > 0) {
+                        self._isotope.remove(gridnote.parent());
+                        self._isotope.layout();
+                        self.renderNavigation();
+                    } else {
+                        self.render();
+                    }
+                }).fail(function () {
+                    OC.dialogs.alert(t('quicknotes', 'Could not delete note, not found'),
+                        t('quicknotes', 'Quick notes'));
+                });
+            },
+            true
+        );
     },
     render: function () {
         this.renderNavigation();

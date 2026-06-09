@@ -34,6 +34,7 @@ use OCP\IURLGenerator;
 use OCP\IServerContainer;
 use OCP\INavigationManager;
 
+use OCA\QuickNotes\BackgroundJob\PurgeOldTrashJob;
 use OCA\QuickNotes\Dashboard\NotesWidget;
 use OCA\QuickNotes\Listeners\BeforeTemplateRenderedListener;
 use OCA\QuickNotes\Search\NoteSearchProvider;
@@ -58,6 +59,7 @@ class Application extends App implements IBootstrap {
 			BeforeTemplateRenderedEvent::class,
 			BeforeTemplateRenderedListener::class
 		);
+		$context->registerBackgroundJob(PurgeOldTrashJob::class);
 	}
 
 	public function boot(IBootContext $context): void {

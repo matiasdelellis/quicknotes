@@ -68,6 +68,8 @@ function assertId(id) {
 var Notes = function (baseUrl) {
     this._baseUrl = baseUrl;
     this._notes = [];
+    this._archived = [];
+    this._deleted = [];
     this._loaded = false;
 
     this._usersSharing = [];
@@ -80,23 +82,51 @@ Notes.prototype = {
         var self = this;
         return $.get(this._baseUrl)
             .then(function (notes) {
-                self._notes = notes.reverse();
+                self._splitBuckets(notes.reverse());
                 self._loaded = true;
             });
+    },
+    // Partition a list of notes into the active / archived / deleted
+    // buckets, in that order. Notes are placed in exactly one bucket:
+    // a note with deletedAt wins over a note with archivedAt.
+    _splitBuckets: function (notes) {
+        var active = [];
+        var archived = [];
+        var deleted = [];
+        notes.forEach(function (n) {
+            if (n.deletedAt) {
+                deleted.push(n);
+            } else if (n.archivedAt) {
+                archived.push(n);
+            } else {
+                active.push(n);
+            }
+        });
+        this._notes = active;
+        this._archived = archived;
+        this._deleted = deleted;
     },
     // Check that all the notes were loaded.
     isLoaded: function () {
         return this._loaded;
     },
-    // Get the amount of notes.
+    // Get the amount of active notes.
     length: function () {
         return this._notes.length;
     },
-    // Get all notes.
+    // Get all active notes.
     getAll: function () {
         return this._notes;
     },
-    // Get the colors used in the notes
+    // Get all archived notes.
+    getArchived: function () {
+        return this._archived;
+    },
+    // Get all soft-deleted notes.
+    getDeleted: function () {
+        return this._deleted;
+    },
+    // Get the colors used in the active notes
     getColors: function () {
         var seen = {};
         var Ccolors = [];
@@ -111,7 +141,7 @@ Notes.prototype = {
     getUsersSharing: function () {
         return this._usersSharing;
     },
-    // Get the tags used in the notes
+    // Get the tags used in the active notes
     getTags: function () {
         var seen = {};
         var tags = [];
@@ -132,41 +162,96 @@ Notes.prototype = {
             return note;
         }.bind(this));
     },
-    // CRUD Read: Load a note to edit.
+    // CRUD Read: Load a note to edit (looks in every bucket).
     read: function (id) {
         assertId(id);
-        return this._notes.find(function (note) { return note.id === id; });
+        return this._notes.find(function (note) { return note.id === id; })
+            || this._archived.find(function (note) { return note.id === id; })
+            || this._deleted.find(function (note) { return note.id === id; });
     },
     // CRUD Update
     update: function (note) {
         var id = assertId(note.id);
         return this._request('PUT', this._baseUrl + '/' + id, note, function (dbnote) {
-            var index = this._notes.findIndex(function (aNote) { return aNote.id === id; });
-            if (index !== -1) {
-                this._notes.splice(index, 1, dbnote);
+            this._removeFromBuckets(id);
+            this._notes.unshift(dbnote);
+            return dbnote;
+        }.bind(this));
+    },
+    // Archive a note: POST /notes/{id}/archive. Moves the note from
+    // its current bucket to the archived one.
+    archive: function (note) {
+        var id = assertId(note.id);
+        return this._request('POST', this._baseUrl + '/' + id + '/archive', null, function (dbnote) {
+            this._removeFromBuckets(id);
+            this._archived.unshift(dbnote);
+            return dbnote;
+        }.bind(this));
+    },
+    // Unarchive a note: POST /notes/{id}/unarchive. If the note was
+    // also in trash it stays there; otherwise it returns to active.
+    unarchive: function (note) {
+        var id = assertId(note.id);
+        return this._request('POST', this._baseUrl + '/' + id + '/unarchive', null, function (dbnote) {
+            this._removeFromBuckets(id);
+            if (dbnote.deletedAt) {
+                this._deleted.unshift(dbnote);
+            } else {
+                this._notes.unshift(dbnote);
             }
             return dbnote;
         }.bind(this));
     },
-    // CRUD Delete
+    // Restore a note from trash: POST /notes/{id}/restore. Clears
+    // deleted_at; if the note is still archived it stays archived,
+    // otherwise it returns to active.
+    restore: function (note) {
+        var id = assertId(note.id);
+        return this._request('POST', this._baseUrl + '/' + id + '/restore', null, function (dbnote) {
+            this._removeFromBuckets(id);
+            if (dbnote.archivedAt) {
+                this._archived.unshift(dbnote);
+            } else {
+                this._notes.unshift(dbnote);
+            }
+            return dbnote;
+        }.bind(this));
+    },
+    // Soft-delete a note: POST /notes/{id}/trash. Moves the note from
+    // its current bucket to the deleted one. No row is removed.
+    trash: function (note) {
+        var id = assertId(note.id);
+        return this._request('POST', this._baseUrl + '/' + id + '/trash', null, function (dbnote) {
+            this._removeFromBuckets(id);
+            this._deleted.unshift(dbnote);
+            return dbnote;
+        }.bind(this));
+    },
+    // Purge a note: hard DELETE /notes/{id}. Used by the trash view
+    // to permanently remove a soft-deleted note.
     remove: function (note) {
         var id = assertId(note.id);
         return this._request('DELETE', this._baseUrl + '/' + id, null, function () {
-            var index = this._notes.findIndex(function (aNote) { return aNote.id === id; });
-            if (index !== -1) {
-                this._notes.splice(index, 1);
-            }
+            this._removeFromBuckets(id);
         }.bind(this));
     },
     // Delete a shared note (i.e. one shared with the current user).
     forgetShare: function (note) {
         var id = assertId(note.id);
         return this._request('DELETE', OC.generateUrl('/apps/quicknotes/share') + '/' + id, null, function () {
-            var index = this._notes.findIndex(function (aNote) { return aNote.id === id; });
-            if (index !== -1) {
-                this._notes.splice(index, 1);
-            }
+            this._removeFromBuckets(id);
         }.bind(this));
+    },
+    // Helper: drop the note with the given id from whichever bucket
+    // it currently lives in.
+    _removeFromBuckets: function (id) {
+        var removeFrom = function (arr) {
+            var i = arr.findIndex(function (n) { return n.id === id; });
+            if (i !== -1) arr.splice(i, 1);
+        };
+        removeFrom(this._notes);
+        removeFrom(this._archived);
+        removeFrom(this._deleted);
     },
     // Perform a JSON request against the notes API and apply `onSuccess`
     // (with `this` bound to the Notes instance) to the response. `onSuccess`

@@ -108,4 +108,58 @@ class NoteMapper extends QBMapper {
 		return count($this->findEntities($qb));
 	}
 
+	/**
+	 * Update only the archive / soft-delete columns of a note in a
+	 * single SQL statement. Using the QueryBuilder directly avoids
+	 * the QBMapper / Entity update path, which would otherwise need
+	 * the columns to be registered via addType() and would re-write
+	 * every other field on the row.
+	 *
+	 * Pass `null` to clear a column.
+	 *
+	 * @param int    $id
+	 * @param string|null $archivedAt
+	 * @param string|null $deletedAt
+	 *
+	 * @return int the number of affected rows
+	 */
+	public function updateArchiveState(int $id, ?string $archivedAt, ?string $deletedAt): int {
+		$qb = $this->db->getQueryBuilder();
+		$qb->update($this->tableName)
+			->set('archived_at', $qb->createNamedParameter($archivedAt, IQueryBuilder::PARAM_STR))
+			->set('deleted_at',  $qb->createNamedParameter($deletedAt,  IQueryBuilder::PARAM_STR))
+			->where($qb->expr()->eq('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT)));
+		return $qb->executeStatement();
+	}
+
+	/**
+	 * Clear both archive / soft-delete columns. Convenience wrapper
+	 * kept for symmetry with updateArchiveState.
+	 */
+	public function clearArchiveState(int $id): int {
+		return $this->updateArchiveState($id, null, null);
+	}
+
+	/**
+	 * Find notes that have been soft-deleted (have a `deleted_at`)
+	 * strictly before the given cutoff. Used by the hourly
+	 * `PurgeOldTrashJob` to hard-delete notes the user left in the
+	 * trash for longer than the retention period.
+	 *
+	 * @return Note[]
+	 */
+	public function findOldDeletedNotes(\DateTime $cutoff): array {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')
+			->from($this->tableName)
+			->where(
+				$qb->expr()->isNotNull('deleted_at'),
+				$qb->expr()->lt('deleted_at', $qb->createNamedParameter(
+					$cutoff->format('Y-m-d H:i:s'),
+					IQueryBuilder::PARAM_STR
+				))
+			);
+		return $this->findEntities($qb);
+	}
+
 }

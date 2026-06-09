@@ -212,4 +212,72 @@ class NoteController extends Controller {
 		return new JSONResponse([]);
 	}
 
+	/**
+	 * @NoAdminRequired
+	 * @NoCSRFRequired
+	 *
+	 * @param int $id
+	 */
+	public function archive(int $id): JSONResponse {
+		$note = $this->noteService->archive($this->userId, $id);
+		if (is_null($note)) {
+			return new JSONResponse([], Http::STATUS_NOT_FOUND);
+		}
+
+		$response = new JSONResponse($note);
+		$response->setETag(md5(json_encode($note)));
+		return $response;
+	}
+
+	/**
+	 * @NoAdminRequired
+	 * @NoCSRFRequired
+	 *
+	 * @param int $id
+	 */
+	public function trash(int $id): JSONResponse {
+		$note = $this->noteService->trash($this->userId, $id);
+		if (is_null($note)) {
+			return new JSONResponse([], Http::STATUS_NOT_FOUND);
+		}
+
+		$response = new JSONResponse($note);
+		$response->setETag(md5(json_encode($note)));
+		return $response;
+	}
+
+	/**
+	 * @NoAdminRequired
+	 * @NoCSRFRequired
+	 *
+	 * @param int $id
+	 */
+	public function unarchive(int $id): JSONResponse {
+		$note = $this->noteService->unarchive($this->userId, $id);
+		if (is_null($note)) {
+			return new JSONResponse([], Http::STATUS_NOT_FOUND);
+		}
+
+		$response = new JSONResponse($note);
+		$response->setETag(md5(json_encode($note)));
+		return $response;
+	}
+
+	/**
+	 * @NoAdminRequired
+	 * @NoCSRFRequired
+	 *
+	 * @param int $id
+	 */
+	public function restore(int $id): JSONResponse {
+		$note = $this->noteService->restore($this->userId, $id);
+		if (is_null($note)) {
+			return new JSONResponse([], Http::STATUS_NOT_FOUND);
+		}
+
+		$response = new JSONResponse($note);
+		$response->setETag(md5(json_encode($note)));
+		return $response;
+	}
+
 }

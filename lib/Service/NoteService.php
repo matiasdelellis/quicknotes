@@ -440,6 +440,100 @@ class NoteService {
 	}
 
 	/**
+	 * Mark a note as archived. The note is kept in the database but will
+	 * no longer be considered an "active" note.
+	 *
+	 * @param string $userId
+	 * @param int $id
+	 *
+	 * @return Note|null
+	 */
+	public function archive(string $userId, int $id): ?Note {
+		$note = $this->get($userId, $id);
+		if (is_null($note))
+			return null;
+
+		$now = (new \DateTime('now', new \DateTimeZone('GMT')))->format('Y-m-d H:i:s');
+		$this->notemapper->updateArchiveState($id, $now, null);
+
+		// Reload the note from the DB so the response reflects the
+		// updated archived_at / deleted_at values without having to
+		// poke the entity's setters (which would mark the row as
+		// updated and trigger a second UPDATE on the next save).
+		$note = $this->get($userId, $id);
+		$note->setColor($this->colormapper->find($note->getColorId())->getColor());
+		return $note;
+	}
+
+	/**
+	 * Soft-delete a note. The row is kept in the database so that a
+	 * background process can purge it later.
+	 *
+	 * @param string $userId
+	 * @param int $id
+	 *
+	 * @return Note|null
+	 */
+	public function trash(string $userId, int $id): ?Note {
+		$note = $this->get($userId, $id);
+		if (is_null($note))
+			return null;
+
+		$now = (new \DateTime('now', new \DateTimeZone('GMT')))->format('Y-m-d H:i:s');
+		$previousArchived = $note->getArchivedAt();
+		$this->notemapper->updateArchiveState($id, $previousArchived, $now);
+
+		// Reload the note so the response carries the new deleted_at.
+		$note = $this->get($userId, $id);
+		$note->setColor($this->colormapper->find($note->getColorId())->getColor());
+		return $note;
+	}
+
+	/**
+	 * Restore a soft-deleted note back to the active list by clearing
+	 * `deleted_at`. The note keeps its `archived_at` state (a note
+	 * can be archived, sent to trash, and then restored to the
+	 * archive — that's intentional).
+	 *
+	 * @param string $userId
+	 * @param int $id
+	 *
+	 * @return Note|null
+	 */
+	public function restore(string $userId, int $id): ?Note {
+		$note = $this->get($userId, $id);
+		if (is_null($note))
+			return null;
+
+		$this->notemapper->updateArchiveState($id, $note->getArchivedAt(), null);
+
+		$note = $this->get($userId, $id);
+		$note->setColor($this->colormapper->find($note->getColorId())->getColor());
+		return $note;
+	}
+
+	/**
+	 * Unarchive a note by clearing `archived_at`. The note keeps its
+	 * `deleted_at` state (unarchiving does not restore from trash).
+	 *
+	 * @param string $userId
+	 * @param int $id
+	 *
+	 * @return Note|null
+	 */
+	public function unarchive(string $userId, int $id): ?Note {
+		$note = $this->get($userId, $id);
+		if (is_null($note))
+			return null;
+
+		$this->notemapper->updateArchiveState($id, null, $note->getDeletedAt());
+
+		$note = $this->get($userId, $id);
+		$note->setColor($this->colormapper->find($note->getColorId())->getColor());
+		return $note;
+	}
+
+	/**
 	 * @param string $userId
 	 * @param int $id
 	 *

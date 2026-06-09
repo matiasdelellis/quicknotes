@@ -4,7 +4,7 @@
 	</div>
 </div>
 <li id="all-notes">
-	<a href="#" class="icon-home svg">
+	<a href="#" class="icon-quicknotes svg">
 		{{allNotesTxt}}
 	</a>
 </li>
@@ -43,18 +43,13 @@
 		{{/each}}
 	</ul>
 </li>
-<li id="notes-folder" class="collapsible open">
-	<button class="collapse"></button>
-	<a href="#" class="icon-quicknotes svg">{{notesTxt}}</a>
-	<ul>
-		{{#each notes}}
-			<li class="nav-note with-menu {{#if active}}active{{/if}}"  data-id="{{ id }}">
-				{{#if title}}
-					<a href="#">{{{ title }}}</a>
-				{{else}}
-					<a href="#">{{tNN id}}</a>
-				{{/if}}
-			</li>
-		{{/each}}
-	</ul>
+<li id="archived-notes">
+	<a href="#" class="icon-archived svg">
+		{{archivedTxt}}
+	</a>
+</li>
+<li id="trash-notes">
+	<a href="#" class="icon-delete svg">
+		{{trashTxt}}
+	</a>
 </li>

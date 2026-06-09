@@ -18,6 +18,10 @@ use OCP\AppFramework\Db\Entity;
  * @method void setColorId(int $colorId)
  * @method bool getPinned()
  * @method void setPinned(bool $pinned)
+ * @method string|null getArchivedAt()
+ * @method void setArchivedAt(string|null $archivedAt)
+ * @method string|null getDeletedAt()
+ * @method void setDeletedAt(string|null $deletedAt)
  */
 class Note extends Entity implements JsonSerializable {
 
@@ -28,6 +32,8 @@ class Note extends Entity implements JsonSerializable {
 	protected $timestamp;
 	protected $colorId;
 	protected $pinned;
+	protected $archivedAt;
+	protected $deletedAt;
 
 	// Extra info to API
 	protected $color;
@@ -39,6 +45,9 @@ class Note extends Entity implements JsonSerializable {
 
 	public function __construct() {
 		$this->addType('pinned', 'boolean');
+		// archivedAt / deletedAt default to 'string' (no addType), so
+		// QBMapper leaves the raw datetime string from the column
+		// untouched.
 	}
 
 	public function setColor(string $color): void {
@@ -76,7 +85,9 @@ class Note extends Entity implements JsonSerializable {
 			'sharedWith'  => $this->sharedWith,
 			'sharedBy'    => $this->sharedBy,
 			'tags'        => $this->tags,
-			'attachments' => $this->attachts
+			'attachments' => $this->attachts,
+			'archivedAt'  => $this->archivedAt,
+			'deletedAt'   => $this->deletedAt
 		];
 	}
 }
