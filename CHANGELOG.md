@@ -1,5 +1,8 @@
 # Changelog
 
+## [0.8.41] 2026-06-09
+- Fix MediumEditor modal. Thanks to my friend OpenCode
+
 ## [0.8.40] 2026-02-12
 - Add support to NC32. Thanks Marius Knüppel
 - Update deprecated APIs for Nextcloud 32 compatibility. Thanks JanGross
