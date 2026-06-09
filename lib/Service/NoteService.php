@@ -88,23 +88,6 @@ class NoteService {
 	 public function getAll(string $userId): array {
 		$notes = $this->notemapper->findAll($userId);
 
-		// Set shares with others.
-		foreach($notes as $note) {
-			$sharedWith = [];
-			$sharedEntries = $this->noteShareMapper->findSharesForNoteId($note->getId());
-			foreach ($sharedEntries as $sharedEntry) {
-				$sharedUid = $sharedEntry->getSharedUser();
-				$user = $this->userManager->get($sharedUid);
-				if (!$user) {
-					// TODO: Debug that...
-					continue;
-				}
-				$sharedEntry->setDisplayName($user->getDisplayName());
-				$sharedWith[] = $sharedEntry;
-			}
-			$note->setSharedWith($sharedWith);
-		}
-
 		// Get shares from others.
 		$shares = [];
 		$sharedEntries = $this->noteShareMapper->findSharesForUserId($userId);
@@ -126,45 +109,11 @@ class NoteService {
 		// Attahch shared notes from others to same response
 		$notes = array_merge($notes, $shares);
 
-		// Set tags to response.
-		foreach($notes as $note) {
-			$note->setTags($this->tagmapper->getTagsForNote($userId, $note->getId()));
-		}
-
-		// Insert color to response
+		// Hydrate every note (color, isPinned, tags, attachments,
+		// sharedWith) so the response shape matches get/show and
+		// archive/trash/unarchive/restore.
 		foreach ($notes as $note) {
-			$note->setColor($this->colormapper->find($note->getColorId())->getColor());
-		}
-
-		// Insert pin to response
-		foreach ($notes as $note) {
-			$note->setIsPinned($note->getPinned() ? true : false);
-		}
-
-		// Insert attachts to response.
-		foreach ($notes as $note) {
-			$rAttachts = [];
-			$attachts = $this->attachMapper->findFromNote($note->getUserId(), $note->getId());
-			foreach ($attachts as $attach) {
-				$previewUrl = $this->fileService->getPreviewUrl($attach->getFileId(), 512);
-				if (is_null($previewUrl))
-					continue;
-
-				$redirectUrl = $this->fileService->getRedirectToFileUrl($attach->getFileId());
-				if (is_null($redirectUrl))
-					continue;
-
-				$deepLinkUrl = $this->fileService->getDeepLinkUrl($attach->getFileId());
-				if (is_null($deepLinkUrl))
-					continue;
-
-				$attach->setPreviewUrl($previewUrl);
-				$attach->setRedirectUrl($redirectUrl);
-				$attach->setDeepLinkUrl($deepLinkUrl);
-
-				$rAttachts[] = $attach;
-			}
-			$note->setAttachts($rAttachts);
+			$this->hydrate($userId, $note);
 		}
 
 		return $notes;
@@ -176,10 +125,11 @@ class NoteService {
 	 */
 	public function get(string $userId, int $id): ?Note {
 		try {
-			return $this->notemapper->find($id, $userId);
+			$note = $this->notemapper->find($id, $userId);
 		} catch(DoesNotExistException $e) {
 			return null;
 		}
+		return $this->hydrate($userId, $note);
 	}
 
 	/**
@@ -461,8 +411,7 @@ class NoteService {
 		// poke the entity's setters (which would mark the row as
 		// updated and trigger a second UPDATE on the next save).
 		$note = $this->get($userId, $id);
-		$note->setColor($this->colormapper->find($note->getColorId())->getColor());
-		return $note;
+		return $this->hydrate($userId, $note);
 	}
 
 	/**
@@ -485,8 +434,7 @@ class NoteService {
 
 		// Reload the note so the response carries the new deleted_at.
 		$note = $this->get($userId, $id);
-		$note->setColor($this->colormapper->find($note->getColorId())->getColor());
-		return $note;
+		return $this->hydrate($userId, $note);
 	}
 
 	/**
@@ -508,8 +456,7 @@ class NoteService {
 		$this->notemapper->updateArchiveState($id, $note->getArchivedAt(), null);
 
 		$note = $this->get($userId, $id);
-		$note->setColor($this->colormapper->find($note->getColorId())->getColor());
-		return $note;
+		return $this->hydrate($userId, $note);
 	}
 
 	/**
@@ -529,7 +476,63 @@ class NoteService {
 		$this->notemapper->updateArchiveState($id, null, $note->getDeletedAt());
 
 		$note = $this->get($userId, $id);
+		return $this->hydrate($userId, $note);
+	}
+
+	/**
+	 * Populate the response-facing fields of a freshly loaded Note so
+	 * the JSON returned to the client matches what `getAll` produces:
+	 * resolved color, isPinned, tags, attachments and sharedWith.
+	 * Centralised here so archive/trash/unarchive/restore stay
+	 * consistent with create/update/getAll.
+	 *
+	 * Tags live in quicknotes_note_tags keyed by the note owner's
+	 * user_id, so we look them up using the note's own userId — not
+	 * the viewer's. This matters for shared notes, whose owner
+	 * differs from the user requesting the list.
+	 */
+	private function hydrate(string $userId, Note $note): Note {
 		$note->setColor($this->colormapper->find($note->getColorId())->getColor());
+		$note->setIsPinned($note->getPinned() ? true : false);
+		$note->setTags($this->tagmapper->getTagsForNote($note->getUserId(), $note->getId()));
+
+		$rAttachts = [];
+		$attachts = $this->attachMapper->findFromNote($note->getUserId(), $note->getId());
+		foreach ($attachts as $attach) {
+			$previewUrl = $this->fileService->getPreviewUrl($attach->getFileId(), 512);
+			if (is_null($previewUrl))
+				continue;
+
+			$redirectUrl = $this->fileService->getRedirectToFileUrl($attach->getFileId());
+			if (is_null($redirectUrl))
+				continue;
+
+			$deepLinkUrl = $this->fileService->getDeepLinkUrl($attach->getFileId());
+			if (is_null($deepLinkUrl))
+				continue;
+
+			$attach->setPreviewUrl($previewUrl);
+			$attach->setRedirectUrl($redirectUrl);
+			$attach->setDeepLinkUrl($deepLinkUrl);
+
+			$rAttachts[] = $attach;
+		}
+		$note->setAttachts($rAttachts);
+
+		$sharedWith = [];
+		$sharedEntries = $this->noteShareMapper->findSharesForNoteId($note->getId());
+		foreach ($sharedEntries as $sharedEntry) {
+			$sharedUid = $sharedEntry->getSharedUser();
+			$user = $this->userManager->get($sharedUid);
+			if (!$user) {
+				// TODO: Debug that...
+				continue;
+			}
+			$sharedEntry->setDisplayName($user->getDisplayName());
+			$sharedWith[] = $sharedEntry;
+		}
+		$note->setSharedWith($sharedWith);
+
 		return $note;
 	}
 

@@ -149,19 +149,23 @@ View.prototype = {
         // Pick the bucket to render based on the active view.
         var currentNotes;
         var emptyMsg;
+        var emptyIcon;
         switch (this._currentView) {
             case 'archived':
                 currentNotes = this._notes.getArchived();
                 emptyMsg = t('quicknotes', 'No archived notes');
+                emptyIcon = 'icon-archived';
                 break;
             case 'trash':
                 currentNotes = this._notes.getDeleted();
                 emptyMsg = t('quicknotes', 'Trash is empty');
+                emptyIcon = 'icon-delete';
                 break;
             case 'all':
             default:
                 currentNotes = this._notes.getAll();
                 emptyMsg = t('quicknotes', 'Nothing here. Take your first quick notes');
+                emptyIcon = 'icon-quicknotes';
                 break;
         }
 
@@ -178,7 +182,7 @@ View.prototype = {
             loadingMsg: t('quicknotes', 'Looking for your notes'),
             loadingIcon: OC.imagePath('core', 'loading.gif'),
             emptyMsg: emptyMsg,
-            emptyIcon: OC.imagePath('quicknotes', 'app'),
+            emptyIcon: emptyIcon,
         });
 
         $('#div-content').html(html);
