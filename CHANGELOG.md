@@ -1,4 +1,9 @@
 # Changelog
+## [0.8.50] 2026-06-09
+- Add Nextcloud 33 compatibility. Thangs to Baki Burak Öğün. PR #124
+- Implement Archive and Trash. It only took 5 years. Issue #65
+- Open the new notes to edit.
+- Many minor usability improvements.
 
 ## [0.8.40] 2026-02-12
 - Add support to NC32. Thanks Marius Knüppel
