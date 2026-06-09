@@ -267,6 +267,9 @@ View.prototype = {
         // Filter notes by tag.
         $('#notes-grid-div').on('click', '.slim-tag', function (event) {
             event.stopPropagation();
+            if (self._currentView !== 'all') {
+                return;
+            }
             var tagId = parseInt($(this).attr('tag-id'), 10);
             self._cleanNavigation();
             self._filterTag(tagId);
@@ -720,6 +723,10 @@ View.prototype = {
 
         $('#colors-folder .circle-toolbar').click(function (event) {
             event.stopPropagation();
+            if (self._currentView !== 'all') {
+                self._currentView = 'all';
+                self.renderContent();
+            }
             self._cleanNavigation();
             $(this).addClass('icon-filter-checkmark');
 
@@ -744,6 +751,10 @@ View.prototype = {
             event.preventDefault();
             event.stopPropagation();
             var tagId = parseInt($(this).parent().attr('tag-id'), 10);
+            if (self._currentView !== 'all') {
+                self._currentView = 'all';
+                self.renderContent();
+            }
             self._cleanNavigation();
             $(this).addClass("active");
             self._filterTag(tagId);
