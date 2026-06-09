@@ -4,13 +4,24 @@
 set -euo pipefail
 
 cd "$(dirname "$0")/.."  # -> docker/
+REPO_ROOT="$(cd .. && pwd)"
 
-if ! docker compose ps builder --status running >/dev/null 2>&1; then
+# Match up.sh: the `.env` lives at the repo root so `docker compose`
+# can interpolate it from any cwd. We pass it explicitly here so the
+# builder service starts with the same env the rest of the stack uses.
+COMPOSE_ENV_FILE="$REPO_ROOT/.env"
+if [[ ! -f "$COMPOSE_ENV_FILE" ]]; then
+  echo "Missing $COMPOSE_ENV_FILE. Copy docker/.env.example first:" >&2
+  echo "  cp $REPO_ROOT/docker/.env.example $COMPOSE_ENV_FILE" >&2
+  exit 1
+fi
+
+if ! docker compose --env-file "$COMPOSE_ENV_FILE" ps builder --status running >/dev/null 2>&1; then
   echo ">> The 'builder' service is not running. Starting it..."
-  docker compose up -d builder
+  docker compose --env-file "$COMPOSE_ENV_FILE" up -d builder
   echo ">> Waiting for 'builder' to be ready..."
   for i in {1..30}; do
-    if docker compose ps builder --status running >/dev/null 2>&1; then
+    if docker compose --env-file "$COMPOSE_ENV_FILE" ps builder --status running >/dev/null 2>&1; then
       break
     fi
     sleep 1
@@ -18,7 +29,7 @@ if ! docker compose ps builder --status running >/dev/null 2>&1; then
 fi
 
 echo ">> Running the build inside the builder container..."
-docker compose exec -T builder sh -c '
+docker compose --env-file "$COMPOSE_ENV_FILE" exec -T builder sh -c '
   set -e
   cd /app
 

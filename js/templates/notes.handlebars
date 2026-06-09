@@ -17,28 +17,22 @@
 					<div class="icon-header-note icon-share" title="{{tSB sharedBy.0.display_name}}"></div>
 					<div class="icon-header-note hide-header-icon icon-delete-note" title="{{t "quicknotes" "Leave this shared note"}}"></div>
 				{{else}}
-					{{#unless trashView}}
+					{{#if ../allView}}
 						{{#if isPinned}}
 							<div class="icon-header-note icon-pinned fixed-header-icon" title="{{t "quicknotes" "Unpin note"}}"></div>
 						{{else}}
-							{{#unless archivedAt}}
-								<div class="icon-header-note icon-pin hide-header-icon" title="{{t "quicknotes" "Pin note"}}"></div>
-							{{/unless}}
+							<div class="icon-header-note icon-pin hide-header-icon" title="{{t "quicknotes" "Pin note"}}"></div>
 						{{/if}}
-						{{#if archivedAt}}
-							<div class="icon-header-note icon-archived fixed-header-icon" title="{{t "quicknotes" "Unarchive"}}"></div>
-						{{else}}
-							<div class="icon-header-note hide-header-icon icon-archived" title="{{t "quicknotes" "Archive note"}}"></div>
-						{{/if}}
-					{{/unless}}
-					{{#if deletedAt}}
-						{{#if trashView}}
-							<div class="icon-header-note hide-header-icon icon-delete-note" title="{{t "quicknotes" "Delete permanently"}}"></div>
-						{{else}}
-							<div class="icon-header-note icon-delete-note fixed-header-icon" title="{{t "quicknotes" "Restore"}}"></div>
-						{{/if}}
-					{{else}}
+						<div class="icon-header-note hide-header-icon icon-archived" title="{{t "quicknotes" "Archive note"}}"></div>
 						<div class="icon-header-note hide-header-icon icon-delete-note" title="{{t "quicknotes" "Move to trash"}}"></div>
+					{{else if ../archivedView}}
+						{{#if isPinned}}
+							<div class="icon-header-note icon-pinned fixed-header-icon" title="{{t "quicknotes" "Pinned"}}"></div>
+						{{/if}}
+						<div class="icon-header-note hide-header-icon icon-unarchive" title="{{t "quicknotes" "Unarchive"}}"></div>
+					{{else if ../trashView}}
+						<div class="icon-header-note icon-restore fixed-header-icon" title="{{t "quicknotes" "Restore"}}"></div>
+						<div class="icon-header-note hide-header-icon icon-delete-note" title="{{t "quicknotes" "Delete permanently"}}"></div>
 					{{/if}}
 				{{/if}}
 				<div class='note-title'>
@@ -115,16 +109,16 @@
 {{else if loaded}}
 <div class="emptycontent">
 	<div class="icon-quicknotes svg"></div>
-	<h2>
+	<h3>
 		{{ emptyMsg }}
-	</h2>
+	</h3>
 </div>
 {{else}}
 <div class="emptycontent">
 	<div class="icon-quicknotes svg"></div>
-	<h2>
+	<h3>
 		{{loadingMsg}}
-	</h2>
+	</h3>
 	<img class="loadingimport" src="{{loadingIcon}}" />
 </div>
 {{/if}}

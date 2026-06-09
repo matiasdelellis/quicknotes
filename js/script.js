@@ -169,7 +169,9 @@ View.prototype = {
         var html = Handlebars.templates['notes']({
             loaded: this._notes.isLoaded(),
             notes: currentNotes,
+            allView: this._currentView === 'all',
             trashView: this._currentView === 'trash',
+            archivedView: this._currentView === 'archived',
             tagTxt: t('quicknotes', 'Tags'),
             cancelTxt: t('quicknotes', 'Cancel'),
             saveTxt: t('quicknotes', 'Save'),
@@ -295,6 +297,25 @@ View.prototype = {
             }
         });
 
+        // Unarchive the note from the archived view. The template only
+        // renders this icon in the archived view, but the guard keeps
+        // the handler safe to wire up unconditionally.
+        $('#notes-grid-div').on("click", ".icon-unarchive", function (event) {
+            event.stopPropagation();
+
+            if (self._currentView !== 'archived') return;
+
+            var icon = $(this);
+            var gridnote = icon.parent().parent();
+            var id = parseInt(gridnote.attr('data-id'), 10);
+            var note = self._notes.read(id);
+            if (!note) return;
+
+            if (note.sharedBy && note.sharedBy.length) return;
+
+            self._unarchiveNote(note, gridnote);
+        });
+
         // Move the note to trash, restore it, or purge it depending
         // on the current view and whether the icon is the fixed
         // "in trash" indicator.
@@ -312,18 +333,30 @@ View.prototype = {
                 return;
             }
 
-            if (icon.hasClass('fixed-header-icon')) {
-                // Icon is rendered as the permanent "in trash" badge.
-                self._restoreNote(note, gridnote);
-                return;
-            }
-
             if (self._currentView === 'trash') {
                 self._purgeNote(note, gridnote);
                 return;
             }
 
             self._trashNote(note, gridnote);
+        });
+
+        // Restore a note from the trash. The template only renders
+        // this icon in the trash view; the guard matches that scope.
+        $('#notes-grid-div').on("click", ".icon-restore", function (event) {
+            event.stopPropagation();
+
+            if (self._currentView !== 'trash') return;
+
+            var icon = $(this);
+            var gridnote = icon.parent().parent();
+            var id = parseInt(gridnote.attr('data-id'), 10);
+            var note = self._notes.read(id);
+            if (!note) return;
+
+            if (note.sharedBy && note.sharedBy.length) return;
+
+            self._restoreNote(note, gridnote);
         });
 
         // Pin note when click icon

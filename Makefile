@@ -93,6 +93,43 @@ build: depsmin js-templates build-vue
 	@echo ""
 	@echo "Build done. You can enable the application in Nextcloud."
 
+
+# Docker dev environment (preferred for end-to-end work).
+# See docker/README.md for the full workflow; the scripts under
+# docker/scripts/ do the actual work — these targets are thin wrappers
+# so the same commands work whether the user types them directly or via
+# make.
+
+docker-up:
+	./docker/scripts/up.sh
+
+docker-down:
+	./docker/scripts/down.sh $(if $(purge),--purge,)
+
+docker-build:
+	./docker/scripts/build.sh
+
+# Re-enable the app after editing PHP / info.xml / templates/*.php.
+# Triggers a disable+enable so the schema migrations and the
+# event-listener registration re-run.
+docker-enable:
+	./docker/scripts/enable-app.sh
+
+# Recompile js/templates.js from js/templates/*.handlebars inside the
+# `builder` container. Cheaper than the full `make docker-build`
+# because it skips `npm install` and the webpack pass — only the
+# Handlebars precompile runs.
+docker-templates:
+	docker compose -f docker/docker-compose.yml exec -T builder \
+		sh -c 'node_modules/.bin/handlebars js/templates -f js/templates.js'
+
+docker-logs:
+	docker compose -f docker/docker-compose.yml logs -f
+
+.PHONY: all build build-vue js-templates \
+        docker-up docker-down docker-build docker-enable \
+        docker-templates docker-logs
+
 # Clean
 clean:
 	rm -rf $(build_dir)
