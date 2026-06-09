@@ -456,3 +456,7 @@ body:has(#modal-note-div.show-modal-note) #app-content {
     opacity: 1;
     font-weight: bold;
 }
+
+#archived-notes {
+    margin-top: auto !important;
+}
