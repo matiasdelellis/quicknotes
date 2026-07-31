@@ -1,0 +1,73 @@
+# syntax=docker/dockerfile:1
+#
+# Dev/test image: replaces the release tree at /var/www/html with a
+# checkout of nextcloud/server at $NEXTCLOUD_DEV_BRANCH (default
+# stable34, matching appinfo/info.xml's max-version="34") and runs
+# `composer install` so phpunit is available at
+# /var/www/html/lib/composer/bin/phpunit.
+#
+# The repository is bind-mounted into
+# /var/www/html/apps/quicknotes (the canonical dev path) by the
+# `dev` service in docker-compose.yml, so phpunit's bootstrap can
+# resolve ../../../tests/bootstrap.php.
+
+ARG NEXTCLOUD_DEV_BRANCH=stable34
+
+FROM nextcloud:34
+
+ARG NEXTCLOUD_DEV_BRANCH
+
+RUN set -eux; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends \
+        git \
+        ca-certificates; \
+    rm -rf /var/lib/apt/lists/*; \
+    \
+    # Install composer (the upstream nextcloud:34 image ships PHP + Apache
+    # but neither git nor composer).
+    curl -fsSL -o /usr/local/bin/composer \
+        https://getcomposer.org/download/latest-stable/composer.phar; \
+    chmod +x /usr/local/bin/composer; \
+    \
+    # Container-friendly git defaults: avoid "dubious ownership" errors
+    # when /var/www/html is bind-mounted from the host with a different
+    # uid, and silence the safe.directory warning in logs.
+    git config --global --add safe.directory '*'; \
+    git config --global --add advice.detachedHead false; \
+    \
+    # Default to git-source installs (clones from github.com) instead of
+    # zipballs via api.github.com, which intermittently returns HTTP/2
+    # 504 from this network. The bamarni bin plugin's sub-installs also
+    # pick this up.
+    composer config --global preferred-install source; \
+    \
+    echo "Cloning nextcloud/server branch ${NEXTCLOUD_DEV_BRANCH}..."; \
+    find /var/www/html -mindepth 1 -delete; \
+    git clone --depth 1 --branch "${NEXTCLOUD_DEV_BRANCH}" \
+        https://github.com/nextcloud/server.git /var/www/html; \
+    \
+    echo "Initializing git submodules (3rdparty autoloader)..."; \
+    git -C /var/www/html submodule update --init --recursive; \
+    \
+    echo "Running composer install (this takes a few minutes)..."; \
+    cd /var/www/html; \
+    # --prefer-source clones the git repos instead of downloading zipballs
+    # via api.github.com, which intermittently returns HTTP/2 504 from
+    # this network. Slower but reliable. Bump the process timeout because
+    # the bamarni bin plugin's sub-installs (phpunit, phpstan, psalm…)
+    # clone dozens of full git repos.
+    COMPOSER_PROCESS_TIMEOUT=1800 composer install --no-interaction --no-progress --prefer-source; \
+    \
+    chown -R www-data:www-data /var/www/html; \
+    \
+    echo "Dev tree ready ($(git rev-parse --short HEAD))."
+
+# Custom entrypoint that forces `occ maintenance:install` on first
+# boot — the upstream entrypoint skips it when the dev tree's
+# version.php matches the image's.
+COPY dev-entrypoint.sh /usr/local/bin/dev-entrypoint.sh
+RUN chmod +x /usr/local/bin/dev-entrypoint.sh
+
+ENTRYPOINT ["/usr/local/bin/dev-entrypoint.sh"]
+CMD ["apache2-foreground"]

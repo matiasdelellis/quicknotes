@@ -20,7 +20,10 @@ class NoteShare extends Entity implements JsonSerializable {
 	protected $sharedGroup;
 
 	protected $userId;
-	protected $displayname;
+	// Not a column: filled in from the user manager when the note is
+	// hydrated. It used to be declared as `displayname`, which made the
+	// setter below create a dynamic property — deprecated since PHP 8.2.
+	protected $displayName;
 
 	public function setUserId (string $userId): void {
 		$this->userId = $userId;

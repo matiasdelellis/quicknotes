@@ -77,7 +77,16 @@ View.prototype = {
         this._editableColor(note.color);
         this._editableShares(note.sharedWith);
         this._editableTags(note.tags);
+        // `|| null` matters: _editableReminder() reads an undefined argument
+        // as "this is a getter call", so a note that somehow arrives without
+        // the field would leave the badge of the previously edited note in
+        // place instead of clearing it.
+        this._editableReminder(note.reminderAt || null, note.reminderNotifiedAt || null);
         this._editableAttachts(note.attachments, !note.sharedBy.length);
+
+        // The reminder is saved through its own endpoint, so remember what it
+        // was to know on save whether it is worth a second request.
+        this._editedReminder = note.reminderAt || null;
 
         // Create medium div editor.
         this._isEditable(!note.sharedBy.length);
@@ -98,8 +107,18 @@ View.prototype = {
             sharedWith: this._editableShares()
         };
 
+        var reminderAt = this._editableReminder();
+        var reminderChanged = reminderAt !== (this._editedReminder || null);
+
         var self = this;
-        this._notes.update(fakeNote).done(function (note) {
+        this._notes.update(fakeNote).then(function (note) {
+            // The reminder lives behind its own endpoint, so it goes out right
+            // after the note, and only when the user actually touched it.
+            if (!reminderChanged) {
+                return note;
+            }
+            return self._notes.setReminder(note, reminderAt);
+        }).done(function (note) {
             // Create an new note and replace in grid.
             var noteHtml = $(Handlebars.templates['note-item'](note)).children();
             self._$notesGrid.find("[data-id='" + note.id + "']").replaceWith(noteHtml);
@@ -115,8 +134,7 @@ View.prototype = {
             self.renderNavigation();
             self.updateSort();
         }).fail(function () {
-            OC.dialogs.alert(t('quicknotes', 'DOh!. Could not update note!.'),
-                t('quicknotes', 'Quick notes'));
+            QnDialogs.error(t('quicknotes', 'DOh!. Could not update note!.'));
         });
     },
     closeEdit: function () {
@@ -391,8 +409,7 @@ View.prototype = {
                 self._isotope.updateSortData();
                 self._isotope.arrange();
             }).fail(function () {
-                OC.dialogs.alert(t('quicknotes', 'Could not pin note'),
-                    t('quicknotes', 'Quick notes'));
+                QnDialogs.error(t('quicknotes', 'Could not pin note'));
             });
         });
 
@@ -423,8 +440,7 @@ View.prototype = {
                 self._isotope.updateSortData();
                 self._isotope.arrange();
             }).fail(function () {
-                OC.dialogs.alert(t('quicknotes', 'Could not unpin note'),
-                    t('quicknotes', 'Quick notes'));
+                QnDialogs.error(t('quicknotes', 'Could not unpin note'));
             });
         });
 
@@ -541,18 +557,17 @@ View.prototype = {
         self._$modal.on("click", "#attach-button", function (event) {
             event.stopPropagation();
             OC.dialogs.filepicker(t('quicknotes', 'Select file to attach'), function(datapath, returntype) {
-                OC.Files.getClient().getFileInfo(datapath).then((status, fileInfo) => {
+                self._notes.getAttachmentInfo(datapath).then(function (attachment) {
                     var attachts = self._editableAttachts();
                     attachts.push({
-                        file_id: fileInfo.id,
-                        preview_url: OC.generateUrl('core') + '/preview.png?file=' + encodeURI(datapath) + '&x=512&y=512',
-                        redirect_url: OC.generateUrl('/apps/files/?dir={dir}&scrollto={scrollto}', {dir: fileInfo.path, scrollto: fileInfo.name})
+                        file_id: attachment.file_id,
+                        preview_url: attachment.preview_url,
+                        redirect_url: attachment.redirect_url
                     });
                     self._editableAttachts(attachts, true);
                     self._noteChanged = true;
-                }).fail(() => {
-                    OC.dialogs.alert(t('quicknotes', 'Could not attach the file.'),
-                        t('quicknotes', 'Quick notes'));
+                }).fail(function () {
+                    QnDialogs.error(t('quicknotes', 'Could not attach the file.'));
                 });
             }, false, null, true, OC.dialogs.FILEPICKER_TYPE_CHOOSE)
         });
@@ -571,6 +586,28 @@ View.prototype = {
                     }
                 }
             );
+        });
+
+        // handle reminder button.
+        self._$modal.on("click", "#reminder-button", function (event) {
+            event.stopPropagation();
+            QnDialogs.reminder(
+                self._editableReminder(),
+                function(result, reminderAt) {
+                    if (result === true) {
+                        // A reminder the user just picked has not been sent
+                        // yet by definition, so the badge starts out pending.
+                        self._editableReminder(reminderAt, null);
+                        self._noteChanged = true;
+                    }
+                }
+            );
+        });
+
+        // Handle the reminder badge on the modal.
+        self._$modal.on("click", ".slim-reminder", function (event) {
+            event.stopPropagation();
+            self._$modal.find('#reminder-button').trigger( "click");
         });
 
         // handle close editing notes.
@@ -604,6 +641,7 @@ View.prototype = {
             tags: this._notes.getTags(),
             newNoteTxt: t('quicknotes', 'New note'),
             allNotesTxt: t('quicknotes', 'All notes'),
+            remindersTxt: t('quicknotes', 'Reminders'),
             archivedTxt: t('quicknotes', 'Archived'),
             trashTxt: t('quicknotes', 'Trash'),
             colorsTxt: t('quicknotes', 'Colors'),
@@ -644,8 +682,7 @@ View.prototype = {
                 // Open the freshly created note for editing.
                 self.editNote(note.id);
             }).fail(function () {
-                OC.dialogs.alert(t('quicknotes', 'Could not create note'),
-                    t('quicknotes', 'Quick notes'));
+                QnDialogs.error(t('quicknotes', 'Could not create note'));
             });
         });
 
@@ -659,6 +696,25 @@ View.prototype = {
             self.renderContent();
             self.updateSort();
             setFilterUrl();
+        });
+
+        /* Show only the notes that carry a reminder.
+         *
+         * A filter over the active notes, not a bucket of its own like Archive
+         * and Trash: it leans on isotope the same way the shared, colour and
+         * tag entries do, so it composes with the grid that is already there
+         * instead of needing another list in notes-api.js. */
+
+        $('#reminder-notes').click(function (event) {
+            event.preventDefault();
+            if (self._currentView !== 'all') {
+                self._currentView = 'all';
+                self.renderContent();
+            }
+            self._cleanNavigation();
+            $(this).addClass("active");
+            self._filterReminders();
+            setFilterUrl('r', '1');
         });
 
         /* Show archived notes */
@@ -783,6 +839,14 @@ View.prototype = {
                 });
         });
 
+        // Unlike the explicit-save one below, this setting lives on the server:
+        // the calendar provider reads it on the CalDAV path, where there is no
+        // browser to keep it in localStorage.
+        $.get(OC.generateUrl('apps/quicknotes/getuservalue'), {'type': 'calendar_enabled'})
+        .done(function (response) {
+            $('#app-settings-content #show-reminders-calendar').prop('checked', response.value === true);
+        });
+
         let sortBy = getSortBy();
         $("#sort-select option[value='" + sortBy + "']").attr("selected", true);
 
@@ -795,6 +859,25 @@ View.prototype = {
 
         $('#app-settings-content').on('click', '#explicit-save-notes', function (event) {
               setExplicitSaveSetting($(this).is(':checked'));
+        });
+
+        $('#app-settings-content').on('click', '#show-reminders-calendar', function (event) {
+            var checkbox = $(this);
+            var enabled = checkbox.is(':checked');
+            $.ajax({
+                url: OC.generateUrl('apps/quicknotes/setuservalue'),
+                type: 'POST',
+                data: {
+                    'type': 'calendar_enabled',
+                    'value': enabled
+                },
+                error: function () {
+                    // Put the box back where it was, so it never claims a
+                    // state the server did not take.
+                    checkbox.prop('checked', !enabled);
+                    QnDialogs.error(t('quicknotes', 'Could not save the calendar setting'));
+                }
+            });
         });
 
         $('#app-settings-content').on( "change", "#sort-select", function() {
@@ -937,6 +1020,25 @@ View.prototype = {
         } else {
             var html = Handlebars.templates['tags']({ tags: tags});
             this._$modal.find(".note-tags").replaceWith(html);
+        }
+    },
+    /**
+     * Read or write the reminder shown in the editor, as the UTC
+     * 'Y-m-d H:i:s' string the backend stores (null when there is none).
+     *
+     * `notified` only matters when writing: it greys the badge out for a
+     * reminder whose notification already went out.
+     */
+    _editableReminder: function(reminderAt, notified) {
+        if (reminderAt === undefined) {
+            var $badge = this._$modal.find(".slim-reminder");
+            return $badge.length ? ($badge.attr('reminder-at') || null) : null;
+        } else {
+            var html = Handlebars.templates['reminder']({
+                reminderAt: reminderAt,
+                reminderNotifiedAt: notified
+            });
+            this._$modal.find(".note-reminder").replaceWith(html);
         }
     },
     _editableAttachts: function(attachts, can_delete) {
@@ -1152,6 +1254,20 @@ View.prototype = {
             }
         });
     },
+    /**
+     * Keep only the notes that carry a reminder.
+     *
+     * The badge is rendered by note-item.handlebars precisely when the note has
+     * a `reminderAt`, so its presence in the DOM is the answer — the same trick
+     * the shared filters use with `.shared` / `.shareowner`.
+     */
+    _filterReminders: function () {
+        this._isotope.arrange({
+            filter: function(index, elem) {
+                return elem.querySelector('.slim-reminder') != null;
+            }
+        });
+    },
     _filterColor: function (color) {
         this._isotope.arrange({
             filter: function(index, elem) {
@@ -1189,8 +1305,7 @@ View.prototype = {
                 self.render();
             }
         }).fail(function () {
-            OC.dialogs.alert(t('quicknotes', 'Could not move note to trash'),
-                t('quicknotes', 'Quick notes'));
+            QnDialogs.error(t('quicknotes', 'Could not move note to trash'));
         });
     },
     // Archive the note and re-render the view.
@@ -1205,8 +1320,7 @@ View.prototype = {
                 self.render();
             }
         }).fail(function () {
-            OC.dialogs.alert(t('quicknotes', 'Could not archive note'),
-                t('quicknotes', 'Quick notes'));
+            QnDialogs.error(t('quicknotes', 'Could not archive note'));
         });
     },
     // Unarchive the note and re-render the view.
@@ -1221,8 +1335,7 @@ View.prototype = {
                 self.render();
             }
         }).fail(function () {
-            OC.dialogs.alert(t('quicknotes', 'Could not unarchive note'),
-                t('quicknotes', 'Quick notes'));
+            QnDialogs.error(t('quicknotes', 'Could not unarchive note'));
         });
     },
     // Restore the note from trash and re-render the view.
@@ -1237,8 +1350,7 @@ View.prototype = {
                 self.render();
             }
         }).fail(function () {
-            OC.dialogs.alert(t('quicknotes', 'Could not restore note'),
-                t('quicknotes', 'Quick notes'));
+            QnDialogs.error(t('quicknotes', 'Could not restore note'));
         });
     },
     // Hard-delete a soft-deleted note (only used from the trash view).
@@ -1258,8 +1370,7 @@ View.prototype = {
                         self.render();
                     }
                 }).fail(function () {
-                    OC.dialogs.alert(t('quicknotes', 'Could not delete note, not found'),
-                        t('quicknotes', 'Quick notes'));
+                    QnDialogs.error(t('quicknotes', 'Could not delete note, not found'));
                 });
             },
             true
@@ -1282,8 +1393,7 @@ View.prototype = {
                         self.render();
                     }
                 }).fail(function () {
-                    OC.dialogs.alert(t('quicknotes', 'Could not delete note, not found'),
-                        t('quicknotes', 'Quick notes'));
+                    QnDialogs.error(t('quicknotes', 'Could not delete note, not found'));
                 });
             },
             true
@@ -1352,6 +1462,13 @@ var setFilterUrl = function (filterParam, filter) {
  * Add Helpers to handlebars
  */
 
+// Until Nextcloud 33 the server registered this one on the Handlebars instance
+// it shipped (core/src/OC/l10n.js). The app now brings its own Handlebars, so
+// it has to register it too.
+Handlebars.registerHelper('t', function(app, text) {
+    return t(app, text);
+});
+
 Handlebars.registerHelper('tSW', function(user) {
     return t('quicknotes', 'Shared with {user}', {user: user});
 });
@@ -1362,6 +1479,70 @@ Handlebars.registerHelper('tSB', function(user) {
 
 Handlebars.registerHelper('tNN', function(number) {
     return t('quicknotes', 'Note {number}', {number: number});
+});
+
+// Reminders are stored as UTC strings. Turning one into something readable
+// needs the locale and the timezone of the browser, and all of that lives in
+// the Vue bundle (src/dialogs.js), next to the dialog that produces them.
+Handlebars.registerHelper('reminderLabel', function(reminderAt) {
+    return QnDialogs.formatReminder(reminderAt);
+});
+
+/*
+ * Off canvas navigation on narrow screens
+ *
+ * The server used to open and close it through snap.js, which set the
+ * `snapjs-left` class on the body. Nextcloud 34 does not ship snap.js
+ * anymore, so the toggle of templates/main.php is wired up here. The class
+ * it sets is the one css/not-vue.css watches.
+ */
+
+var setNavigationOpen = function (open) {
+    $('body').toggleClass('qn-nav-open', open);
+    $('#app-navigation-toggle').attr('aria-expanded', open ? 'true' : 'false');
+};
+
+$('#app-navigation-toggle').on('click', function (event) {
+    event.stopPropagation();
+    setNavigationOpen(!$('body').hasClass('qn-nav-open'));
+});
+
+/*
+ * Settings panel at the foot of the navigation
+ *
+ * The server used to open it itself: `data-apps-slide-toggle` on the button
+ * was picked up by a jQuery plugin of the core that slid the target open.
+ * Nextcloud 34 dropped it along with jQuery, so the button did nothing at all
+ * and the panel — which renderSettings() had already filled — stayed at the
+ * `display: none` the server's own CSS gives it.
+ *
+ * That CSS is still there and still keys off `#app-settings.opened`, so
+ * setting the class is all that is needed.
+ *
+ * It does not close on an outside click, unlike the plugin: the panel holds a
+ * colour picker and two checkboxes, and closing while the user is aiming at
+ * one of them was worse than leaving it to the button.
+ */
+$('.settings-button').on('click', function (event) {
+    event.stopPropagation();
+    var opened = $('#app-settings').toggleClass('opened').hasClass('opened');
+    $(this).attr('aria-expanded', opened ? 'true' : 'false');
+});
+
+// Picking an entry, or reaching for the notes, closes it again. Collapsing a
+// section or opening the settings does not, since the user is still busy in
+// the navigation.
+$(document).on('click', '#app-navigation', function (event) {
+    if ($(event.target).closest('.collapse, #app-settings').length) {
+        return;
+    }
+    setNavigationOpen(false);
+});
+
+$(document).on('click', '#app-content', function () {
+    if ($('body').hasClass('qn-nav-open')) {
+        setNavigationOpen(false);
+    }
 });
 
 /*
@@ -1394,9 +1575,13 @@ notes.load().done(function () {
         view._selectColor(color);
         view._filterColor(color);
     }
+
+    if (getFilterUrl('r') !== undefined) {
+        $('#reminder-notes').addClass('active');
+        view._filterReminders();
+    }
 }).fail(function () {
-    OC.dialogs.alert(t('quicknotes', 'Could not load notes'),
-        t('quicknotes', 'Quick notes'));
+    QnDialogs.error(t('quicknotes', 'Could not load notes'));
 });
 
 

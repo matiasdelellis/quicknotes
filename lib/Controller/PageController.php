@@ -22,6 +22,8 @@
 
 namespace OCA\QuickNotes\Controller;
 
+use OCP\AppFramework\Http\Attribute\NoAdminRequired;
+use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\AppFramework\Controller;
 
@@ -44,13 +46,10 @@ class PageController extends Controller {
 	 *          basically the only required method to add this exemption, don't
 	 *          add it to any other method if you don't exactly know what it does
 	 *
-	 *
-	 * @NoAdminRequired
-	 *
-	 * @NoCSRFRequired
-	 *
 	 * @return TemplateResponse
 	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
 	public function index(): TemplateResponse {
 		return new TemplateResponse($this->appName, 'main');
 	}

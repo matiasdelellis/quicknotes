@@ -227,6 +227,25 @@ Notes.prototype = {
             return dbnote;
         }.bind(this));
     },
+    // Set, move or cancel the reminder of a note: PUT /notes/{id}/reminder.
+    // `reminderAt` is a UTC 'Y-m-d H:i:s' string, or null to cancel it.
+    // The reminder has its own endpoint rather than travelling with the note,
+    // so the editor applies it right after saving the note itself.
+    setReminder: function (note, reminderAt) {
+        var id = assertId(note.id);
+        var url = this._baseUrl + '/' + id + '/reminder';
+        return this._request('PUT', url, {reminderAt: reminderAt}, function (dbnote) {
+            this._removeFromBuckets(id);
+            if (dbnote.deletedAt) {
+                this._deleted.unshift(dbnote);
+            } else if (dbnote.archivedAt) {
+                this._archived.unshift(dbnote);
+            } else {
+                this._notes.unshift(dbnote);
+            }
+            return dbnote;
+        }.bind(this));
+    },
     // Purge a note: hard DELETE /notes/{id}. Used by the trash view
     // to permanently remove a soft-deleted note.
     remove: function (note) {
@@ -241,6 +260,13 @@ Notes.prototype = {
         return this._request('DELETE', OC.generateUrl('/apps/quicknotes/share') + '/' + id, null, function () {
             this._removeFromBuckets(id);
         }.bind(this));
+    },
+    // Resolve a file picked from the Files app into an attachment payload
+    // ({file_id, preview_url, redirect_url, deep_link_url}). Nextcloud 34
+    // removed the OC.Files javascript client, so the file id lookup is done
+    // server side from the path the picker returns.
+    getAttachmentInfo: function (path) {
+        return $.get(OC.generateUrl('/apps/quicknotes/api/v1/attachments/info'), {path: path});
     },
     // Helper: drop the note with the given id from whichever bucket
     // it currently lives in.

@@ -41,6 +41,15 @@
 				<div class='note-content'>
 					{{{ content }}}
 				</div>
+				<div class='note-reminder'>
+					{{#if reminderAt}}
+						{{#if reminderNotifiedAt}}
+							<div class="slim-reminder slim-reminder-sent" reminder-at="{{ reminderAt }}" title="{{t "quicknotes" "Reminder already sent"}}">{{ reminderLabel reminderAt }}</div>
+						{{else}}
+							<div class="slim-reminder" reminder-at="{{ reminderAt }}" title="{{t "quicknotes" "Reminder"}}">{{ reminderLabel reminderAt }}</div>
+						{{/if}}
+					{{/if}}
+				</div>
 				<div class='note-shares'>
 					{{#each sharedWith}}
 						<div class="slim-share" share-id="{{ shared_user }}" title="{{tSW display_name}}">{{{ display_name }}}</div>
@@ -68,6 +77,7 @@
 				<div class="icon-header-note icon-pin fixed-header-icon" title="{{t "quicknotes" "Pin note"}}"></div>
 				<div contenteditable="true" id='title-editable' class='note-title' data-placeholder="{{t "quicknotes" "Title"}}"></div>
 				<div contenteditable="true" id='content-editable' class='note-content'></div>
+				<div class='note-reminder'></div>
 				<div class='note-shares'></div>
 				<div class='note-tags'></div>
 			</div>
@@ -81,6 +91,9 @@
 					</button>
 					<button id='tag-button' class='round-tool-button'>
 						<div class="icon-tag" title="{{t "quicknotes" "Tags"}}"></div>
+					</button>
+					<button id='reminder-button' class='round-tool-button'>
+						<div class="icon-qn-reminder" title="{{t "quicknotes" "Remind me"}}"></div>
 					</button>
 					<button id='attach-button' class='round-tool-button'>
 						<div class="icon-picture" title="{{t "quicknotes" "Attach file"}}"></div>

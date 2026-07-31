@@ -67,11 +67,29 @@ return ['resources' =>
 			'url' => '/api/v1/notes/{id}/restore',
 			'verb' => 'POST'
 		],
+		// Set / move / cancel the reminder of a note. A null reminderAt
+		// cancels it, so one route covers both.
+		[
+			'name' => 'note#reminder',
+			'url' => '/notes/{id}/reminder',
+			'verb' => 'PUT'
+		],
+		[
+			'name' => 'noteApi#reminder',
+			'url' => '/api/v1/notes/{id}/reminder',
+			'verb' => 'PUT'
+		],
 		// Upload attachments
 		[
 			'name' => 'AttachmentApi#upload',
 			'url' => '/api/v1/attachments',
 			'verb' => 'POST'
+		],
+		// Describe an existing file to attach it to a note
+		[
+			'name' => 'AttachmentApi#info',
+			'url' => '/api/v1/attachments/info',
+			'verb' => 'GET'
 		],
 		// User Settings
 		[

@@ -22,6 +22,8 @@
 
 namespace OCA\QuickNotes\Controller;
 
+use OCP\AppFramework\Http\Attribute\NoAdminRequired;
+use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\JSONResponse;
 use OCP\AppFramework\Controller;
@@ -47,16 +49,14 @@ class NoteController extends Controller {
 		$this->userId      = $userId;
 	}
 
-	/**
-	 * @NoAdminRequired
-	 */
+	#[NoAdminRequired]
 	public function index(): JSONResponse {
 		$notes = $this->noteService->getAll($this->userId);
 		if (count($notes) === 0) {
 			return new JSONResponse([]);
 		}
 
-		$lastModified = new \DateTime(null, new \DateTimeZone('GMT'));
+		$lastModified = new \DateTime('now', new \DateTimeZone('GMT'));
 		$timestamp = max(array_map(function($note) { return $note->getTimestamp(); }, $notes));
 		$lastModified->setTimestamp($timestamp);
 
@@ -67,9 +67,7 @@ class NoteController extends Controller {
 		return $response;
 	}
 
-	/**
-	 * @NoAdminRequired
-	 */
+	#[NoAdminRequired]
 	public function dashboard(): JSONResponse {
 		$notes = $this->noteService->getAll($this->userId);
 		if (count($notes) === 0) {
@@ -103,10 +101,9 @@ class NoteController extends Controller {
 	}
 
 	/**
-	 * @NoAdminRequired
-	 *
 	 * @param int $id
 	 */
+	#[NoAdminRequired]
 	public function show(int $id): JSONResponse {
 		$note = $this->noteService->get($this->userId, $id);
 		if (is_null($note)) {
@@ -122,8 +119,6 @@ class NoteController extends Controller {
 	}
 
 	/**
-	 * @NoAdminRequired
-	 *
 	 * @param string $title
 	 * @param string $content
 	 * @param string $color
@@ -134,6 +129,7 @@ class NoteController extends Controller {
 	 *
 	 * @return JSONResponse
 	 */
+	#[NoAdminRequired]
 	public function create(string $title,
 		               string $content,
 		               ?string $color = null,
@@ -160,8 +156,6 @@ class NoteController extends Controller {
 	}
 
 	/**
-	 * @NoAdminRequired
-	 *
 	 * @param int $id
 	 * @param string $title
 	 * @param string $content
@@ -171,6 +165,7 @@ class NoteController extends Controller {
 	 * @param array  $attachments
 	 * @param array  $sharedWith
 	 */
+	#[NoAdminRequired]
 	public function update(int $id,
 	                       string $title,
 	                       string $content,
@@ -203,21 +198,19 @@ class NoteController extends Controller {
 	}
 
 	/**
-	 * @NoAdminRequired
-	 *
 	 * @param int $id
 	 */
+	#[NoAdminRequired]
 	public function destroy(int $id): JSONResponse {
 		$this->noteService->destroy($this->userId, $id);
 		return new JSONResponse([]);
 	}
 
 	/**
-	 * @NoAdminRequired
-	 * @NoCSRFRequired
-	 *
 	 * @param int $id
 	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
 	public function archive(int $id): JSONResponse {
 		$note = $this->noteService->archive($this->userId, $id);
 		if (is_null($note)) {
@@ -230,11 +223,10 @@ class NoteController extends Controller {
 	}
 
 	/**
-	 * @NoAdminRequired
-	 * @NoCSRFRequired
-	 *
 	 * @param int $id
 	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
 	public function trash(int $id): JSONResponse {
 		$note = $this->noteService->trash($this->userId, $id);
 		if (is_null($note)) {
@@ -247,11 +239,10 @@ class NoteController extends Controller {
 	}
 
 	/**
-	 * @NoAdminRequired
-	 * @NoCSRFRequired
-	 *
 	 * @param int $id
 	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
 	public function unarchive(int $id): JSONResponse {
 		$note = $this->noteService->unarchive($this->userId, $id);
 		if (is_null($note)) {
@@ -264,13 +255,33 @@ class NoteController extends Controller {
 	}
 
 	/**
-	 * @NoAdminRequired
-	 * @NoCSRFRequired
-	 *
 	 * @param int $id
 	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
 	public function restore(int $id): JSONResponse {
 		$note = $this->noteService->restore($this->userId, $id);
+		if (is_null($note)) {
+			return new JSONResponse([], Http::STATUS_NOT_FOUND);
+		}
+
+		$response = new JSONResponse($note);
+		$response->setETag(md5(json_encode($note)));
+		return $response;
+	}
+
+	/**
+	 * @param int $id
+	 * @param string|null $reminderAt UTC 'Y-m-d H:i:s', null to cancel
+	 */
+	#[NoAdminRequired]
+	public function reminder(int $id, ?string $reminderAt = null): JSONResponse {
+		try {
+			$note = $this->noteService->setReminder($this->userId, $id, $reminderAt);
+		} catch (\InvalidArgumentException $e) {
+			return new JSONResponse(['message' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
+		}
+
 		if (is_null($note)) {
 			return new JSONResponse([], Http::STATUS_NOT_FOUND);
 		}

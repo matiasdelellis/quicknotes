@@ -41,6 +41,7 @@ use OCA\QuickNotes\Db\Tag;
 use OCA\QuickNotes\Db\TagMapper;
 
 use OCA\QuickNotes\Service\FileService;
+use OCA\QuickNotes\Service\ReminderService;
 use OCA\QuickNotes\Service\SettingsService;
 
 use OCP\AppFramework\Db\DoesNotExistException;
@@ -57,6 +58,7 @@ class NoteService {
 	private $tagmapper;
 	private $fileService;
 	private $settingsService;
+	private $reminderService;
 
 	/** @var IUserManager */
 	private $userManager;
@@ -69,6 +71,7 @@ class NoteService {
 	                            TagMapper       $tagmapper,
 	                            FileService     $fileService,
 	                            SettingsService $settingsService,
+	                            ReminderService $reminderService,
 	                            IUserManager    $userManager)
 	{
 		$this->notemapper      = $notemapper;
@@ -79,13 +82,11 @@ class NoteService {
 		$this->tagmapper       = $tagmapper;
 		$this->fileService     = $fileService;
 		$this->settingsService = $settingsService;
+		$this->reminderService = $reminderService;
 		$this->userManager     = $userManager;
 	}
 
-	/**
-	 * @NoAdminRequired
-	 */
-	 public function getAll(string $userId): array {
+	public function getAll(string $userId): array {
 		$notes = $this->notemapper->findAll($userId);
 
 		// Get shares from others.
@@ -169,7 +170,7 @@ class NoteService {
 
 		$note->setTitle($title);
 		$note->setContent($content);
-		$note->setPinned($isPinned ? 1 : 0);
+		$note->setPinned($isPinned);
 		$note->setTimestamp(time());
 		$note->setColorId($hcolor->id);
 		$note->setUserId($userId);
@@ -337,7 +338,7 @@ class NoteService {
 		// Set new info on Note
 		$note->setTitle($title);
 		$note->setContent($content);
-		$note->setPinned($isPinned ? 1 : 0);
+		$note->setPinned($isPinned);
 		$note->setTimestamp(time());
 		$note->setColorId($hcolor->id);
 
@@ -432,9 +433,47 @@ class NoteService {
 		$previousArchived = $note->getArchivedAt();
 		$this->notemapper->updateArchiveState($id, $previousArchived, $now);
 
+		// Sending to the trash cancels the reminder: findDueReminders()
+		// skips trashed notes, and this withdraws a notification that may
+		// already be sitting in the user's list.
+		$this->reminderService->dismiss($userId, $id);
+
 		// Reload the note so the response carries the new deleted_at.
 		$note = $this->get($userId, $id);
 		return $this->hydrate($userId, $note);
+	}
+
+	/**
+	 * Arm, move or cancel the reminder of a note.
+	 *
+	 * $reminderAt is a UTC 'Y-m-d H:i:s' string — the caller is expected to
+	 * have converted from the user's timezone already. Pass null to cancel.
+	 *
+	 * @param string $userId
+	 * @param int $id
+	 * @param string|null $reminderAt
+	 *
+	 * @throws \InvalidArgumentException if $reminderAt is malformed
+	 *
+	 * @return Note|null
+	 */
+	public function setReminder(string $userId, int $id, ?string $reminderAt): ?Note {
+		$reminderAt = $this->reminderService->normalize($reminderAt);
+
+		$note = $this->get($userId, $id);
+		if (is_null($note))
+			return null;
+
+		$this->notemapper->updateReminder($id, $reminderAt);
+
+		// Anything already sitting in the notification list was queued for
+		// the previous date, so it has to go regardless of whether this is a
+		// reschedule or a cancellation.
+		$this->reminderService->dismiss($userId, $id);
+
+		// Reload so the response carries the new reminder columns, the same
+		// way archive/trash do.
+		return $this->get($userId, $id);
 	}
 
 	/**
@@ -552,6 +591,9 @@ class NoteService {
 		$oldcolorid = $note->getColorId();
 
 		$this->noteShareMapper->forgetSharesByNoteId($note->getId());
+
+		// The row is about to go, so its notification must not outlive it.
+		$this->reminderService->dismiss($userId, $id);
 
 		// Delete note.
 		$this->notemapper->delete($note);

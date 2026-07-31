@@ -22,6 +22,8 @@
 
 namespace OCA\QuickNotes\Controller;
 
+use OCP\AppFramework\Http\Attribute\NoAdminRequired;
+use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
 use OCP\AppFramework\ApiController;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\JSONResponse;
@@ -49,11 +51,10 @@ class AttachmentApiController extends ApiController {
 	}
 
 	/**
-	 * @NoAdminRequired
-	 * @NoCSRFRequired
-	 *
 	 * @return JSONResponse
 	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
 	public function upload() {
 		$files = $this->request->files;
 
@@ -69,12 +70,39 @@ class AttachmentApiController extends ApiController {
 
 		$fileId = $this->fileService->upload($file['name'], file_get_contents($file['tmp_name']));
 
-		return new JSONResponse([
+		return new JSONResponse($this->getAttachmentInfo($fileId));
+	}
+
+	/**
+	 * Describe an already existing file so it can be attached to a note.
+	 *
+	 * The files picker only returns a path, and the `OC.Files` javascript
+	 * client that used to resolve it into a file id was removed in
+	 * Nextcloud 34, so the lookup happens here.
+	 *
+	 * @param string $path path of the file, relative to the user folder
+	 *
+	 * @return JSONResponse
+	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
+	public function info(string $path) {
+		$fileId = $this->fileService->getFileIdByPath($path);
+
+		if (is_null($fileId)) {
+			return new JSONResponse([], Http::STATUS_NOT_FOUND);
+		}
+
+		return new JSONResponse($this->getAttachmentInfo($fileId));
+	}
+
+	private function getAttachmentInfo(int $fileId): array {
+		return [
 			'file_id'       => $fileId,
 			'preview_url'   => $this->fileService->getPreviewUrl($fileId, 512),
 			'redirect_url'  => $this->fileService->getRedirectToFileUrl($fileId),
 			'deep_link_url' => $this->fileService->getDeepLinkUrl($fileId)
-		]);
+		];
 	}
 
 }

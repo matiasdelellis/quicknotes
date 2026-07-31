@@ -162,4 +162,90 @@ class NoteMapper extends QBMapper {
 		return $this->findEntities($qb);
 	}
 
+	/**
+	 * Every note of a user that carries a reminder, whether it has already
+	 * fired or not. Notes in the trash are left out, the same way
+	 * findDueReminders() leaves them out.
+	 *
+	 * Feeds the virtual calendar, so it is ordered by the reminder date to
+	 * save the caller a sort.
+	 *
+	 * @return Note[]
+	 */
+	public function findWithReminders(string $userId): array {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')
+			->from($this->tableName)
+			->where(
+				$qb->expr()->eq('user_id', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR)),
+				$qb->expr()->isNotNull('reminder_at'),
+				$qb->expr()->isNull('deleted_at')
+			)
+			->orderBy('reminder_at', 'ASC');
+		return $this->findEntities($qb);
+	}
+
+	/**
+	 * Arm, move or clear the reminder of a note. Uses the QueryBuilder
+	 * directly for the same reason as updateArchiveState().
+	 *
+	 * Writing a reminder always clears `reminder_notified_at`, so moving a
+	 * reminder that already fired arms it again instead of staying silent.
+	 *
+	 * @param int         $id
+	 * @param string|null $reminderAt UTC 'Y-m-d H:i:s', or null to cancel
+	 *
+	 * @return int the number of affected rows
+	 */
+	public function updateReminder(int $id, ?string $reminderAt): int {
+		$qb = $this->db->getQueryBuilder();
+		$qb->update($this->tableName)
+			->set('reminder_at', $qb->createNamedParameter($reminderAt, IQueryBuilder::PARAM_STR))
+			->set('reminder_notified_at', $qb->createNamedParameter(null, IQueryBuilder::PARAM_STR))
+			->where($qb->expr()->eq('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT)));
+		return $qb->executeStatement();
+	}
+
+	/**
+	 * Record that the reminder notification for this note went out.
+	 *
+	 * @return int the number of affected rows
+	 */
+	public function markReminderNotified(int $id, \DateTime $when): int {
+		$qb = $this->db->getQueryBuilder();
+		$qb->update($this->tableName)
+			->set('reminder_notified_at', $qb->createNamedParameter(
+				$when->format('Y-m-d H:i:s'),
+				IQueryBuilder::PARAM_STR
+			))
+			->where($qb->expr()->eq('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT)));
+		return $qb->executeStatement();
+	}
+
+	/**
+	 * Find notes whose reminder is due and has not been notified yet. Used
+	 * by `NoteReminderJob`.
+	 *
+	 * Notes in the trash are skipped: sending to the trash cancels the
+	 * reminder. Archived notes are *not* skipped — archiving only takes a
+	 * note out of the active list, it is not a way to cancel a reminder.
+	 *
+	 * @return Note[]
+	 */
+	public function findDueReminders(\DateTime $now): array {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')
+			->from($this->tableName)
+			->where(
+				$qb->expr()->isNotNull('reminder_at'),
+				$qb->expr()->isNull('reminder_notified_at'),
+				$qb->expr()->isNull('deleted_at'),
+				$qb->expr()->lte('reminder_at', $qb->createNamedParameter(
+					$now->format('Y-m-d H:i:s'),
+					IQueryBuilder::PARAM_STR
+				))
+			);
+		return $this->findEntities($qb);
+	}
+
 }

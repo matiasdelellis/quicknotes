@@ -6,6 +6,11 @@ supports basic rich text formatting such as **bold**, *italic*, and numbered or
 bullet lists to enhance your notes. It also allows attaching files, and the
 notes can be shared as read-only with other users.
 
+A note can also carry a reminder: Nextcloud sends you a notification when the
+date arrives. If you turn it on in the app settings, the notes with a reminder
+are published as a read-only calendar too, so they show up in the Calendar app
+and in any CalDAV client you use.
+
 ![Screenshot of Quick notes](/doc/quicknotes-grid-view.jpeg "App screenshot")
 
 ## :heart: Support

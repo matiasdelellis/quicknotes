@@ -1,4 +1,35 @@
 # Changelog
+## [Unreleased]
+- Add note reminders: a note can carry a date, and a background job sends a
+  Nextcloud notification when it falls due. Sending a note to the trash
+  cancels its reminder; archiving does not.
+- Add a Reminders entry to the navigation, filtering the grid down to the notes
+  that carry one.
+- Publish the notes with a reminder as a read-only calendar, so they show up in
+  the Calendar app and in CalDAV clients. It is generated from the notes on
+  every read, so editing or deleting a note is reflected right away. Off by
+  default, there is a checkbox in the app settings.
+- Fix the Settings button of the navigation opening nothing: it relied on the
+  `data-apps-slide-toggle` jQuery plugin, which Nextcloud 34 removed.
+- Fix the format toolbar of the note editor being drawn behind the modal since
+  the overlay was raised to the NcModal z-index.
+- Ship the calendar icon with the app: Nextcloud 34 no longer serves the
+  `icon-*` stylesheet the app used to rely on, so it rendered blank.
+
+## [0.9.0] 2026-07-30
+- Add Nextcloud 34 compatibility, and drop the older versions.
+- Ship our own jQuery: Nextcloud 34 no longer provides it to the apps.
+- Rewrite the tags and shares dialogs with the Nextcloud Vue components,
+  replacing the select2 and ocdialog jQuery plugins removed in Nextcloud 34.
+- Resolve attachments server side, since the OC.Files javascript client was
+  also removed in Nextcloud 34.
+- Show errors as toasts: OC.dialogs.alert() no longer works in Nextcloud 34.
+- Bring back the navigation on small screens, with our own toggle: Nextcloud 34
+  removed snap.js, which used to open and close it.
+- Migrate the controllers to route attributes, and the settings to IUserConfig.
+- Fix the display name of shared notes being set on an undeclared property,
+  deprecated since PHP 8.2.
+
 ## [0.8.50] 2026-06-09
 - Add Nextcloud 33 compatibility. Thangs to Baki Burak Öğün. PR #124
 - Implement Archive and Trash. It only took 5 years. Issue #65

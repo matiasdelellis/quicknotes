@@ -1,0 +1,9 @@
+<div class='note-reminder'>
+	{{#if reminderAt}}
+		{{#if reminderNotifiedAt}}
+			<div class="slim-reminder slim-reminder-sent" reminder-at="{{ reminderAt }}" title="{{t "quicknotes" "Reminder already sent"}}">{{ reminderLabel reminderAt }}</div>
+		{{else}}
+			<div class="slim-reminder" reminder-at="{{ reminderAt }}" title="{{t "quicknotes" "Reminder"}}">{{ reminderLabel reminderAt }}</div>
+		{{/if}}
+	{{/if}}
+</div>

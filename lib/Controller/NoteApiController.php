@@ -22,6 +22,9 @@
 
 namespace OCA\QuickNotes\Controller;
 
+use OCP\AppFramework\Http\Attribute\NoAdminRequired;
+use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
+use OCP\AppFramework\Http\Attribute\CORS;
 use OCP\AppFramework\ApiController;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\JSONResponse;
@@ -47,18 +50,16 @@ class NoteApiController extends ApiController {
 		$this->userId      = $userId;
 	}
 
-	/**
-	 * @NoAdminRequired
-	 * @CORS
-	 * @NoCSRFRequired
-	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
+	#[CORS]
 	public function index(): JSONResponse {
 		$notes = $this->noteService->getAll($this->userId);
 		if (count($notes) === 0) {
 			return new JSONResponse([]);
 		}
 
-		$lastModified = new \DateTime(null, new \DateTimeZone('GMT'));
+		$lastModified = new \DateTime('now', new \DateTimeZone('GMT'));
 		$timestamp = max(array_map(function($note) { return $note->getTimestamp(); }, $notes));
 		$lastModified->setTimestamp($timestamp);
 
@@ -70,12 +71,11 @@ class NoteApiController extends ApiController {
 	}
 
 	/**
-	 * @NoAdminRequired
-	 * @CORS
-	 * @NoCSRFRequired
-	 *
 	 * @param int $id
 	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
+	#[CORS]
 	public function show(int $id): JSONResponse {
 		$note = $this->noteService->get($this->userId, $id);
 		if (is_null($note)) {
@@ -91,12 +91,6 @@ class NoteApiController extends ApiController {
 	}
 
 	/**
-	 * @NoAdminRequired
-	 *
-	 * @CORS
-	 *
-	 * @NoCSRFRequired
-	 *
 	 * @param string $title
 	 * @param string $content
 	 * @param string $color
@@ -107,6 +101,9 @@ class NoteApiController extends ApiController {
 	 *
 	 * @return JSONResponse
 	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
+	#[CORS]
 	public function create(string $title,
 	                       string $content,
 	                       ?string $color = null,
@@ -133,10 +130,6 @@ class NoteApiController extends ApiController {
 	}
 
 	/**
-	 * @NoAdminRequired
-	 * @CORS
-	 * @NoCSRFRequired
-	 *
 	 * @param int $id
 	 * @param string $title
 	 * @param string $content
@@ -146,6 +139,9 @@ class NoteApiController extends ApiController {
 	 * @param array  $attachments
 	 * @param array  $sharedWith
 	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
+	#[CORS]
 	public function update(int    $id,
 	                       string $title,
 	                       string $content,
@@ -178,24 +174,22 @@ class NoteApiController extends ApiController {
 	}
 
 	/**
-	 * @NoAdminRequired
-	 * @CORS
-	 * @NoCSRFRequired
-	 *
 	 * @param int $id
 	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
+	#[CORS]
 	public function destroy(int $id): JSONResponse {
 		$this->noteService->destroy($this->userId, $id);
 		return new JSONResponse([]);
 	}
 
 	/**
-	 * @NoAdminRequired
-	 * @CORS
-	 * @NoCSRFRequired
-	 *
 	 * @param int $id
 	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
+	#[CORS]
 	public function archive(int $id): JSONResponse {
 		$note = $this->noteService->archive($this->userId, $id);
 		if (is_null($note)) {
@@ -208,12 +202,11 @@ class NoteApiController extends ApiController {
 	}
 
 	/**
-	 * @NoAdminRequired
-	 * @CORS
-	 * @NoCSRFRequired
-	 *
 	 * @param int $id
 	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
+	#[CORS]
 	public function trash(int $id): JSONResponse {
 		$note = $this->noteService->trash($this->userId, $id);
 		if (is_null($note)) {
@@ -226,12 +219,11 @@ class NoteApiController extends ApiController {
 	}
 
 	/**
-	 * @NoAdminRequired
-	 * @CORS
-	 * @NoCSRFRequired
-	 *
 	 * @param int $id
 	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
+	#[CORS]
 	public function unarchive(int $id): JSONResponse {
 		$note = $this->noteService->unarchive($this->userId, $id);
 		if (is_null($note)) {
@@ -244,14 +236,36 @@ class NoteApiController extends ApiController {
 	}
 
 	/**
-	 * @NoAdminRequired
-	 * @CORS
-	 * @NoCSRFRequired
-	 *
 	 * @param int $id
 	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
+	#[CORS]
 	public function restore(int $id): JSONResponse {
 		$note = $this->noteService->restore($this->userId, $id);
+		if (is_null($note)) {
+			return new JSONResponse([], Http::STATUS_NOT_FOUND);
+		}
+
+		$response = new JSONResponse($note);
+		$response->setETag(md5(json_encode($note)));
+		return $response;
+	}
+
+	/**
+	 * @param int $id
+	 * @param string|null $reminderAt UTC 'Y-m-d H:i:s', null to cancel
+	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
+	#[CORS]
+	public function reminder(int $id, ?string $reminderAt = null): JSONResponse {
+		try {
+			$note = $this->noteService->setReminder($this->userId, $id, $reminderAt);
+		} catch (\InvalidArgumentException $e) {
+			return new JSONResponse(['message' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
+		}
+
 		if (is_null($note)) {
 			return new JSONResponse([], Http::STATUS_NOT_FOUND);
 		}

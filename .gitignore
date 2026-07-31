@@ -2,10 +2,13 @@ build
 js/templates.js
 js/quicknotes-dashboard.js*
 js/quicknotes-talk.js*
+js/quicknotes-legacy.js*
 js/vendor
 css/vendor
 node_modules
 vendor
+composer.lock
+.phpunit.result.cache
 translationfiles/
 translationtool.phar
 

@@ -297,6 +297,7 @@ div[contenteditable="true"] {
     opacity: 0.5;
 }
 
+.slim-reminder,
 .slim-share,
 .slim-tag {
     background-repeat: no-repeat;
@@ -310,11 +311,13 @@ div[contenteditable="true"] {
     font-size: 90%;
 }
 
+.slim-reminder:hover,
 .slim-share:hover,
 .slim-tag:hover {
     background-color: var(--color-background-dark);
 }
 
+.note-reminder > .slim-reminder,
 .note-shares > .slim-share,
 .note-tags > .slim-tag {
     margin-top: 5px;
@@ -328,39 +331,20 @@ div[contenteditable="true"] {
     background-image: var(--original-icon-tag-dark);
 }
 
-/* Restore defaults select2 rules */
-
-#select2-drop {
-    z-index: 100001;
+/* Inlined rather than reached through `--original-icon-calendar-dark`: that name
+   belongs to the server, which redefines it per theme, so a badge sitting on a
+   note — always light, whatever the theme — would follow the theme and turn
+   white. See the note next to .icon-qn-reminder in css/icons.css. */
+.slim-reminder {
+    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTcgMTJoLTV2NWg1di01ek0xNiAxdjJIOFYxSDZ2Mkg1Yy0xLjExIDAtMS45OS45LTEuOTkgMkwzIDE5YzAgMS4xLjg5IDIgMiAyaDE0YzEuMSAwIDItLjkgMi0yVjVjMC0xLjEtLjktMi0yLTJoLTFWMWgtMnptMyAxOEg1VjhoMTR2MTF6Ii8+PC9zdmc+");
 }
 
-.select2-container {
-    width: 100%;
+/* A reminder whose notification already went out is history, not a pending
+   thing, so it is toned down instead of removed — the date is still useful. */
+.slim-reminder-sent {
+    opacity: 0.5;
+    text-decoration: line-through;
 }
-
-.select2-search-choice {
-    padding-right: 18px !important;
-}
-
-.select2-search-choice-close {
-    display: block !important;
-    right: 3px !important;
-    left: unset !important;
-    top: 8px !important;
-}
-
-.select2-container-multi .select2-choices .select2-search-choice {
-    padding: 3px 18px 3px 18px;
-}
-
-.select2-input {
-    margin-top: 4px !important;
-}
-
-div.select2-container-multi .select2-choices, div.select2-container-multi.select2-container-active .select2-choices {
-    min-height: 26px;
-}
-
 
 /* Modal Content */
 

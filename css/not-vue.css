@@ -182,16 +182,40 @@
 
 /* mobile.css */
 
+/* Below 1024px the navigation slides out of the way and is opened with the
+ * toggle. Until Nextcloud 33 the server did this with snap.js, which set
+ * `snapjs-left` on the body; snap.js is gone in 34, so the toggle in
+ * templates/main.php sets `qn-nav-open` (js/script.js) instead. Both classes
+ * are honoured so the app also behaves on older servers. */
+
 @media only screen and (width < 1024px) {
 
   #app-navigation:not(.vue) {
     transform: translateX(-300px);
     position: fixed;
     height: var(--body-height);
+    transition: transform 100ms ease-in-out;
   }
 
-  .snapjs-left #app-navigation {
+  .snapjs-left #app-navigation,
+  .qn-nav-open #app-navigation {
     transform: translateX(0);
+    /* The server gives #app-content a z-index of 1000, and snap.js used to
+     * slide the content aside rather than layer over it, so the navigation
+     * has to be lifted above the notes to be clickable. */
+    z-index: 1100;
+    box-shadow: 0 0 10px var(--color-box-shadow);
+  }
+
+  /* Dim the notes while the navigation is open. Clicking the backdrop lands
+   * on #app-content, which closes the navigation again (js/script.js). */
+  .snapjs-left #app-content::before,
+  .qn-nav-open #app-content::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 1050;
+    background-color: rgba(0, 0, 0, 0.3);
   }
 
   #app-navigation:not(.hidden) + #app-content {
@@ -207,11 +231,27 @@
     z-index: 1050;
     cursor: pointer;
     opacity: 0.6;
+    border: none;
+    border-radius: 0;
+    background-color: transparent;
+    color: var(--color-main-text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   #app-navigation-toggle:hover,
   #app-navigation-toggle:focus {
     opacity: 1;
+  }
+
+}
+
+/* The toggle only makes sense while the navigation is off canvas. */
+@media only screen and (width >= 1024px) {
+
+  #app-navigation-toggle {
+    display: none !important;
   }
 
 }

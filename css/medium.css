@@ -5,7 +5,20 @@
 .medium-toolbar-arrow-over:before {
   border-color: transparent transparent var(--color-main-background-translucent, #000) transparent; }
 
+/* MediumEditor appends its toolbar to the body, so it competes with the note
+   modal on equal terms. Its own stylesheet pins it at z-index 2000, which used
+   to be enough — the modal sat at 1051 until it was raised to 9998 to line up
+   with the NcModal mask, and from then on the toolbar was painted underneath
+   the overlay and could not be seen or clicked.
+
+   9999 clears the modal and stays below the Nextcloud dialogs (10000 and up),
+   so a QnDialogs modal opened on top of the editor still covers the toolbar
+   rather than the other way round.
+
+   `!important` because templates/main.php loads `vendor/medium-editor` *after*
+   this file, so the vendor rule wins every tie on order. */
 .medium-editor-toolbar {
+  z-index: 9999 !important;
   background-color: var(--color-main-background-translucent, #000);
   border: none;
   border-radius: 50px; }

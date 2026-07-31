@@ -12,6 +12,23 @@
   background-image: var(--original-icon-quicknotes-white);
 }
 
+/* Reminders entry of the navigation, and reminder button of the note editor.
+ *
+ * The class name is the app's own, and the svg is inlined here rather than
+ * reached through a variable — on purpose, and it took three tries to get here.
+ * `icon-calendar` and `--original-icon-calendar-dark` are names *Nextcloud*
+ * owns: where the server ships its icon stylesheet it defines `body
+ * .icon-calendar` itself, which at specificity (0,1,1) beats a plain
+ * `.icon-calendar` here, and resolves to whichever asset the current theme
+ * calls for — a white one under a dark theme. The app's rule never gets a say.
+ *
+ * Every icon of the app that renders correctly avoids both traps the same way:
+ * a name the server does not use (`icon-pin`, `icon-archived`, `icon-restore`)
+ * and a direct `url(data:…)`. Do that for anything new. */
+.icon-qn-reminder {
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTcgMTJoLTV2NWg1di01ek0xNiAxdjJIOFYxSDZ2Mkg1Yy0xLjExIDAtMS45OS45LTEuOTkgMkwzIDE5YzAgMS4xLjg5IDIgMiAyaDE0YzEuMSAwIDItLjkgMi0yVjVjMC0xLjEtLjktMi0yLTJoLTFWMWgtMnptMyAxOEg1VjhoMTR2MTF6Ii8+PC9zdmc+");
+}
+
 .dashboard-pinned-icon {
     background-image: url(../img/pinned.svg);
     filter: var(--background-invert-if-dark);
@@ -25,4 +42,8 @@
   .icon-quicknotes-white {
     background-image: var(--original-icon-quicknotes-dark);
   }
+  /* Nothing for icon-qn-reminder here on purpose: every other icon of the app
+     is a plain dark svg with no media query and no filter, and singling this
+     one out is what made it look different from its neighbours. Dark mode for
+     the icons is worth closing across the app in one pass. */
 }

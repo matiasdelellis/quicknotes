@@ -1,7 +1,15 @@
 <?xml version="1.0"?>
+<!--
+	Psalm 6 turns on dead code detection by default and adds a few checks that
+	do not fit an app of this shape (entities built on Nextcloud's magic
+	accessors, services only ever instantiated by the DI container), so they
+	are turned off / suppressed below. Everything else is left on.
+-->
 <psalm
 	errorLevel="4"
 	resolveFromConfigFile="true"
+	findUnusedCode="false"
+	findUnusedBaselineEntry="false"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns="https://getpsalm.org/schema/config"
 	xsi:schemaLocation="https://getpsalm.org/schema/config"
@@ -16,20 +24,42 @@
 		<directory name="vendor" />
 	</extraFiles>
 	<issueHandlers>
-		<UndefinedClass>
-			<errorLevel type="suppress">
-				<referencedClass name="OC" />
-				<referencedClass name="OC_App" />
-				<referencedClass name="OC_Util" />
-			</errorLevel>
-		</UndefinedClass>
 		<UndefinedDocblockClass>
 			<errorLevel type="suppress">
 				<referencedClass name="Doctrine\DBAL\Driver\Statement" />
 				<referencedClass name="Doctrine\DBAL\Schema\Schema" />
 				<referencedClass name="Doctrine\DBAL\Schema\SchemaException" />
 				<referencedClass name="Doctrine\DBAL\Schema\Table" />
+				<referencedClass name="Sabre\VObject\Component\VCalendar" />
+				<referencedClass name="Sabre\VObject\Component\VEvent" />
 			</errorLevel>
 		</UndefinedDocblockClass>
+		<!-- sabre/vobject is provided by the server at runtime (the dav app
+		     depends on it) and is not a dependency of this app, so psalm has
+		     no stubs for it. The virtual calendar of lib/Calendar builds its
+		     events with it. -->
+		<UndefinedClass>
+			<errorLevel type="suppress">
+				<referencedClass name="Sabre\VObject\Component\VCalendar" />
+				<referencedClass name="Sabre\VObject\Component\VEvent" />
+			</errorLevel>
+		</UndefinedClass>
+		<!-- The entities of the app are addressed through the @method
+		     annotations of OCP\AppFramework\Db\Entity, which psalm cannot
+		     follow once a mapper returns the base Entity type. -->
+		<UndefinedMagicMethod errorLevel="suppress" />
+		<!-- OCP\Files\IRootFolder extends an internal OC\Hooks\Emitter,
+		     which is not part of the nextcloud/ocp package. -->
+		<MissingDependency errorLevel="suppress" />
+		<!-- QBMapper and friends are generic; the mappers of the app do not
+		     carry the @extends annotations, and the mappers narrow the
+		     Entity parameter of update()/insert() on purpose. -->
+		<MissingTemplateParam errorLevel="suppress" />
+		<MoreSpecificImplementedParamType errorLevel="suppress" />
+		<!-- New in psalm 6, purely stylistic. -->
+		<MissingOverrideAttribute errorLevel="suppress" />
+		<!-- IRequest does not declare the legacy `files` property that the
+		     upload controller reads. -->
+		<NoInterfaceProperties errorLevel="suppress" />
 	</issueHandlers>
 </psalm>

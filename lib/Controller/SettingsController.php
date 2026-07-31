@@ -24,6 +24,7 @@ declare(strict_types=1);
 
 namespace OCA\QuickNotes\Controller;
 
+use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\JSONResponse;
 use OCP\IRequest;
@@ -57,17 +58,24 @@ class SettingsController extends Controller {
 	}
 
 	/**
-	 * @NoAdminRequired
 	 * @param $type
 	 * @param $value
 	 * @return JSONResponse
 	 */
+	#[NoAdminRequired]
 	public function setUserValue($type, $value) {
 		$status = self::STATE_SUCCESS;
 
 		switch ($type) {
 			case SettingsService::COLOR_FOR_NEW_NOTES_KEY:
 				$this->settingsService->setColorForNewNotes($value);
+				break;
+			case SettingsService::CALENDAR_ENABLED_KEY:
+				// The value arrives form encoded, so a checkbox reaches this
+				// as the string 'true' or 'false'.
+				$this->settingsService->setCalendarEnabled(
+					filter_var($value, FILTER_VALIDATE_BOOLEAN)
+				);
 				break;
 			default:
 				$status = self::STATE_ERROR;
@@ -84,10 +92,10 @@ class SettingsController extends Controller {
 	}
 
 	/**
-	 * @NoAdminRequired
 	 * @param $type
 	 * @return JSONResponse
 	 */
+	#[NoAdminRequired]
 	public function getUserValue($type) {
 		$status = self::STATE_OK;
 		$value ='nodata';
@@ -95,6 +103,9 @@ class SettingsController extends Controller {
 		switch ($type) {
 			case SettingsService::COLOR_FOR_NEW_NOTES_KEY:
 				$value = $this->settingsService->getColorForNewNotes();
+				break;
+			case SettingsService::CALENDAR_ENABLED_KEY:
+				$value = $this->settingsService->isCalendarEnabled();
 				break;
 			default:
 				$status = self::STATE_FALSE;

@@ -125,6 +125,30 @@ class FileService {
 	}
 
 	/**
+	 * Resolve a path relative to the user folder into a file id.
+	 *
+	 * Nextcloud 34 dropped the legacy `OC.Files` javascript client, so the
+	 * file picker only hands back a path and the lookup has to happen here.
+	 *
+	 * @param string $path path as returned by the files picker
+	 */
+	public function getFileIdByPath(string $path): ?int {
+		$userFolder = $this->rootFolder->getUserFolder($this->userId);
+
+		try {
+			$file = $userFolder->get($path);
+		} catch (NotFoundException $e) {
+			return null;
+		}
+
+		if (!($file instanceof File)) {
+			return null;
+		}
+
+		return $file->getId();
+	}
+
+	/**
 	 * Upload attachment and return fileId
 	 */
 	public function upload($fileName, $fileContent): int {

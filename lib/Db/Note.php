@@ -22,6 +22,10 @@ use OCP\AppFramework\Db\Entity;
  * @method void setArchivedAt(string|null $archivedAt)
  * @method string|null getDeletedAt()
  * @method void setDeletedAt(string|null $deletedAt)
+ * @method string|null getReminderAt()
+ * @method void setReminderAt(string|null $reminderAt)
+ * @method string|null getReminderNotifiedAt()
+ * @method void setReminderNotifiedAt(string|null $reminderNotifiedAt)
  */
 class Note extends Entity implements JsonSerializable {
 
@@ -34,6 +38,8 @@ class Note extends Entity implements JsonSerializable {
 	protected $pinned;
 	protected $archivedAt;
 	protected $deletedAt;
+	protected $reminderAt;
+	protected $reminderNotifiedAt;
 
 	// Extra info to API
 	protected $color;
@@ -45,9 +51,9 @@ class Note extends Entity implements JsonSerializable {
 
 	public function __construct() {
 		$this->addType('pinned', 'boolean');
-		// archivedAt / deletedAt default to 'string' (no addType), so
-		// QBMapper leaves the raw datetime string from the column
-		// untouched.
+		// archivedAt / deletedAt / reminderAt / reminderNotifiedAt default
+		// to 'string' (no addType), so QBMapper leaves the raw datetime
+		// string from the column untouched.
 	}
 
 	public function setColor(string $color): void {
@@ -87,7 +93,11 @@ class Note extends Entity implements JsonSerializable {
 			'tags'        => $this->tags,
 			'attachments' => $this->attachts,
 			'archivedAt'  => $this->archivedAt,
-			'deletedAt'   => $this->deletedAt
+			'deletedAt'   => $this->deletedAt,
+			'reminderAt'  => $this->reminderAt,
+			// Lets the client tell a reminder that is still pending from one
+			// that already fired, without a second request.
+			'reminderNotifiedAt' => $this->reminderNotifiedAt
 		];
 	}
 }

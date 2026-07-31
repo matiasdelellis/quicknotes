@@ -31,11 +31,14 @@ use OCP\AppFramework\Http\Events\BeforeTemplateRenderedEvent;
 
 use OCP\IL10N;
 use OCP\IURLGenerator;
-use OCP\IServerContainer;
 use OCP\INavigationManager;
 
+use Psr\Container\ContainerInterface;
+
+use OCA\QuickNotes\Calendar\CalendarProvider;
 use OCA\QuickNotes\Dashboard\NotesWidget;
 use OCA\QuickNotes\Listeners\BeforeTemplateRenderedListener;
+use OCA\QuickNotes\Notification\Notifier;
 use OCA\QuickNotes\Search\NoteSearchProvider;
 
 class Application extends App implements IBootstrap {
@@ -54,6 +57,8 @@ class Application extends App implements IBootstrap {
 		$context->registerSearchProvider(NoteSearchProvider::class);
 		$context->registerCapability(Capabilities::class);
 		$context->registerDashboardWidget(NotesWidget::class);
+		$context->registerNotifierService(Notifier::class);
+		$context->registerCalendarProvider(CalendarProvider::class);
 		$context->registerEventListener(
 			BeforeTemplateRenderedEvent::class,
 			BeforeTemplateRenderedListener::class
@@ -61,14 +66,21 @@ class Application extends App implements IBootstrap {
 	}
 
 	public function boot(IBootContext $context): void {
-		$server = $context->getServerContainer();
-		$this->registerNavigationEntry($server);
+		$this->registerNavigationEntry($context->getAppContainer());
 	}
 
-	private function registerNavigationEntry(IServerContainer $server): void {
-		$server->get(INavigationManager::class)->add(static function () use ($server) {
-			$urlGenerator = $server->getURLGenerator();
-			$l10n = $server->getL10N(self::APP_ID);
+	/**
+	 * Nextcloud 34 trimmed IServerContainer down to a handful of methods, so
+	 * the services are resolved from the app container instead. The entry
+	 * itself stays lazy: nothing is instantiated until the navigation is
+	 * actually rendered.
+	 */
+	private function registerNavigationEntry(ContainerInterface $container): void {
+		$container->get(INavigationManager::class)->add(static function () use ($container) {
+			/** @var IURLGenerator $urlGenerator */
+			$urlGenerator = $container->get(IURLGenerator::class);
+			/** @var IL10N $l10n */
+			$l10n = $container->get(IL10N::class);
 			return [
 				'id' => self::APP_ID,
 				'order' => 10,

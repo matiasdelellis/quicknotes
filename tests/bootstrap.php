@@ -10,4 +10,8 @@
  */
 
 require_once __DIR__ . '/../../../tests/bootstrap.php';
-require_once __DIR__ . '/../appinfo/autoload.php';
+
+$autoload = __DIR__ . '/../appinfo/autoload.php';
+if (file_exists($autoload)) {
+    require_once $autoload;
+}

@@ -22,6 +22,7 @@
 
 namespace OCA\QuickNotes\Controller;
 
+use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\JSONResponse;
 use OCP\AppFramework\Controller;
@@ -50,10 +51,9 @@ class ShareController extends Controller {
 	}
 
 	/**
-	 * @NoAdminRequired
-	 *
 	 * @param int $noteId
 	 */
+	#[NoAdminRequired]
 	public function forget(int $noteId): JSONResponse {
 		$this->noteShareMapper->forgetShareByNoteIdAndSharedUser($noteId, $this->userId);
 		return new JSONResponse([]);

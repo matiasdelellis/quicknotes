@@ -28,7 +28,7 @@ services:
   # custom_apps/quicknotes so changes to the code are picked up live. The
   # `:z` SELinux relabeling option is required when SELinux is in Enforcing mode.
   app:
-    image: nextcloud:33
+    image: nextcloud:34
     container_name: quicknotes-app
     restart: unless-stopped
     depends_on:
@@ -70,6 +70,39 @@ services:
       - npm_cache:/root/.npm
     command: ["sh", "-c", "echo 'Use docker/scripts/build.sh to trigger the build' && sleep infinity"]
 
+  # Dev/test image: a checkout of nextcloud/server with `composer install`
+  # already done at build time (see docker/Dockerfile.dev), so phpunit is
+  # available at /var/www/html/lib/composer/bin/phpunit. The repo is
+  # bind-mounted at /var/www/html/apps/quicknotes (the canonical dev path
+  # — required so phpunit's bootstrap resolves ../../../tests/bootstrap.php).
+  #
+  # Auto-installs with sqlite so it does not share a database with `app`.
+  # Bring it up explicitly with `docker compose up -d dev` and run the tests
+  # via `./docker/scripts/test.sh`.
+  dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      args:
+        NEXTCLOUD_DEV_BRANCH: ${NEXTCLOUD_DEV_BRANCH:-stable34}
+    container_name: quicknotes-dev
+    restart: unless-stopped
+    ports:
+      - "${NEXTCLOUD_DEV_HTTP_PORT:-8081}:80"
+    environment:
+      NEXTCLOUD_ADMIN_USER: ${NEXTCLOUD_ADMIN_USER}
+      NEXTCLOUD_ADMIN_PASSWORD: ${NEXTCLOUD_ADMIN_PASSWORD}
+      NEXTCLOUD_TRUSTED_DOMAINS: ${NEXTCLOUD_DEV_TRUSTED_DOMAINS:-localhost}
+      NEXTCLOUD_OVERWRITEPROTOCOL: ${NEXTCLOUD_OVERWRITEPROTOCOL:-http}
+    volumes:
+      - nc-dev:/var/www/html
+      - ../:/var/www/html/apps/quicknotes:z
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost/status.php"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
 volumes:
   db:
     name: quicknotes_db
@@ -77,3 +110,5 @@ volumes:
     name: quicknotes_nc
   npm_cache:
     name: quicknotes_npm_cache
+  nc-dev:
+    name: quicknotes_nc_dev

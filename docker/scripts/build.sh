@@ -16,16 +16,26 @@ if [[ ! -f "$COMPOSE_ENV_FILE" ]]; then
   exit 1
 fi
 
-if ! docker compose --env-file "$COMPOSE_ENV_FILE" ps builder --status running >/dev/null 2>&1; then
+# `docker compose ps` exits 0 even when the service is not there, so the
+# container id is what actually tells us whether it is up.
+builder_running() {
+  [[ -n "$(docker compose --env-file "$COMPOSE_ENV_FILE" ps -q --status running builder)" ]]
+}
+
+if ! builder_running; then
   echo ">> The 'builder' service is not running. Starting it..."
   docker compose --env-file "$COMPOSE_ENV_FILE" up -d builder
   echo ">> Waiting for 'builder' to be ready..."
   for i in {1..30}; do
-    if docker compose --env-file "$COMPOSE_ENV_FILE" ps builder --status running >/dev/null 2>&1; then
+    if builder_running; then
       break
     fi
     sleep 1
   done
+  if ! builder_running; then
+    echo "The 'builder' service did not come up. Check 'docker compose logs builder'." >&2
+    exit 1
+  fi
 fi
 
 echo ">> Running the build inside the builder container..."

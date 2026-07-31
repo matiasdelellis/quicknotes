@@ -11,38 +11,29 @@
 
 namespace OCA\QuickNotes\Controller;
 
-use PHPUnit_Framework_TestCase;
-
 use OCP\AppFramework\Http\TemplateResponse;
+use OCP\IRequest;
+use PHPUnit\Framework\TestCase;
 
 
-class PageControllerTest extends PHPUnit_Framework_TestCase {
+class PageControllerTest extends TestCase {
 
 	private $controller;
-	private $userId = 'john';
 
-	public function setUp() {
-		$request = $this->getMockBuilder('OCP\IRequest')->getMock();
+	protected function setUp(): void {
+		$request = $this->createMock(IRequest::class);
 
 		$this->controller = new PageController(
-			'quicknotes', $request, $this->userId
+			'quicknotes', $request
 		);
 	}
 
 
-	public function testIndex() {
+	public function testIndex(): void {
 		$result = $this->controller->index();
 
-		$this->assertEquals(['user' => 'john'], $result->getParams());
 		$this->assertEquals('main', $result->getTemplateName());
 		$this->assertTrue($result instanceof TemplateResponse);
 	}
-
-
-	public function testEcho() {
-		$result = $this->controller->doEcho('hi');
-		$this->assertEquals(['echo' => 'hi'], $result->getData());
-	}
-
 
 }

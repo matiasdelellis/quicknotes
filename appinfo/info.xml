@@ -5,7 +5,7 @@
     <name>Quick notes</name>
     <summary>Quick notes with a basic rich text</summary>
     <description>Quick notes with a basic rich text</description>
-    <version>0.8.50</version>
+    <version>0.9.0</version>
     <licence>agpl</licence>
     <author>Matias De lellis</author>
     <namespace>QuickNotes</namespace>
@@ -20,9 +20,11 @@
     <screenshot>https://raw.githubusercontent.com/matiasdelellis/quicknotes/master/doc/quicknotes-attachments.jpeg</screenshot>
     <screenshot>https://raw.githubusercontent.com/matiasdelellis/quicknotes/master/doc/quicknotes-shared-note.jpeg</screenshot>
     <dependencies>
-        <nextcloud min-version="33" max-version="33"/>
+        <php min-version="8.2" max-version="8.5"/>
+        <nextcloud min-version="34" max-version="34"/>
     </dependencies>
     <background-jobs>
         <job>OCA\QuickNotes\BackgroundJob\PurgeOldTrashJob</job>
+        <job>OCA\QuickNotes\BackgroundJob\NoteReminderJob</job>
     </background-jobs>
 </info>
