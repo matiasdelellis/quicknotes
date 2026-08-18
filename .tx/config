@@ -1,10 +1,12 @@
 [main]
 host = https://www.transifex.com
 
-[quicknotes.quicknotes-pot]
-file_filter = translationfiles/<lang>/quicknotes.po
-minimum_perc = 0
-source_file = translationfiles/templates/quicknotes.pot
-source_lang = en
-type = PO
+[o:matias:p:quicknotes:r:quicknotes-pot]
+file_filter            = translationfiles/<lang>/quicknotes.po
+source_file            = translationfiles/templates/quicknotes.pot
+source_lang            = en
+type                   = PO
+minimum_perc           = 0
+replace_edited_strings = false
+keep_translations      = false
 

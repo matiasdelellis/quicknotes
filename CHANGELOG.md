@@ -13,6 +13,19 @@
   there is something in it. Until now a note could only be purged one at a
   time, or left for the weekly cleanup. The API has it as
   `DELETE /notes/trash`, which answers how many notes went.
+- Describe the API in `doc/openapi.yml`: every `/api/v1` endpoint, what the
+  payloads carry, and which of their fields belong to the note and which to
+  whoever is asking.
+- Let the reminder, sorting and archive vocabulary be translated at last.
+  Twelve strings — "Remind me", "Sort by:", "Move to trash", "Restore" and the
+  rest of them — were written inside the handlebars templates, which the
+  translation tool does not read, so they never reached Transifex and were in
+  English in every language. They go through `templates/fake.php` now, like
+  the others already did.
+- Stop asking translators to translate the minified vue runtime. The extractor
+  was reading the built bundles and pulling strings like
+  `key,ref,slot,slot-scope,is` out of them; a `.l10nignore` keeps the build
+  output out of it.
 - Fix opening the colour palette of a note breaking the rest of the editor: it
   was added with `innerHTML +=`, which re-parses the whole note being edited, so
   every field came back as a new element. The format toolbar stopped appearing

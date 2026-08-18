@@ -1,0 +1,23 @@
+# What the translation tool must not read.
+#
+# Entries are matched as a prefix of the path relative to the app, and are
+# read by translationtool.phar (`make l10n-update-pot`).
+
+# Build output. The bundles are generated from src/, which the tool already
+# reads on its own — and xgettext digs strings out of the minified vue runtime
+# inside them ("slot,component", "key,ref,slot,slot-scope,is", the list of svg
+# tags…) that no translator should ever be shown.
+js/quicknotes-dashboard.js
+js/quicknotes-legacy.js
+js/quicknotes-talk.js
+js/templates.js
+js/vendor
+
+# Dependencies. `vendor/nextcloud/ocp` is the stub of the server API, and its
+# TaskProcessing task types alone put some 170 strings of the server —
+# "Chat with tools", "Change tone", "Translate" — into the pot.
+vendor
+
+# Not part of the app the user sees.
+tests
+build

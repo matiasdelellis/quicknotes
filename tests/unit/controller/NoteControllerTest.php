@@ -68,7 +68,7 @@ class NoteControllerTest extends TestCase {
 
 	/**
 	 * A note taken out of the grid — archived, or in the trash — has no
-	 * business still being on the dashboard. It was until 0.9.5.
+	 * business still being on the dashboard. It was until 1.0.
 	 */
 	public function testDashboardLeavesOutArchivedAndTrashedNotes(): void {
 		$this->noteService->method('getAll')->willReturn([

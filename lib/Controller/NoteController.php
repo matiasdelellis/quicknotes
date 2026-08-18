@@ -72,7 +72,7 @@ class NoteController extends Controller {
 	/**
 	 * The handful of notes the dashboard widget shows.
 	 *
-	 * Archived and trashed notes are left out. They were not until 0.9.5, which
+	 * Archived and trashed notes are left out. They were not until 1.0, which
 	 * was wrong all along and became visible once archiving turned personal:
 	 * taking a note out of your grid and finding it still on your dashboard is
 	 * not a widget being helpful.

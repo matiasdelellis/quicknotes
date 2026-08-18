@@ -21,7 +21,7 @@ their own time.
 
 A reminder arrives as a Nextcloud notification, and can also be published as a
 read-only calendar for the Calendar app and any CalDAV client.]]></description>
-    <version>0.9.5</version>
+    <version>1.0.0</version>
     <licence>agpl</licence>
     <author>Matias De lellis</author>
     <namespace>QuickNotes</namespace>

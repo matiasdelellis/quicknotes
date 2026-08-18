@@ -167,7 +167,7 @@ the current view already rendered. `?t=` (tag), `?c=` (colour), `?r=`
 and survives a reload; `_cleanNavigation()` runs first because they are
 exclusive with each other.
 
-- **The text filter** (`View._filterText()`, 0.9.5) matches the title, the body
+- **The text filter** (`View._filterText()`, 1.0) matches the title, the body
   and the tag names, read off the DOM the way `_filterTag()` reads the badges —
   which scopes it to the bucket on screen for free. Terms are AND and
   `normalizeForFilter()` strips case and accents, because requiring the right
@@ -272,7 +272,7 @@ reason. The file is never copied and never shared in Files.
     `files_pdfviewer` too. `OCA\Viewer\Event\LoadViewer` is suppressed in
     `psalm.xml` as an `UndefinedClass` for the same reason.
 - **The layout is a mosaic in CSS, keyed off `data-count`** on
-  `.note-attachts` (0.9.5). It used to be a strip: javascript gave the
+  `.note-attachts` (1.0). It used to be a strip: javascript gave the
   container a height of `500 / n` pixels and each attachment a width of
   `100 / n` percent, so every file added made all of them thinner *and*
   shorter — five were slivers. Now the container holds a 3:2 ratio up to six
@@ -410,6 +410,13 @@ reaches a note by id.
   Two users asking for the same row get two different payloads: their own tags,
   their own pin, their permissions, and `sharedWith` only if they are the owner
   or may reshare (a plain recipient has no business knowing who else has it).
+- **`doc/openapi.yml` is the contract, and it is checked in.** It describes
+  the `/api/v1` surface — the one clients talk to, CORS and no CSRF — and not
+  the page routes the web interface uses. Change an endpoint or a payload and
+  it changes with them, along with `Application::API_VERSION` and its
+  docblock; a spec that lies is worse than none. It validates as OpenAPI 3.0
+  (`openapi-spec-validator`), and every shape in it was read off a live
+  instance, not off the entities.
 - **Shares are their own endpoints, applied immediately.** `share#*` /
   `shareApi#*` over `/notes/{noteId}/shares`, `/shares/{shareId}`,
   `/notes/{noteId}/shares/self` and `/notes/{noteId}/sharees`; the logic is in
@@ -484,14 +491,17 @@ version second.
   - Dark mode for the icons is worth doing across the app in one pass — `icon-quicknotes` is the only one that attempts it today, through the media query, so it has the browser/theme mismatch built in.
 - `OC.Files` is also gone in 34: the file picker only returns a path, so the file id is resolved server side through `AttachmentApi#info` (`GET /api/v1/attachments/info?path=…`).
 - Off‑canvas navigation below 1024px: the server used to open it with snap.js (`snapjs-left` on the body), which 34 dropped. The app now renders its own `#app-navigation-toggle` in `templates/main.php`, toggles `qn-nav-open` on the body from `js/script.js`, and lifts `#app-navigation` above `#app-content` (which core gives `z-index: 1000`) in `css/not-vue.css`. Without that z‑index the navigation is visible but not clickable.
-- **`css/medium.css` is a theme and must be loaded *after* `css/vendor/medium-editor.css`.** Both style the same selectors at the same specificity, so whichever comes last wins, and `templates/main.php` had them the wrong way round until 0.9.5: the base kept `padding: 15px` on every toolbar button, which left a 9x10 content box and squashed the svg icon of the wikilink button. The order is the fix; the `!important` on the z-index of the toolbar stays as insurance, because inverting it again makes the toolbar *invisible* (painted under the modal overlay) rather than merely ugly. Measured with `getComputedStyle`, not read off the file — the two sheets are minified and the winner is not obvious from either.
+- **`css/medium.css` is a theme and must be loaded *after* `css/vendor/medium-editor.css`.** Both style the same selectors at the same specificity, so whichever comes last wins, and `templates/main.php` had them the wrong way round until 1.0: the base kept `padding: 15px` on every toolbar button, which left a 9x10 content box and squashed the svg icon of the wikilink button. The order is the fix; the `!important` on the z-index of the toolbar stays as insurance, because inverting it again makes the toolbar *invisible* (painted under the modal overlay) rather than merely ugly. Measured with `getComputedStyle`, not read off the file — the two sheets are minified and the winner is not obvious from either.
 - Controller permissions use PHP attributes (`#[NoAdminRequired]`, `#[NoCSRFRequired]`, `#[CORS]`), not the old `@NoAdminRequired` docblocks.
 - PHP namespace root: `OCA\QuickNotes\` (see `lib/AppInfo/Application.php:23`).
 - Two parallel route sets: human pages (`note#*`, `share#*`, `page#index`, `settings#*`) and JSON API (`noteApi#*`, `AttachmentApi#upload`) under `/api/v1/...`. When adding endpoints, add both forms if the UI needs them — the legacy `js/script.js` calls the non‑API routes, while `src/NotesService.js` calls `/api/v1/notes`.
 - CORS preflight route: `noteApi#preflighted_cors` at `OPTIONS /api/v1/{path}` — keep the `requirements: ['path' => '.+']` when modifying.
-- Error rendering lives in `lib/Controller/NoteResponses.php` (404/403/412 for a note) and `lib/Controller/ShareActions.php`. There used to be a `lib/Controller/Errors.php` trait recommended here for the job; it was removed in 0.9.5 because it caught a `OCA\QuickNotes\Service\NotFoundException` that does not exist in this repo, so anybody following the advice got a fatal instead of a 404. Nothing used it.
+- Error rendering lives in `lib/Controller/NoteResponses.php` (404/403/412 for a note) and `lib/Controller/ShareActions.php`. There used to be a `lib/Controller/Errors.php` trait recommended here for the job; it was removed in 1.0 because it caught a `OCA\QuickNotes\Service\NotFoundException` that does not exist in this repo, so anybody following the advice got a fatal instead of a 404. Nothing used it.
 - Migrations live in `lib/Migration/` and follow the `Version<appVersion>Date<timestamp>.php` convention (the latest is `Version00900Date20260731120000.php`). Add a new one when changing schema; do not edit historical migrations.
-- L10n: strings go through `t('quicknotes', '…')`. `.tx/config` drives Transifex. `make l10n-deps` fetches `translationtool.phar`; `make l10n-update-pot`, `make l10n-transifex-pull/push/apply` are the workflow. `translationfiles/` and `translationtool.phar` are gitignored.
+- L10n: strings go through `t('quicknotes', '…')` in javascript and `$l->t('…')` in php. `.tx/config` drives Transifex. `make l10n-deps` fetches `translationtool.phar`; then `l10n-update-pot` → `l10n-transifex-push` → (translators) → `l10n-transifex-pull` → `l10n-transifex-apply`. `translationfiles/` and `translationtool.phar` are gitignored; `l10n/*.js` and `l10n/*.json` are what ships and are committed. Three things about it are not obvious and have each cost strings:
+  - **A string written inside a `.handlebars` file is invisible to the extractor.** It only reads `.php`, `.js`, `.ts`, `.py`, `.html` and `.vue`. That is what `templates/fake.php` is for: every `{{t "quicknotes" "…"}}` in a template must also be listed there, or nobody can translate it. Twelve of them were missing until 1.0 — the whole reminder, sorting and archive vocabulary — and were untranslated in all sixteen languages. Adding a string to a template means adding a line there in the same change.
+  - **`.l10nignore` keeps the build output out.** Entries match as a prefix of the path. Without it xgettext digs through the minified vue runtime inside `js/quicknotes-*.js` and asks translators for things like `key,ref,slot,slot-scope,is` and the list of svg tag names; thirteen such entries were in the pot. The bundles add nothing anyway, since `src/` is read directly.
+  - **`convert-po-files` rewrites `l10n/<lang>.{js,json}` from the `.po` alone.** Whatever is not in the file is gone, so `l10n-transifex-apply` after a partial pull truncates the translations. Always `tx pull -a` first. Languages with no `.po` at all are left alone.
 - The `js/templates/*.handlebars` are precompiled into a single `js/templates.js` (not loaded at runtime from individual files) — editing a template without rebuilding is invisible.
 - Vue 2 (not 3). `@nextcloud/vue` is on the `^5.x` line that still supports Vue 2; don't bump to `^8` without a migration.
 - `js/script.js` and friends are the original non‑Vue app; the Vue dashboard lives alongside it. They are not mutually exclusive — both are shipped.

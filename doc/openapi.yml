@@ -1,0 +1,893 @@
+openapi: 3.0.3
+
+info:
+  title: Quick notes
+  version: '1.5'
+  description: |
+    The REST API of the [Quick notes](https://github.com/matiasdelellis/quicknotes)
+    app for Nextcloud.
+
+    This describes the `/api/v1` surface, which is the one meant for clients:
+    it answers CORS preflights and does not ask for a CSRF token. The web
+    interface of the app talks to the very same endpoints under
+    `/index.php/apps/quicknotes/` instead, without the `/api/v1`, plus two of
+    its own that are not part of this contract (`/notes/dashboard` and the
+    user settings).
+
+    The version above is `api_version`, which the app publishes through the
+    capabilities of the server:
+
+    ```
+    GET /ocs/v2.php/cloud/capabilities
+    → { "quicknotes": { "version": "1.0.0", "api_version": "1.5" } }
+    ```
+
+    Read it before assuming a field is there: `1.1` reshaped `sharedBy` and
+    `sharedWith`, `1.2` and `1.3` made reminders and archiving personal, `1.4`
+    changed where attachment urls point, and `1.5` added emptying the trash.
+    All of them ship in version 1.0 of the app.
+
+    ## What belongs to whom
+
+    A note has an owner, and can be shared with people and with groups. Some
+    of what comes back is the note's and the same for everybody — `title`,
+    `content`, `color`, `attachments` — and some belongs to whoever is asking:
+    `isPinned`, `tags`, `reminderAt` and `archivedAt` are read and written per
+    user, so two people see their own on the same note. `deletedAt` is the
+    note's, and only its owner can set it.
+
+  license:
+    name: AGPL-3.0-or-later
+    url: https://www.gnu.org/licenses/agpl-3.0.html
+
+servers:
+  - url: https://{host}/index.php/apps/quicknotes/api/v1
+    variables:
+      host:
+        default: cloud.example.com
+
+security:
+  - basicAuth: []
+
+tags:
+  - name: notes
+    description: Reading and writing notes.
+  - name: trash
+    description: Archiving, trashing, restoring and destroying.
+  - name: shares
+    description: Who else has a note, and what they may do with it.
+  - name: attachments
+    description: Files hanging off a note, served by the app.
+
+paths:
+
+  /notes:
+    get:
+      tags: [notes]
+      summary: Every note the caller can see
+      description: |
+        Their own notes plus the ones shared with them, directly or through a
+        group they are in. Archived and trashed notes are included: they carry
+        `archivedAt` / `deletedAt` for the client to sort out.
+
+        The response carries an `ETag` and a `Last-Modified` of the whole
+        collection, so a client can ask again cheaply.
+      responses:
+        '200':
+          description: The notes, or an empty array.
+          headers:
+            ETag:
+              schema: { type: string }
+            Last-Modified:
+              schema: { type: string }
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Note' }
+    post:
+      tags: [notes]
+      summary: Create a note
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/NewNote' }
+      responses:
+        '200':
+          description: The note as it was stored.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Note' }
+
+  /notes/trash:
+    delete:
+      tags: [trash]
+      summary: Empty the trash
+      description: |
+        Destroys every note of the caller that is in the trash, the same way
+        `DELETE /notes/{id}` destroys one: shares, tags, personal state and
+        attachment records go with each. Notes belonging to somebody else are
+        never touched.
+
+        An empty trash is not an error; the answer is `0`.
+      responses:
+        '200':
+          description: How many notes were destroyed.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  destroyed: { type: integer, example: 3 }
+
+  /notes/{id}:
+    parameters:
+      - $ref: '#/components/parameters/NoteId'
+    get:
+      tags: [notes]
+      summary: One note
+      responses:
+        '200':
+          description: The note, as whoever asked sees it.
+          headers:
+            ETag:
+              description: What to send back in `If-Match` when saving it.
+              schema: { type: string }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Note' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    put:
+      tags: [notes]
+      summary: Save a note
+      description: |
+        `title` and `content` are required; every other field is optional and
+        one that is not sent is left alone.
+
+        Who may change what depends on the share: the title and the content
+        are open to anybody who can edit, `color` and `attachments` are the
+        owner's, and `isPinned` and `tags` are personal to the caller — they
+        never touch what anybody else sees. `sharedWith` is accepted for old
+        clients and superseded by the share endpoints.
+
+        Send the `ETag` of the note as it was last read in `If-Match` to be
+        told about a concurrent edit (412) instead of silently overwriting it.
+        `If-Match: *` means "as long as it still exists", i.e. no condition.
+      parameters:
+        - $ref: '#/components/parameters/IfMatch'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/NoteUpdate' }
+      responses:
+        '200':
+          description: The note as it was stored.
+          headers:
+            ETag:
+              schema: { type: string }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Note' }
+        '403':
+          description: |
+            The caller can see the note, but this share does not let them
+            write to it — or the field they tried to change is not theirs.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '412':
+          description: |
+            The note changed since the caller last read it. The current note
+            comes back in the body, so the client can show what it was about
+            to overwrite.
+          headers:
+            ETag:
+              description: The tag of the note as it is now.
+              schema: { type: string }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Conflict' }
+    delete:
+      tags: [trash]
+      summary: Destroy a note
+      description: |
+        Only its owner can. Somebody a note was shared with leaves it
+        (`DELETE /notes/{noteId}/shares/self`) or archives it instead.
+      responses:
+        '200':
+          description: Gone.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Empty' }
+        '404':
+          description: No such note of theirs.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Empty' }
+
+  /notes/{id}/archive:
+    parameters: [ { $ref: '#/components/parameters/NoteId' } ]
+    post:
+      tags: [trash]
+      summary: Archive a note, for the caller alone
+      description: |
+        Takes the note off the caller's board without touching anybody else's,
+        which is what makes it the answer for a note somebody shared with them
+        and that they cannot delete. Anybody who can see the note may archive
+        it.
+      responses:
+        '200':
+          description: The note, with `archivedAt` set.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Note' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /notes/{id}/unarchive:
+    parameters: [ { $ref: '#/components/parameters/NoteId' } ]
+    post:
+      tags: [trash]
+      summary: Bring an archived note back
+      responses:
+        '200':
+          description: The note, with `archivedAt` cleared.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Note' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /notes/{id}/trash:
+    parameters: [ { $ref: '#/components/parameters/NoteId' } ]
+    post:
+      tags: [trash]
+      summary: Move a note to the trash
+      description: |
+        The owner's alone: the trash is about whether the note goes on
+        existing. Pending reminders on it are withdrawn, whoever set them.
+        What stays there is destroyed a week later by a background job, or by
+        `DELETE /notes/trash`.
+      responses:
+        '200':
+          description: The note, with `deletedAt` set.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Note' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /notes/{id}/restore:
+    parameters: [ { $ref: '#/components/parameters/NoteId' } ]
+    post:
+      tags: [trash]
+      summary: Bring a note back from the trash
+      description: |
+        Whoever had it archived still has it archived: the two say different
+        things.
+      responses:
+        '200':
+          description: The note, with `deletedAt` cleared.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Note' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /notes/{id}/reminder:
+    parameters: [ { $ref: '#/components/parameters/NoteId' } ]
+    put:
+      tags: [notes]
+      summary: Set, move or cancel the reminder of a note
+      description: |
+        The reminder is the caller's: anybody who can see the note may set
+        one, including on a note shared with them to read, and it never
+        touches anybody else's. Sending no date, or `null`, cancels it.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reminderAt:
+                  type: string
+                  nullable: true
+                  description: UTC, `YYYY-MM-DD HH:MM:SS`. Null cancels it.
+                  example: '2026-08-24 12:00:00'
+      responses:
+        '200':
+          description: The note, with the reminder of the caller.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Note' }
+        '400':
+          description: The date was not a UTC datetime in that format.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /notes/{noteId}/shares:
+    parameters: [ { $ref: '#/components/parameters/NoteIdPath' } ]
+    get:
+      tags: [shares]
+      summary: The shares of a note
+      description: |
+        For its owner, or for a recipient who was given the right to pass the
+        note on. A plain recipient has no business knowing who else has it.
+      responses:
+        '200':
+          description: The shares.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Share' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    post:
+      tags: [shares]
+      summary: Share a note with one user or one group
+      description: |
+        Nobody can give away more than they hold: a recipient resharing can
+        only pass on what their own share grants them.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [shareWith]
+              properties:
+                shareType:
+                  $ref: '#/components/schemas/ShareType'
+                shareWith:
+                  type: string
+                  description: User id, or group id when `shareType` is 1.
+                  example: emma
+                permissions:
+                  $ref: '#/components/schemas/Permissions'
+      responses:
+        '200':
+          description: The share that was made.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Share' }
+        '400':
+          description: |
+            No such user or group, a share with oneself or with the owner, or
+            permissions that are not a valid combination.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /notes/{noteId}/shares/self:
+    parameters: [ { $ref: '#/components/parameters/NoteIdPath' } ]
+    delete:
+      tags: [shares]
+      summary: Walk away from a note somebody shared with you
+      description: |
+        Drops the caller's own share, and with it their tags, pin, reminder
+        and the attachments they had added.
+
+        Only a share made with them personally can be left: one that reaches
+        them through a group is not theirs to drop, since it would take the
+        note from everybody else in it. That answers 404 — archiving is the
+        way out of a group share.
+      responses:
+        '200':
+          description: Left.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Empty' }
+        '404':
+          description: There was no share of theirs to leave.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Empty' }
+
+  /shares/{shareId}:
+    parameters:
+      - name: shareId
+        in: path
+        required: true
+        schema: { type: integer }
+    put:
+      tags: [shares]
+      summary: Change what a share grants
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [permissions]
+              properties:
+                permissions: { $ref: '#/components/schemas/Permissions' }
+      responses:
+        '200':
+          description: The share as it stands now.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Share' }
+        '400':
+          description: Not a valid combination of permissions.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    delete:
+      tags: [shares]
+      summary: Take a share back
+      description: |
+        Whatever the person had passed on goes with it: a chain of reshares
+        that no longer has anybody who can see the note is swept away.
+      responses:
+        '200':
+          description: Gone.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Empty' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /notes/{noteId}/sharees:
+    parameters: [ { $ref: '#/components/parameters/NoteIdPath' } ]
+    get:
+      tags: [shares]
+      summary: Who this note could still be shared with
+      description: |
+        Goes through the collaborator search of the server, so what an admin
+        decided about user enumeration is honoured. Whoever already has the
+        note, and the caller themselves, are left out.
+      parameters:
+        - name: search
+          in: query
+          schema: { type: string, default: '' }
+        - name: limit
+          in: query
+          description: Clamped to 1..50.
+          schema: { type: integer, default: 25 }
+      responses:
+        '200':
+          description: Candidates.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Sharee' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /notes/{noteId}/attachments/{fileId}/preview:
+    parameters:
+      - $ref: '#/components/parameters/NoteIdPath'
+      - $ref: '#/components/parameters/FileId'
+    get:
+      tags: [attachments]
+      summary: Thumbnail of an attachment
+      description: |
+        Served by the app to anybody who can see the note, reading the file
+        with the authority of whoever attached it. The file itself is never
+        shared in Files.
+
+        A file the preview manager cannot draw — a pdf on an instance without
+        the generator, say — answers with a redirect to the icon of its mime
+        type rather than a 404, so a client can show the tile either way.
+      parameters:
+        - name: x
+          in: query
+          description: Width asked of the preview manager, clamped to 32..1024.
+          schema: { type: integer, default: 512 }
+        - name: 'y'
+          in: query
+          description: Height, same clamp.
+          schema: { type: integer, default: 512 }
+      responses:
+        '200':
+          description: The thumbnail.
+          content:
+            image/*:
+              schema: { type: string, format: binary }
+        '303':
+          description: No preview to be had; the icon of the mime type instead.
+        '404':
+          description: |
+            No such note for this caller, no such attachment on it, the file
+            is gone, or whoever attached it can no longer see the note.
+
+  /notes/{noteId}/attachments/{fileId}/download:
+    parameters:
+      - $ref: '#/components/parameters/NoteIdPath'
+      - $ref: '#/components/parameters/FileId'
+    get:
+      tags: [attachments]
+      summary: Download an attachment
+      description: |
+        The same four checks as the preview. For somebody the note was shared
+        with, this is the only way to the bytes: the file is not in their
+        Files, and the app deliberately does not put it there.
+      responses:
+        '200':
+          description: The file, as an attachment.
+          headers:
+            Content-Disposition:
+              schema: { type: string, example: attachment; filename="Birdie.jpg" }
+          content:
+            application/octet-stream:
+              schema: { type: string, format: binary }
+        '404':
+          description: Same as the preview.
+
+  /attachments:
+    post:
+      tags: [attachments]
+      summary: Upload a file to attach
+      description: |
+        Stores the file in the caller's own Files, under the folder the app is
+        configured to use, and describes it the same way `/attachments/info`
+        does. Attaching it is a separate step: send the `file_id` in the
+        `attachments` of a save.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              description: |
+                Exactly one file. The name of the field does not matter: the
+                app takes the only one there is, and answers 400 to anything
+                else.
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: What the client needs to attach it.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AttachmentInfo' }
+        '400':
+          description: Not exactly one file, or the upload failed.
+
+  /attachments/info:
+    get:
+      tags: [attachments]
+      summary: Describe a file the caller already has
+      description: |
+        For a file picked out of Files: the picker hands back a path, and this
+        resolves it into the id and the urls a client needs.
+      parameters:
+        - name: path
+          in: query
+          required: true
+          description: Path of the file, relative to the user's folder.
+          schema: { type: string, example: /Photos/Birdie.jpg }
+      responses:
+        '200':
+          description: The file.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AttachmentInfo' }
+        '404':
+          description: No such file for this caller.
+
+components:
+
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+      description: |
+        The user id and a password. Use an app password rather than the
+        account's own, and note that these endpoints answer CORS preflights,
+        so a browser client does not need a CSRF token.
+
+  parameters:
+    NoteId:
+      name: id
+      in: path
+      required: true
+      schema: { type: integer }
+    NoteIdPath:
+      name: noteId
+      in: path
+      required: true
+      schema: { type: integer }
+    FileId:
+      name: fileId
+      in: path
+      required: true
+      description: Id of the file in Nextcloud, as it travels in `attachments`.
+      schema: { type: integer }
+    IfMatch:
+      name: If-Match
+      in: header
+      required: false
+      description: The `etag` of the note as the client last read it.
+      schema: { type: string }
+
+  responses:
+    NotFound:
+      description: |
+        No such note, or none of this caller's business. The body is an empty
+        array, `[]`, as it is everywhere this app answers with nothing.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Empty' }
+    Forbidden:
+      description: Readable, but not theirs to do this with.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+
+  schemas:
+
+    Note:
+      type: object
+      properties:
+        id: { type: integer }
+        title: { type: string }
+        content:
+          type: string
+          description: Rich text, as html.
+        isPinned:
+          type: boolean
+          description: The caller's own pin.
+        timestamp:
+          type: integer
+          description: Unix time of the last change to the note itself.
+        color: { type: string, example: '#F7EB96' }
+        tags:
+          type: array
+          description: The caller's own tags on this note.
+          items: { $ref: '#/components/schemas/Tag' }
+        attachments:
+          type: array
+          items: { $ref: '#/components/schemas/Attachment' }
+        archivedAt:
+          type: string
+          nullable: true
+          description: When the caller archived it, `YYYY-MM-DD HH:MM:SS` UTC.
+        deletedAt:
+          type: string
+          nullable: true
+          description: When its owner moved it to the trash.
+        reminderAt:
+          type: string
+          nullable: true
+          description: The caller's own reminder.
+        reminderNotifiedAt:
+          type: string
+          nullable: true
+          description: |
+            When the notification for it went out, so a client can tell a
+            reminder still pending from one that already fired.
+        owner:
+          $ref: '#/components/schemas/User'
+        isOwner: { type: boolean }
+        canLeave:
+          type: boolean
+          description: |
+            Whether there is a share of the caller's own to walk away from. A
+            note reaching them through a group is archived instead.
+        permissions:
+          $ref: '#/components/schemas/Permissions'
+        canEdit: { type: boolean }
+        canReshare: { type: boolean }
+        sharedWith:
+          type: array
+          description: |
+            Only for the owner and for somebody who may reshare; empty
+            otherwise.
+          items: { $ref: '#/components/schemas/Share' }
+        sharedBy:
+          allOf: [ { $ref: '#/components/schemas/User' } ]
+          nullable: true
+          description: Who shared it with the caller; null on their own note.
+        sharedByMe:
+          type: boolean
+          description: Their own note, and somebody else has it.
+        etag:
+          type: string
+          description: |
+            Derived from the stored note, so it means the same thing to
+            everybody. Send it back in `If-Match` when saving.
+
+    NewNote:
+      type: object
+      required: [title, content]
+      properties:
+        title: { type: string }
+        content: { type: string }
+        color: { type: string, example: '#F7EB96' }
+        isPinned: { type: boolean, default: false }
+        tags:
+          type: array
+          items: { $ref: '#/components/schemas/TagInput' }
+        attachments:
+          type: array
+          items: { $ref: '#/components/schemas/AttachmentInput' }
+        sharedWith:
+          type: array
+          description: Deprecated; use the share endpoints.
+          items: { type: object }
+
+    NoteUpdate:
+      type: object
+      required: [title, content]
+      description: A field that is not sent is left alone.
+      properties:
+        title: { type: string }
+        content: { type: string }
+        color:
+          type: string
+          description: The owner's.
+        isPinned:
+          type: boolean
+          description: The caller's own.
+        tags:
+          type: array
+          description: The caller's own.
+          items: { $ref: '#/components/schemas/TagInput' }
+        attachments:
+          type: array
+          description: |
+            The whole list of the note. Entries carrying somebody else's
+            `user_id` are left as they are; what the caller sends without one,
+            or with their own, is taken as theirs and anything of theirs that
+            is missing from the list is detached.
+          items: { $ref: '#/components/schemas/AttachmentInput' }
+        sharedWith:
+          type: array
+          description: Deprecated; use the share endpoints.
+          items: { type: object }
+
+    Tag:
+      type: object
+      properties:
+        id: { type: integer }
+        userid: { type: string, nullable: true }
+        name: { type: string }
+
+    TagInput:
+      type: object
+      description: An existing tag by `id`, or a new one by `name`.
+      properties:
+        id: { type: integer }
+        name: { type: string }
+
+    Attachment:
+      type: object
+      properties:
+        id: { type: integer }
+        note_id: { type: integer }
+        file_id: { type: integer }
+        created_at: { type: integer }
+        user_id:
+          type: string
+          description: Who attached it.
+        is_mine:
+          type: boolean
+          description: Whether that is the caller.
+        has_preview: { type: boolean }
+        basename: { type: string, nullable: true }
+        mime: { type: string, nullable: true }
+        preview_url:
+          type: string
+          description: This app's preview endpoint, not the server's.
+        download_url: { type: string }
+        redirect_url:
+          type: string
+          nullable: true
+          description: |
+            The file in Files. Null for somebody who cannot reach it there,
+            which is the normal case on a shared note.
+        deep_link_url: { type: string, nullable: true }
+        link_url:
+          type: string
+          description: |
+            Where clicking the thumbnail should go: `redirect_url` when there
+            is one, the download otherwise.
+
+    AttachmentInput:
+      type: object
+      required: [file_id]
+      properties:
+        file_id: { type: integer }
+        user_id:
+          type: string
+          description: |
+            Who attached it. Sent back as it came for somebody else's
+            attachment; omit it for one of the caller's own.
+
+    AttachmentInfo:
+      type: object
+      description: A file, before it is attached to anything.
+      properties:
+        file_id: { type: integer }
+        basename: { type: string, nullable: true }
+        mime: { type: string, nullable: true }
+        has_preview: { type: boolean }
+        preview_url: { type: string, nullable: true }
+        redirect_url: { type: string, nullable: true }
+        deep_link_url: { type: string, nullable: true }
+
+    Share:
+      type: object
+      properties:
+        id: { type: integer }
+        noteId: { type: integer }
+        shareType: { $ref: '#/components/schemas/ShareType' }
+        isGroup: { type: boolean }
+        shareWith:
+          type: string
+          description: The user id, or the group id.
+        displayName: { type: string }
+        permissions: { $ref: '#/components/schemas/Permissions' }
+        canEdit: { type: boolean }
+        canReshare: { type: boolean }
+        uidOwner:
+          type: string
+          description: The owner of the note.
+        ownerDisplayName: { type: string }
+        uidInitiator:
+          type: string
+          description: Who made this share, which is not always the owner.
+        createdAt: { type: integer }
+
+    Sharee:
+      type: object
+      properties:
+        shareType: { $ref: '#/components/schemas/ShareType' }
+        shareWith: { type: string }
+        label: { type: string }
+        subline: { type: string }
+
+    User:
+      type: object
+      properties:
+        uid: { type: string }
+        displayName: { type: string }
+
+    ShareType:
+      type: integer
+      description: |
+        `0` a user, `1` a group. The same numbers the server uses
+        (`OCP\Share\IShare`).
+      enum: [0, 1]
+      default: 0
+
+    Permissions:
+      type: integer
+      description: |
+        A bitmask, with the same values as `OCP\Constants`: `1` read, `2`
+        write, `16` reshare. Read is always part of it, so `1` is "can view",
+        `3` is "can edit", `17` and `19` add passing the note on. Defaults to
+        `1`.
+      example: 3
+      default: 1
+
+    Conflict:
+      type: object
+      description: The note as it is now, along with why the save was refused.
+      properties:
+        message: { type: string }
+        note: { $ref: '#/components/schemas/Note' }
+
+    Error:
+      type: object
+      properties:
+        message: { type: string }
+
+    Empty:
+      type: array
+      description: |
+        Nothing. It is an empty json array rather than an object because that
+        is what the app has always answered.
+      items: {}
+      maxItems: 0
+      example: []

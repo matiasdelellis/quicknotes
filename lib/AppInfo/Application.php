@@ -47,7 +47,11 @@ class Application extends App implements IBootstrap {
 	public const APP_ID = 'quicknotes';
 
 	/**
-	 * Bumped to 1.5 in 0.9.5 with `DELETE /notes/trash`, which destroys every
+	 * The 0.9.x are development versions: 1.1 through 1.5 all reach anybody
+	 * outside this repository in the same release, the 1.0 of the app, which
+	 * is why a client can see the API go from 1.0 to 1.5 in one update.
+	 *
+	 * Bumped to 1.5 in 1.0 with `DELETE /notes/trash`, which destroys every
 	 * note of the caller that is in the trash and answers how many went. The
 	 * trash could only be emptied one note at a time before, or waited on:
 	 * `PurgeOldTrashJob` clears what has been in there for a week.
