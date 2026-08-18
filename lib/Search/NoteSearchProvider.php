@@ -34,6 +34,7 @@ use OCP\Search\SearchResultEntry;
 
 use OCA\QuickNotes\Db\Note;
 use OCA\QuickNotes\Db\NoteMapper;
+use OCA\QuickNotes\Service\ShareService;
 
 /**
  * Provide search results from the 'quicknotes' app
@@ -49,14 +50,19 @@ class NoteSearchProvider implements IProvider {
 	/** @var IURLGenerator */
 	private $urlGenerator;
 
+	/** @var ShareService */
+	private $shareService;
+
 	public function __construct(
 		IL10N         $l10n,
 		IURLGenerator $urlGenerator,
-		NoteMapper    $noteMapper
+		NoteMapper    $noteMapper,
+		ShareService  $shareService
 	) {
 		$this->l10n         = $l10n;
 		$this->urlGenerator = $urlGenerator;
 		$this->noteMapper   = $noteMapper;
+		$this->shareService = $shareService;
 	}
 
 	/**
@@ -103,8 +109,12 @@ class NoteSearchProvider implements IProvider {
 					true,
 				);
 			},
+			// Notes shared with the user are notes they can open from the
+			// app, so they are searchable too. They were not until 0.9.1,
+			// while the dashboard listed them all along.
 			$this->noteMapper->findLike($user->getUID(),
 				$query->getTerm(),
+				$this->shareService->getSharedNoteIds($user->getUID()),
 				$page * $limit,
 				$limit)
 			),

@@ -25,6 +25,7 @@ namespace OCA\QuickNotes\Service;
 
 use OCP\AppFramework\Utility\ITimeFactory;
 
+use OCP\IPreview;
 use OCP\IURLGenerator;
 
 use OCP\Files\File;
@@ -47,6 +48,9 @@ class FileService {
 	/** @var IURLGenerator */
 	private $urlGenerator;
 
+	/** @var IPreview */
+	private $previewManager;
+
 	/** @var ITimeFactory */
 	private $timeFactory;
 
@@ -56,18 +60,93 @@ class FileService {
 	public function __construct(?string $userId,
 	                            IRootFolder     $rootFolder,
 	                            IURLGenerator   $urlGenerator,
+	                            IPreview        $previewManager,
 	                            ITimeFactory    $timeFactory,
 	                            SettingsService $settingsService)
 	{
 		$this->userId          = $userId;
 		$this->rootFolder      = $rootFolder;
 		$this->urlGenerator    = $urlGenerator;
+		$this->previewManager  = $previewManager;
 		$this->timeFactory     = $timeFactory;
 		$this->settingsService = $settingsService;
 	}
 
 	/**
-	 * Get thumbnail of the give file id
+	 * The file behind an attachment, read from the storage of whoever
+	 * attached it rather than of whoever is asking.
+	 *
+	 * This is the whole of the "sharing a note shares its attachments" story:
+	 * the app resolves the file with the attacher's authority and serves it
+	 * through its own endpoints, having already asked whether the caller may
+	 * see the *note*. Nothing is shared in Files, so there is nothing to keep
+	 * in sync and nothing to clean up when the note stops being shared.
+	 *
+	 * @return File|null null when the file is gone, or when the user it
+	 *         belonged to no longer has it
+	 */
+	public function getFileOf(string $userId, int $fileId): ?File {
+		try {
+			$userFolder = $this->rootFolder->getUserFolder($userId);
+		} catch (\Throwable $e) {
+			// No such user any more; their storage is not there to read.
+			return null;
+		}
+
+		$file = current($userFolder->getById($fileId));
+
+		return ($file instanceof File) ? $file : null;
+	}
+
+	/**
+	 * Whether there is a real thumbnail behind the preview url of this file, or
+	 * whether it will fall back to the icon of the file type.
+	 *
+	 * The client needs to know, because the two are laid out differently: a
+	 * photo is cropped to fill its tile of the mosaic, an icon is centred at
+	 * its own size — stretching a pdf icon to cover a tile looks like a bug.
+	 */
+	public function hasPreview(File $file): bool {
+		return $this->previewManager->isAvailable($file);
+	}
+
+	/**
+	 * Where the app serves the thumbnail of an attachment from.
+	 *
+	 * Deliberately not `/core/preview`, which checks the *viewer* against the
+	 * file: for somebody the note was shared with that answers 404, which is
+	 * exactly the hole this closes. The note id is part of the url because it
+	 * is what the endpoint checks access against.
+	 */
+	public function getAttachmentPreviewUrl(int $noteId, int $fileId, int $sideSize): string {
+		return $this->urlGenerator->getAbsoluteURL(
+			$this->urlGenerator->linkToRoute('quicknotes.AttachmentApi.preview', [
+				'noteId' => $noteId,
+				'fileId' => $fileId,
+				'x' => $sideSize,
+				'y' => $sideSize,
+			])
+		);
+	}
+
+	/**
+	 * Where the app serves the file itself from. Same access check as the
+	 * preview, and the only way a recipient has of getting the bytes.
+	 */
+	public function getAttachmentDownloadUrl(int $noteId, int $fileId): string {
+		return $this->urlGenerator->getAbsoluteURL(
+			$this->urlGenerator->linkToRoute('quicknotes.AttachmentApi.download', [
+				'noteId' => $noteId,
+				'fileId' => $fileId,
+			])
+		);
+	}
+
+	/**
+	 * Get thumbnail of the give file id, through the preview endpoint of the
+	 * server. Only good for a file the *current* user can reach, which is why
+	 * it is what the attach dialog uses on a file just picked, and not what a
+	 * note carries once it is saved.
 	 *
 	 * @param int $fileId file id to show
 	 * @param int $sideSize side lenght to show
@@ -84,7 +163,11 @@ class FileService {
 	}
 
 	/**
-	 * Redirects to the file list and highlight the given file id
+	 * Redirects to the file list and highlight the given file id.
+	 *
+	 * Resolved against the *viewer*, and null when they cannot reach the file:
+	 * pointing somebody at a path in somebody else's Files is worse than not
+	 * offering the link at all. The attachment falls back to its download url.
 	 *
 	 * @param int $fileId file id to show
 	 */

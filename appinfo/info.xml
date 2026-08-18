@@ -3,9 +3,25 @@
       xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
     <id>quicknotes</id>
     <name>Quick notes</name>
-    <summary>Quick notes with a basic rich text</summary>
-    <description>Quick notes with a basic rich text</description>
-    <version>0.9.0</version>
+    <summary>Quick notes on small cards, with colors, tags, attachments, reminders and sharing</summary>
+    <description><![CDATA[Take quick notes on small cards, organized by colors and tags, with basic rich
+text — bold, italic, lists — and any file of your Nextcloud attached to them.
+
+Notes can be shared with other people and with groups, and every share says what
+it allows: can view, can edit, or pass the note on. Editing a shared note is real
+collaboration, and if two people save at once the second one is told rather than
+quietly overwriting the first. The attachments travel with the note: whoever can
+see it can see them, and images, video and audio open in the Nextcloud viewer.
+
+What belongs to the note is the same for everybody — the title, the content, the
+colour, the attachments. What belongs to you is yours: your pin, your tags, your
+reminder and whether you archived it. Pinning a note somebody shared with you
+does not pin it for them, and two people can be reminded of the same note at
+their own time.
+
+A reminder arrives as a Nextcloud notification, and can also be published as a
+read-only calendar for the Calendar app and any CalDAV client.]]></description>
+    <version>0.9.5</version>
     <licence>agpl</licence>
     <author>Matias De lellis</author>
     <namespace>QuickNotes</namespace>
@@ -14,11 +30,11 @@
     <website>https://github.com/matiasdelellis/quicknotes</website>
     <bugs>https://github.com/matiasdelellis/quicknotes/issues</bugs>
     <repository type="git">https://github.com/matiasdelellis/quicknotes.git</repository>
-    <screenshot small-thumbnail="https://raw.githubusercontent.com/matiasdelellis/quicknotes/master/doc/quicknotes-grid-view-small.jpeg">https://raw.githubusercontent.com/matiasdelellis/quicknotes/master/doc/quicknotes-grid-view.jpeg</screenshot>
-    <screenshot>https://raw.githubusercontent.com/matiasdelellis/quicknotes/master/doc/quicknotes-note-edit.jpeg</screenshot>
-    <screenshot>https://raw.githubusercontent.com/matiasdelellis/quicknotes/master/doc/quicknotes-rich-text.jpeg</screenshot>
-    <screenshot>https://raw.githubusercontent.com/matiasdelellis/quicknotes/master/doc/quicknotes-attachments.jpeg</screenshot>
-    <screenshot>https://raw.githubusercontent.com/matiasdelellis/quicknotes/master/doc/quicknotes-shared-note.jpeg</screenshot>
+    <screenshot small-thumbnail="https://matiasdelellis.github.io/img/quicknotes/quicknotes-grid-view-small.jpeg">https://matiasdelellis.github.io/img/quicknotes/quicknotes-grid-view.jpeg</screenshot>
+    <screenshot>https://matiasdelellis.github.io/img/quicknotes/quicknotes-note-edit.jpeg</screenshot>
+    <screenshot>https://matiasdelellis.github.io/img/quicknotes/quicknotes-rich-text.jpeg</screenshot>
+    <screenshot>https://matiasdelellis.github.io/img/quicknotes/quicknotes-attachments.jpeg</screenshot>
+    <screenshot>https://matiasdelellis.github.io/img/quicknotes/quicknotes-shared-note.jpeg</screenshot>
     <dependencies>
         <php min-version="8.2" max-version="8.5"/>
         <nextcloud min-version="34" max-version="34"/>

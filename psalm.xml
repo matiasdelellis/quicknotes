@@ -37,11 +37,17 @@
 		<!-- sabre/vobject is provided by the server at runtime (the dav app
 		     depends on it) and is not a dependency of this app, so psalm has
 		     no stubs for it. The virtual calendar of lib/Calendar builds its
-		     events with it. -->
+		     events with it.
+
+		     OCA\Viewer\Event\LoadViewer is the same story with a twist: the
+		     Viewer app ships it, is not a dependency of this one, and can be
+		     disabled — which is why the listener guards the dispatch with
+		     class_exists() instead of assuming it is there. -->
 		<UndefinedClass>
 			<errorLevel type="suppress">
 				<referencedClass name="Sabre\VObject\Component\VCalendar" />
 				<referencedClass name="Sabre\VObject\Component\VEvent" />
+				<referencedClass name="OCA\Viewer\Event\LoadViewer" />
 			</errorLevel>
 		</UndefinedClass>
 		<!-- The entities of the app are addressed through the @method

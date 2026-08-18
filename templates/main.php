@@ -16,9 +16,15 @@
 \OCP\Util::addScript('quicknotes', 'script');
 \OCP\Util::addStyle('quicknotes', 'not-vue');
 \OCP\Util::addStyle('quicknotes', 'style');
+// The base stylesheet of MediumEditor first, `css/medium.css` after it: the
+// second is a *theme* for the first and overrides it property by property, at
+// the same specificity, so it only wins if it comes later. It used to be the
+// other way round, which left the base in charge of things the theme meant to
+// change — `padding: 15px` on every toolbar button, so the content box came out
+// at 9x10 and the svg icon of the wikilink button was visibly squashed.
+\OCP\Util::addStyle('quicknotes', 'vendor/medium-editor');
 \OCP\Util::addStyle('quicknotes', 'medium');
 \OCP\Util::addStyle('quicknotes', 'qn-colorpick');
-\OCP\Util::addStyle('quicknotes', 'vendor/medium-editor');
 ?>
 
 	<?php /* Opens the navigation on narrow screens, where it sits off canvas.

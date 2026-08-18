@@ -25,6 +25,8 @@ namespace OCA\QuickNotes\Service;
 use OCA\QuickNotes\AppInfo\Application;
 use OCA\QuickNotes\Db\Note;
 use OCA\QuickNotes\Db\NoteMapper;
+use OCA\QuickNotes\Db\NoteState;
+use OCA\QuickNotes\Db\NoteStateMapper;
 use OCA\QuickNotes\Notification\Notifier;
 
 use OCP\AppFramework\Utility\ITimeFactory;
@@ -35,8 +37,14 @@ use Psr\Log\LoggerInterface;
 /**
  * Everything notification-shaped about note reminders.
  *
- * Deliberately depends on NoteMapper and not on NoteService, so that
- * NoteService can depend on this one without a cycle.
+ * A reminder belongs to a *user*, not to a note: it is somebody deciding when
+ * they want to be interrupted, and since 0.9.2 it lives in
+ * `quicknotes_note_states` next to the pin. Everybody who can see a note can
+ * arm their own, the owner included, and none of them sees anybody else's.
+ *
+ * Deliberately depends on the mappers and not on NoteService, so that
+ * NoteService can depend on this one without a cycle. It does reach for
+ * ShareService, which has no reminder of its own to ask about.
  */
 class ReminderService {
 
@@ -49,6 +57,12 @@ class ReminderService {
 	/** @var NoteMapper */
 	private $noteMapper;
 
+	/** @var NoteStateMapper */
+	private $noteStateMapper;
+
+	/** @var ShareService */
+	private $shareService;
+
 	/** @var INotificationManager */
 	private $notificationManager;
 
@@ -59,11 +73,15 @@ class ReminderService {
 	private $logger;
 
 	public function __construct(NoteMapper           $noteMapper,
+	                            NoteStateMapper      $noteStateMapper,
+	                            ShareService         $shareService,
 	                            INotificationManager $notificationManager,
 	                            ITimeFactory         $timeFactory,
 	                            LoggerInterface      $logger)
 	{
 		$this->noteMapper          = $noteMapper;
+		$this->noteStateMapper     = $noteStateMapper;
+		$this->shareService        = $shareService;
 		$this->notificationManager = $notificationManager;
 		$this->timeFactory         = $timeFactory;
 		$this->logger              = $logger;
@@ -109,9 +127,17 @@ class ReminderService {
 	public function notifyDue(): int {
 		$now = $this->timeFactory->getDateTime('now', new \DateTimeZone('GMT'));
 
-		$notes = $this->noteMapper->findDueReminders($now);
-		if (count($notes) === 0) {
+		$states = $this->noteStateMapper->findDueReminders($now);
+		if (count($states) === 0) {
 			return 0;
+		}
+
+		// One query for the notes of the whole batch instead of one each.
+		$notes = [];
+		foreach ($this->noteMapper->findByIds(array_map(
+			function (NoteState $state) { return $state->getNoteId(); }, $states
+		)) as $note) {
+			$notes[(int)$note->getId()] = $note;
 		}
 
 		// One transaction-ish round trip to the push service instead of one
@@ -120,9 +146,23 @@ class ReminderService {
 
 		$sent = 0;
 		try {
-			foreach ($notes as $note) {
+			foreach ($states as $state) {
+				$note = $notes[$state->getNoteId()] ?? null;
+				if (is_null($note)) {
+					continue;
+				}
+
+				// Access can have been lost since the reminder was armed —
+				// left a group, or a group share taken back — and a reminder
+				// about a note the user can no longer open is worse than no
+				// reminder. Losing a personal share already deletes the row.
+				if (!$this->stillReachable($state, $note)) {
+					$this->noteStateMapper->setReminder($state->getUserId(), $state->getNoteId(), null);
+					continue;
+				}
+
 				try {
-					$this->notify($note);
+					$this->notify($state, $note);
 				} catch (\Throwable $e) {
 					// Leave the row unnotified so the next run retries it,
 					// and let the rest of the batch through.
@@ -133,7 +173,7 @@ class ReminderService {
 					continue;
 				}
 
-				$this->noteMapper->markReminderNotified($note->getId(), $now);
+				$this->noteStateMapper->markReminderNotified($state, $now);
 				$sent++;
 			}
 		} finally {
@@ -146,25 +186,88 @@ class ReminderService {
 	}
 
 	/**
-	 * Withdraw any pending reminder notification for a note. Called when the
-	 * reminder is moved or cancelled, and when the note goes to the trash or
-	 * is deleted for good — otherwise a notification for a date that no
-	 * longer exists sits in the user's list forever.
+	 * The notes one user set a reminder on, each carrying that user's date,
+	 * ordered by it. Feeds the virtual calendar, which is per principal and so
+	 * shows each of them their own reminders — the owner's on their notes, and
+	 * whatever they armed on the ones shared with them.
+	 *
+	 * @return Note[]
+	 */
+	public function findNotesWithRemindersOf(string $userId): array {
+		$states = $this->noteStateMapper->findRemindersOf($userId);
+		if (count($states) === 0) {
+			return [];
+		}
+
+		$notes = [];
+		foreach ($this->noteMapper->findByIds(array_map(
+			function (NoteState $state) { return $state->getNoteId(); }, $states
+		)) as $note) {
+			$notes[(int)$note->getId()] = $note;
+		}
+
+		$reminders = [];
+		foreach ($states as $state) {
+			$note = $notes[$state->getNoteId()] ?? null;
+			if (is_null($note) || !is_null($note->getDeletedAt())) {
+				continue;
+			}
+			// The date of this user, which is what the whole calendar is.
+			$note->setReminderAt($state->getReminderAt());
+			$note->setReminderNotifiedAt($state->getReminderNotifiedAt());
+			$reminders[] = $note;
+		}
+
+		return $reminders;
+	}
+
+	/**
+	 * Whether the user this reminder belongs to can still see the note.
+	 */
+	private function stillReachable(NoteState $state, Note $note): bool {
+		if ($note->getUserId() === $state->getUserId()) {
+			return true;
+		}
+		return $this->shareService->getPermissions($state->getUserId(), $note) !== 0;
+	}
+
+	/**
+	 * Withdraw the pending reminder notification of one user on one note.
+	 * Called when the reminder is moved or cancelled, and when the note goes
+	 * to the trash or is deleted for good — otherwise a notification for a
+	 * date that no longer exists sits in the list forever.
+	 *
+	 * The subject is part of what is matched on purpose: since reminders are
+	 * personal, the same user can hold both a reminder and a "shared with you"
+	 * notification about the same note, and rescheduling one must not take the
+	 * other with it.
 	 */
 	public function dismiss(string $userId, int $noteId): void {
 		$notification = $this->notificationManager->createNotification();
 		$notification->setApp(Application::APP_ID)
 			->setUser($userId)
-			->setObject(Notifier::OBJECT_NOTE, (string)$noteId);
+			->setObject(Notifier::OBJECT_NOTE, (string)$noteId)
+			->setSubject(Notifier::SUBJECT_REMINDER);
 
 		$this->notificationManager->markProcessed($notification);
 	}
 
-	private function notify(Note $note): void {
+	/**
+	 * The same, for everybody who armed a reminder on this note. The note is
+	 * on its way out — the trash, or deletion — so nobody is being reminded of
+	 * it any more.
+	 */
+	public function dismissForNote(int $noteId): void {
+		foreach ($this->noteStateMapper->findRemindersForNote($noteId) as $state) {
+			$this->dismiss($state->getUserId(), $noteId);
+		}
+	}
+
+	private function notify(NoteState $state, Note $note): void {
 		$notification = $this->notificationManager->createNotification();
 		$notification->setApp(Application::APP_ID)
-			->setUser($note->getUserId())
-			->setDateTime($this->reminderDateTime($note))
+			->setUser($state->getUserId())
+			->setDateTime($this->reminderDateTime($state))
 			->setObject(Notifier::OBJECT_NOTE, (string)$note->getId())
 			->setSubject(Notifier::SUBJECT_REMINDER, [
 				'title' => $this->plainTitle($note),
@@ -178,10 +281,10 @@ class ReminderService {
 	 * else. Falls back to now if the column somehow holds something the
 	 * format does not cover, so a single odd row cannot break the batch.
 	 */
-	private function reminderDateTime(Note $note): \DateTime {
+	private function reminderDateTime(NoteState $state): \DateTime {
 		$parsed = \DateTime::createFromFormat(
 			self::DATE_FORMAT,
-			(string)$note->getReminderAt(),
+			(string)$state->getReminderAt(),
 			new \DateTimeZone('GMT')
 		);
 

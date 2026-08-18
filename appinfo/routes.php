@@ -17,11 +17,74 @@ return ['resources' =>
 			'url' => '/notes/dashboard',
 			'verb' => 'GET',
 		],
-		// Share
+		// Shares of a note. Their own resource since 0.9.1: they used to be
+		// a list inside the note payload, applied on save, which meant a
+		// share existed only once the note was saved and that an old browser
+		// tab could revoke what a newer one had just shared.
 		[
-			'name' => 'share#forget',
-			'url' => '/share/{noteId}',
+			'name' => 'share#index',
+			'url' => '/notes/{noteId}/shares',
+			'verb' => 'GET'
+		],
+		[
+			'name' => 'shareApi#index',
+			'url' => '/api/v1/notes/{noteId}/shares',
+			'verb' => 'GET'
+		],
+		[
+			'name' => 'share#create',
+			'url' => '/notes/{noteId}/shares',
+			'verb' => 'POST'
+		],
+		[
+			'name' => 'shareApi#create',
+			'url' => '/api/v1/notes/{noteId}/shares',
+			'verb' => 'POST'
+		],
+		// Leaving a note somebody shared with you. Before the shares of a
+		// note, so `self` is not read as a share id.
+		[
+			'name' => 'share#leave',
+			'url' => '/notes/{noteId}/shares/self',
 			'verb' => 'DELETE'
+		],
+		[
+			'name' => 'shareApi#leave',
+			'url' => '/api/v1/notes/{noteId}/shares/self',
+			'verb' => 'DELETE'
+		],
+		[
+			'name' => 'share#update',
+			'url' => '/shares/{shareId}',
+			'verb' => 'PUT'
+		],
+		[
+			'name' => 'shareApi#update',
+			'url' => '/api/v1/shares/{shareId}',
+			'verb' => 'PUT'
+		],
+		[
+			'name' => 'share#destroy',
+			'url' => '/shares/{shareId}',
+			'verb' => 'DELETE'
+		],
+		[
+			'name' => 'shareApi#destroy',
+			'url' => '/api/v1/shares/{shareId}',
+			'verb' => 'DELETE'
+		],
+		// Who a note could still be shared with. Goes through the
+		// collaborator search of the server, so the admin settings about
+		// user enumeration are honoured.
+		[
+			'name' => 'share#sharees',
+			'url' => '/notes/{noteId}/sharees',
+			'verb' => 'GET'
+		],
+		[
+			'name' => 'shareApi#sharees',
+			'url' => '/api/v1/notes/{noteId}/sharees',
+			'verb' => 'GET'
 		],
 		// Archive
 		[
@@ -89,6 +152,19 @@ return ['resources' =>
 		[
 			'name' => 'AttachmentApi#info',
 			'url' => '/api/v1/attachments/info',
+			'verb' => 'GET'
+		],
+		// Serve an attachment to whoever can see the note it hangs off. The
+		// note id is in the path because it is what access is checked
+		// against: the file itself is never shared in Files.
+		[
+			'name' => 'AttachmentApi#preview',
+			'url' => '/api/v1/notes/{noteId}/attachments/{fileId}/preview',
+			'verb' => 'GET'
+		],
+		[
+			'name' => 'AttachmentApi#download',
+			'url' => '/api/v1/notes/{noteId}/attachments/{fileId}/download',
 			'verb' => 'GET'
 		],
 		// User Settings

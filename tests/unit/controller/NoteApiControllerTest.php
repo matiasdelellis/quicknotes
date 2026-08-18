@@ -17,6 +17,8 @@ use OCP\IRequest;
 use PHPUnit\Framework\TestCase;
 
 use OCA\QuickNotes\Db\Note;
+use OCA\QuickNotes\Exception\ConflictException;
+use OCA\QuickNotes\Exception\ForbiddenException;
 use OCA\QuickNotes\Service\NoteService;
 
 
@@ -24,14 +26,15 @@ class NoteApiControllerTest extends TestCase {
 
 	private $controller;
 	private $noteService;
+	private $request;
 	private $userId = 'john';
 
 	protected function setUp(): void {
-		$request = $this->createMock(IRequest::class);
+		$this->request = $this->createMock(IRequest::class);
 		$this->noteService = $this->createMock(NoteService::class);
 
 		$this->controller = new NoteApiController(
-			'quicknotes', $request, $this->noteService, $this->userId
+			'quicknotes', $this->request, $this->noteService, $this->userId
 		);
 	}
 
@@ -45,7 +48,6 @@ class NoteApiControllerTest extends TestCase {
 		$note->setContent($content);
 		$note->setTimestamp(1700000000);
 		$note->setColorId(1);
-		$note->setPinned(false);
 		$note->setColor('#F7EB96');
 		$note->setIsPinned(false);
 		return $note;
@@ -161,13 +163,29 @@ class NoteApiControllerTest extends TestCase {
 		$note = $this->makeNote(5);
 		$this->noteService->expects($this->once())
 			->method('update')
-			->with($this->userId, 5, 't', 'c', '#fff', false, [], [], [])
+			->with($this->userId, 5, 't', 'c', '#fff', false, [], [], [], null)
 			->willReturn($note);
 
 		$response = $this->controller->update(5, 't', 'c', '#fff', false, [], [], []);
 
 		$this->assertSame(Http::STATUS_OK, $response->getStatus());
-		$this->assertNotEmpty($response->getETag());
+		$this->assertSame($note->getEtag(), trim($response->getETag(), '"'));
+	}
+
+	/**
+	 * Everything but the title and the content is optional, so that a client
+	 * that only means to change one thing does not have to resend the rest.
+	 */
+	public function testUpdateLeavesOmittedFieldsAlone(): void {
+		$note = $this->makeNote(5);
+		$this->noteService->expects($this->once())
+			->method('update')
+			->with($this->userId, 5, 't', 'c', null, null, null, null, null, null)
+			->willReturn($note);
+
+		$response = $this->controller->update(5, 't', 'c');
+
+		$this->assertSame(Http::STATUS_OK, $response->getStatus());
 	}
 
 	public function testUpdateNotFound(): void {
@@ -180,18 +198,85 @@ class NoteApiControllerTest extends TestCase {
 		$this->assertSame(Http::STATUS_NOT_FOUND, $response->getStatus());
 	}
 
+	/** A note shared read only is a 403, not a 404: the user can see it. */
+	public function testUpdateForbidden(): void {
+		$this->noteService->expects($this->once())
+			->method('update')
+			->willThrowException(new ForbiddenException('read only'));
+
+		$response = $this->controller->update(5, 't', 'c');
+
+		$this->assertSame(Http::STATUS_FORBIDDEN, $response->getStatus());
+		$this->assertSame(['message' => 'read only'], $response->getData());
+	}
+
+	/**
+	 * An `If-Match` that no longer matches comes back as 412 with the note as
+	 * it now stands, so the client can show what it was about to overwrite.
+	 */
+	public function testUpdateConflictCarriesTheCurrentNote(): void {
+		$current = $this->makeNote(5, 'theirs', 'their content');
+
+		$this->request->method('getHeader')
+			->with('If-Match')
+			->willReturn('"stale-etag"');
+
+		$this->noteService->expects($this->once())
+			->method('update')
+			->with($this->userId, 5, 't', 'c', null, null, null, null, null, 'stale-etag')
+			->willThrowException(new ConflictException($current));
+
+		$response = $this->controller->update(5, 't', 'c');
+
+		$this->assertSame(Http::STATUS_PRECONDITION_FAILED, $response->getStatus());
+		$this->assertSame($current, $response->getData()['note']);
+	}
+
+	/** `If-Match: *` is "as long as it exists", i.e. no condition at all. */
+	public function testUpdateIgnoresWildcardIfMatch(): void {
+		$note = $this->makeNote(5);
+
+		$this->request->method('getHeader')
+			->with('If-Match')
+			->willReturn('*');
+
+		$this->noteService->expects($this->once())
+			->method('update')
+			->with($this->userId, 5, 't', 'c', null, null, null, null, null, null)
+			->willReturn($note);
+
+		$response = $this->controller->update(5, 't', 'c');
+
+		$this->assertSame(Http::STATUS_OK, $response->getStatus());
+	}
+
 	// destroy ---------------------------------------------------------------
 
 	public function testDestroy(): void {
 		$this->noteService->expects($this->once())
 			->method('destroy')
-			->with($this->userId, 5);
+			->with($this->userId, 5)
+			->willReturn(true);
 
 		$response = $this->controller->destroy(5);
 
 		$this->assertInstanceOf(JSONResponse::class, $response);
 		$this->assertSame(Http::STATUS_OK, $response->getStatus());
 		$this->assertSame([], $response->getData());
+	}
+
+	/**
+	 * Destroying is the owner's alone, and a note that is not theirs used to
+	 * be answered with a cheerful 200 after doing nothing at all.
+	 */
+	public function testDestroyOfSomebodyElsesNote(): void {
+		$this->noteService->expects($this->once())
+			->method('destroy')
+			->willReturn(false);
+
+		$response = $this->controller->destroy(5);
+
+		$this->assertSame(Http::STATUS_NOT_FOUND, $response->getStatus());
 	}
 
 	// archive / unarchive / trash / restore --------------------------------

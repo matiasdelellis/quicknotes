@@ -36,6 +36,8 @@ use OCA\QuickNotes\Service\NoteService;
 
 class NoteApiController extends ApiController {
 
+	use NoteResponses;
+
 	private $noteService;
 	private $userId;
 
@@ -77,17 +79,7 @@ class NoteApiController extends ApiController {
 	#[NoCSRFRequired]
 	#[CORS]
 	public function show(int $id): JSONResponse {
-		$note = $this->noteService->get($this->userId, $id);
-		if (is_null($note)) {
-			return new JSONResponse([], Http::STATUS_NOT_FOUND);
-		}
-
-		$etag = md5(json_encode($note));
-
-		$response = new JSONResponse($note);
-		$response->setETag($etag);
-
-		return $response;
+		return $this->respondWithNote($this->noteService->get($this->userId, $id));
 	}
 
 	/**
@@ -121,56 +113,40 @@ class NoteApiController extends ApiController {
 		                                   $tags,
 		                                   $attachments);
 
-		$etag = md5(json_encode($note));
-
-		$response = new JSONResponse($note);
-		$response->setETag($etag);
-
-		return $response;
+		return $this->respondWithNote($note);
 	}
 
 	/**
+	 * Save a note. Everything but the title and the content is optional: a
+	 * field that is not sent is left alone.
+	 *
+	 * Send the etag of the note as it was read in `If-Match` to be told (412)
+	 * instead of silently overwriting somebody else's edit.
+	 *
 	 * @param int $id
 	 * @param string $title
 	 * @param string $content
-	 * @param string $color
-	 * @param bool   $isPinned
-	 * @param array  $tags
-	 * @param array  $attachments
-	 * @param array  $sharedWith
+	 * @param string|null $color owner only
+	 * @param bool|null   $isPinned personal to the caller
+	 * @param array|null  $tags personal to the caller
+	 * @param array|null  $attachments owner only
+	 * @param array|null  $sharedWith owner only, superseded by the share endpoints
 	 */
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
 	#[CORS]
-	public function update(int    $id,
-	                       string $title,
-	                       string $content,
-	                       string $color,
-	                       bool   $isPinned,
-	                       array  $tags,
-	                       array  $attachments,
-	                       array  $sharedWith): JSONResponse
+	public function update(int     $id,
+	                       string  $title,
+	                       string  $content,
+	                       ?string $color = null,
+	                       ?bool   $isPinned = null,
+	                       ?array  $tags = null,
+	                       ?array  $attachments = null,
+	                       ?array  $sharedWith = null): JSONResponse
 	{
-		$note = $this->noteService->update($this->userId,
-		                                   $id,
-		                                   $title,
-		                                   $content,
-		                                   $color,
-		                                   $isPinned,
-		                                   $tags,
-		                                   $attachments,
-		                                   $sharedWith);
-
-		if (is_null($note)) {
-			return new JSONResponse([], Http::STATUS_NOT_FOUND);
-		}
-
-		$etag = md5(json_encode($note));
-
-		$response = new JSONResponse($note);
-		$response->setETag($etag);
-
-		return $response;
+		return $this->saveNote($this->noteService, $this->userId, $id, $title,
+		                       $content, $color, $isPinned, $tags, $attachments,
+		                       $sharedWith);
 	}
 
 	/**
@@ -180,7 +156,9 @@ class NoteApiController extends ApiController {
 	#[NoCSRFRequired]
 	#[CORS]
 	public function destroy(int $id): JSONResponse {
-		$this->noteService->destroy($this->userId, $id);
+		if (!$this->noteService->destroy($this->userId, $id)) {
+			return new JSONResponse([], Http::STATUS_NOT_FOUND);
+		}
 		return new JSONResponse([]);
 	}
 
@@ -191,14 +169,7 @@ class NoteApiController extends ApiController {
 	#[NoCSRFRequired]
 	#[CORS]
 	public function archive(int $id): JSONResponse {
-		$note = $this->noteService->archive($this->userId, $id);
-		if (is_null($note)) {
-			return new JSONResponse([], Http::STATUS_NOT_FOUND);
-		}
-
-		$response = new JSONResponse($note);
-		$response->setETag(md5(json_encode($note)));
-		return $response;
+		return $this->respondWithNote($this->noteService->archive($this->userId, $id));
 	}
 
 	/**
@@ -208,14 +179,7 @@ class NoteApiController extends ApiController {
 	#[NoCSRFRequired]
 	#[CORS]
 	public function trash(int $id): JSONResponse {
-		$note = $this->noteService->trash($this->userId, $id);
-		if (is_null($note)) {
-			return new JSONResponse([], Http::STATUS_NOT_FOUND);
-		}
-
-		$response = new JSONResponse($note);
-		$response->setETag(md5(json_encode($note)));
-		return $response;
+		return $this->respondWithNote($this->noteService->trash($this->userId, $id));
 	}
 
 	/**
@@ -225,14 +189,7 @@ class NoteApiController extends ApiController {
 	#[NoCSRFRequired]
 	#[CORS]
 	public function unarchive(int $id): JSONResponse {
-		$note = $this->noteService->unarchive($this->userId, $id);
-		if (is_null($note)) {
-			return new JSONResponse([], Http::STATUS_NOT_FOUND);
-		}
-
-		$response = new JSONResponse($note);
-		$response->setETag(md5(json_encode($note)));
-		return $response;
+		return $this->respondWithNote($this->noteService->unarchive($this->userId, $id));
 	}
 
 	/**
@@ -242,14 +199,7 @@ class NoteApiController extends ApiController {
 	#[NoCSRFRequired]
 	#[CORS]
 	public function restore(int $id): JSONResponse {
-		$note = $this->noteService->restore($this->userId, $id);
-		if (is_null($note)) {
-			return new JSONResponse([], Http::STATUS_NOT_FOUND);
-		}
-
-		$response = new JSONResponse($note);
-		$response->setETag(md5(json_encode($note)));
-		return $response;
+		return $this->respondWithNote($this->noteService->restore($this->userId, $id));
 	}
 
 	/**
@@ -266,13 +216,7 @@ class NoteApiController extends ApiController {
 			return new JSONResponse(['message' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
 		}
 
-		if (is_null($note)) {
-			return new JSONResponse([], Http::STATUS_NOT_FOUND);
-		}
-
-		$response = new JSONResponse($note);
-		$response->setETag(md5(json_encode($note)));
-		return $response;
+		return $this->respondWithNote($note);
 	}
 
 }

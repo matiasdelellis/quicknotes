@@ -19,6 +19,9 @@ use Psr\Log\LoggerInterface;
 
 use OCA\QuickNotes\Db\Note;
 use OCA\QuickNotes\Db\NoteMapper;
+use OCA\QuickNotes\Db\NoteShare;
+use OCA\QuickNotes\Db\NoteState;
+use OCA\QuickNotes\Db\NoteStateMapper;
 use OCA\QuickNotes\Notification\Notifier;
 
 
@@ -26,6 +29,8 @@ class ReminderServiceTest extends TestCase {
 
 	private $service;
 	private $noteMapper;
+	private $noteStateMapper;
+	private $shareService;
 	private $notificationManager;
 	private $timeFactory;
 	private $logger;
@@ -35,6 +40,8 @@ class ReminderServiceTest extends TestCase {
 
 	protected function setUp(): void {
 		$this->noteMapper          = $this->createMock(NoteMapper::class);
+		$this->noteStateMapper     = $this->createMock(NoteStateMapper::class);
+		$this->shareService        = $this->createMock(ShareService::class);
 		$this->notificationManager = $this->createMock(INotificationManager::class);
 		$this->timeFactory         = $this->createMock(ITimeFactory::class);
 		$this->logger              = $this->createMock(LoggerInterface::class);
@@ -44,6 +51,8 @@ class ReminderServiceTest extends TestCase {
 
 		$this->service = new ReminderService(
 			$this->noteMapper,
+			$this->noteStateMapper,
+			$this->shareService,
 			$this->notificationManager,
 			$this->timeFactory,
 			$this->logger
@@ -52,17 +61,37 @@ class ReminderServiceTest extends TestCase {
 
 	private function makeNote(int $id = 1,
 	                         string $title = 'Pay the rent',
-	                         ?string $reminderAt = '2026-07-31 11:55:00'): Note {
+	                         string $owner = 'john'): Note {
 		$note = new Note();
 		$note->setId($id);
-		$note->setUserId('john');
+		$note->setUserId($owner);
 		$note->setTitle($title);
 		$note->setContent('A content');
 		$note->setTimestamp(1700000000);
 		$note->setColorId(1);
-		$note->setPinned(false);
-		$note->setReminderAt($reminderAt);
 		return $note;
+	}
+
+	private function makeState(int $noteId = 1,
+	                           string $userId = 'john',
+	                           ?string $reminderAt = '2026-07-31 11:55:00'): NoteState {
+		$state = new NoteState();
+		$state->setNoteId($noteId);
+		$state->setUserId($userId);
+		$state->setPinned(false);
+		$state->setReminderAt($reminderAt);
+		return $state;
+	}
+
+	/** A notification that accepts the whole builder chain. */
+	private function makeNotification(): INotification {
+		$notification = $this->createMock(INotification::class);
+		$notification->method('setApp')->willReturnSelf();
+		$notification->method('setUser')->willReturnSelf();
+		$notification->method('setDateTime')->willReturnSelf();
+		$notification->method('setObject')->willReturnSelf();
+		$notification->method('setSubject')->willReturnSelf();
+		return $notification;
 	}
 
 	// normalize -------------------------------------------------------------
@@ -101,7 +130,7 @@ class ReminderServiceTest extends TestCase {
 	// notifyDue -------------------------------------------------------------
 
 	public function testNotifyDueDoesNothingWithoutDueReminders(): void {
-		$this->noteMapper->expects($this->once())
+		$this->noteStateMapper->expects($this->once())
 			->method('findDueReminders')
 			->with($this->now)
 			->willReturn([]);
@@ -111,20 +140,13 @@ class ReminderServiceTest extends TestCase {
 		$this->assertSame(0, $this->service->notifyDue());
 	}
 
-	public function testNotifyDueNotifiesAndMarksTheNote(): void {
-		$note = $this->makeNote(7);
+	public function testNotifyDueNotifiesAndMarksTheReminder(): void {
+		$state = $this->makeState(7);
 
-		$this->noteMapper->expects($this->once())
-			->method('findDueReminders')
-			->willReturn([$note]);
+		$this->noteStateMapper->method('findDueReminders')->willReturn([$state]);
+		$this->noteMapper->method('findByIds')->with([7])->willReturn([$this->makeNote(7)]);
 
-		$notification = $this->createMock(INotification::class);
-		$notification->method('setApp')->willReturnSelf();
-		$notification->method('setUser')->willReturnSelf();
-		$notification->method('setDateTime')->willReturnSelf();
-		$notification->method('setObject')->willReturnSelf();
-		$notification->method('setSubject')->willReturnSelf();
-
+		$notification = $this->makeNotification();
 		$notification->expects($this->once())
 			->method('setObject')
 			->with(Notifier::OBJECT_NOTE, '7');
@@ -137,9 +159,58 @@ class ReminderServiceTest extends TestCase {
 			->method('notify')
 			->with($notification);
 
-		$this->noteMapper->expects($this->once())
+		$this->noteStateMapper->expects($this->once())
 			->method('markReminderNotified')
-			->with(7, $this->now);
+			->with($state, $this->now);
+
+		$this->assertSame(1, $this->service->notifyDue());
+	}
+
+	/**
+	 * The reminder is the recipient's, not the owner's: the notification goes
+	 * to whoever armed it, on somebody else's note.
+	 */
+	public function testNotifyDueNotifiesWhoeverArmedTheReminder(): void {
+		$state = $this->makeState(7, 'bob');
+
+		$this->noteStateMapper->method('findDueReminders')->willReturn([$state]);
+		$this->noteMapper->method('findByIds')->willReturn([$this->makeNote(7, 'Pay the rent', 'alice')]);
+		$this->shareService->method('getPermissions')->willReturn(NoteShare::PERMISSION_READ);
+
+		$notification = $this->makeNotification();
+		$notification->expects($this->once())->method('setUser')->with('bob');
+		$this->notificationManager->method('createNotification')->willReturn($notification);
+
+		$this->assertSame(1, $this->service->notifyDue());
+	}
+
+	/**
+	 * Access can be lost after a reminder is armed — a group share taken back,
+	 * or leaving the group. Reminding somebody of a note they can no longer
+	 * open is worse than not reminding them, so it is dropped instead.
+	 */
+	public function testNotifyDueDropsAReminderOnANoteTheUserLostAccessTo(): void {
+		$state = $this->makeState(7, 'bob');
+
+		$this->noteStateMapper->method('findDueReminders')->willReturn([$state]);
+		$this->noteMapper->method('findByIds')->willReturn([$this->makeNote(7, 'Pay the rent', 'alice')]);
+		$this->shareService->method('getPermissions')->willReturn(0);
+
+		$this->notificationManager->expects($this->never())->method('notify');
+		$this->noteStateMapper->expects($this->once())
+			->method('setReminder')
+			->with('bob', 7, null);
+
+		$this->assertSame(0, $this->service->notifyDue());
+	}
+
+	/** The owner never has to be checked against the shares. */
+	public function testNotifyDueDoesNotAskAboutTheOwner(): void {
+		$this->noteStateMapper->method('findDueReminders')->willReturn([$this->makeState(7, 'john')]);
+		$this->noteMapper->method('findByIds')->willReturn([$this->makeNote(7, 'Pay the rent', 'john')]);
+
+		$this->shareService->expects($this->never())->method('getPermissions');
+		$this->notificationManager->method('createNotification')->willReturn($this->makeNotification());
 
 		$this->assertSame(1, $this->service->notifyDue());
 	}
@@ -149,17 +220,10 @@ class ReminderServiceTest extends TestCase {
 	 * notification as plain text.
 	 */
 	public function testNotifyDueStripsMarkupFromTheTitle(): void {
-		$note = $this->makeNote(7, '<b>Pay</b> the&nbsp;rent');
+		$this->noteStateMapper->method('findDueReminders')->willReturn([$this->makeState(7)]);
+		$this->noteMapper->method('findByIds')->willReturn([$this->makeNote(7, '<b>Pay</b> the&nbsp;rent')]);
 
-		$this->noteMapper->method('findDueReminders')->willReturn([$note]);
-
-		$notification = $this->createMock(INotification::class);
-		$notification->method('setApp')->willReturnSelf();
-		$notification->method('setUser')->willReturnSelf();
-		$notification->method('setDateTime')->willReturnSelf();
-		$notification->method('setObject')->willReturnSelf();
-		$notification->method('setSubject')->willReturnSelf();
-
+		$notification = $this->makeNotification();
 		$notification->expects($this->once())
 			->method('setSubject')
 			->with(Notifier::SUBJECT_REMINDER, ['title' => 'Pay the&nbsp;rent']);
@@ -170,21 +234,18 @@ class ReminderServiceTest extends TestCase {
 	}
 
 	/**
-	 * A note that cannot be notified must not be marked, so the next run
+	 * A reminder that cannot be notified must not be marked, so the next run
 	 * retries it — and must not take the rest of the batch down with it.
 	 */
 	public function testNotifyDueKeepsGoingAfterAFailure(): void {
-		$this->noteMapper->method('findDueReminders')
+		$second = $this->makeState(2);
+
+		$this->noteStateMapper->method('findDueReminders')
+			->willReturn([$this->makeState(1), $second]);
+		$this->noteMapper->method('findByIds')
 			->willReturn([$this->makeNote(1), $this->makeNote(2)]);
 
-		$notification = $this->createMock(INotification::class);
-		$notification->method('setApp')->willReturnSelf();
-		$notification->method('setUser')->willReturnSelf();
-		$notification->method('setDateTime')->willReturnSelf();
-		$notification->method('setObject')->willReturnSelf();
-		$notification->method('setSubject')->willReturnSelf();
-
-		$this->notificationManager->method('createNotification')->willReturn($notification);
+		$this->notificationManager->method('createNotification')->willReturn($this->makeNotification());
 		$this->notificationManager->method('notify')
 			->willReturnOnConsecutiveCalls(
 				$this->throwException(new \RuntimeException('push is down')),
@@ -192,25 +253,29 @@ class ReminderServiceTest extends TestCase {
 			);
 
 		// Only the second one gets marked.
-		$this->noteMapper->expects($this->once())
+		$this->noteStateMapper->expects($this->once())
 			->method('markReminderNotified')
-			->with(2, $this->now);
+			->with($second, $this->now);
 
 		$this->logger->expects($this->once())->method('warning');
 
 		$this->assertSame(1, $this->service->notifyDue());
 	}
 
-	public function testNotifyDueFlushesWhenItDeferred(): void {
-		$this->noteMapper->method('findDueReminders')->willReturn([$this->makeNote()]);
+	/** A reminder whose note vanished under it is skipped, not fatal. */
+	public function testNotifyDueSkipsAReminderWithoutANote(): void {
+		$this->noteStateMapper->method('findDueReminders')->willReturn([$this->makeState(7)]);
+		$this->noteMapper->method('findByIds')->willReturn([]);
 
-		$notification = $this->createMock(INotification::class);
-		$notification->method('setApp')->willReturnSelf();
-		$notification->method('setUser')->willReturnSelf();
-		$notification->method('setDateTime')->willReturnSelf();
-		$notification->method('setObject')->willReturnSelf();
-		$notification->method('setSubject')->willReturnSelf();
-		$this->notificationManager->method('createNotification')->willReturn($notification);
+		$this->notificationManager->expects($this->never())->method('notify');
+
+		$this->assertSame(0, $this->service->notifyDue());
+	}
+
+	public function testNotifyDueFlushesWhenItDeferred(): void {
+		$this->noteStateMapper->method('findDueReminders')->willReturn([$this->makeState()]);
+		$this->noteMapper->method('findByIds')->willReturn([$this->makeNote()]);
+		$this->notificationManager->method('createNotification')->willReturn($this->makeNotification());
 
 		$this->notificationManager->method('defer')->willReturn(true);
 		$this->notificationManager->expects($this->once())->method('flush');
@@ -219,15 +284,9 @@ class ReminderServiceTest extends TestCase {
 	}
 
 	public function testNotifyDueDoesNotFlushWhenAlreadyDeferred(): void {
-		$this->noteMapper->method('findDueReminders')->willReturn([$this->makeNote()]);
-
-		$notification = $this->createMock(INotification::class);
-		$notification->method('setApp')->willReturnSelf();
-		$notification->method('setUser')->willReturnSelf();
-		$notification->method('setDateTime')->willReturnSelf();
-		$notification->method('setObject')->willReturnSelf();
-		$notification->method('setSubject')->willReturnSelf();
-		$this->notificationManager->method('createNotification')->willReturn($notification);
+		$this->noteStateMapper->method('findDueReminders')->willReturn([$this->makeState()]);
+		$this->noteMapper->method('findByIds')->willReturn([$this->makeNote()]);
+		$this->notificationManager->method('createNotification')->willReturn($this->makeNotification());
 
 		// Somebody up the stack is already batching: flushing here would
 		// cut their batch short.
@@ -240,15 +299,17 @@ class ReminderServiceTest extends TestCase {
 	// dismiss ---------------------------------------------------------------
 
 	public function testDismissMarksTheNotificationProcessed(): void {
-		$notification = $this->createMock(INotification::class);
-		$notification->method('setApp')->willReturnSelf();
-		$notification->method('setUser')->willReturnSelf();
-		$notification->method('setObject')->willReturnSelf();
+		$notification = $this->makeNotification();
 
 		$notification->expects($this->once())->method('setUser')->with('john');
 		$notification->expects($this->once())
 			->method('setObject')
 			->with(Notifier::OBJECT_NOTE, '42');
+		// Scoped to the reminder: the same user can also hold a "shared with
+		// you" notification about this very note, and it is not ours to drop.
+		$notification->expects($this->once())
+			->method('setSubject')
+			->with(Notifier::SUBJECT_REMINDER);
 
 		$this->notificationManager->method('createNotification')->willReturn($notification);
 		$this->notificationManager->expects($this->once())
@@ -256,6 +317,51 @@ class ReminderServiceTest extends TestCase {
 			->with($notification);
 
 		$this->service->dismiss('john', 42);
+	}
+
+	public function testDismissForNoteReachesEverybodyWhoArmedOne(): void {
+		$this->noteStateMapper->method('findRemindersForNote')
+			->with(42)
+			->willReturn([$this->makeState(42, 'john'), $this->makeState(42, 'bob')]);
+
+		$notification = $this->makeNotification();
+		$this->notificationManager->method('createNotification')->willReturn($notification);
+
+		$users = [];
+		$notification->method('setUser')->willReturnCallback(function ($user) use (&$users, $notification) {
+			$users[] = $user;
+			return $notification;
+		});
+
+		$this->notificationManager->expects($this->exactly(2))->method('markProcessed');
+
+		$this->service->dismissForNote(42);
+
+		$this->assertSame(['john', 'bob'], $users);
+	}
+
+	// the calendar ----------------------------------------------------------
+
+	public function testNotesWithRemindersCarryTheDateOfTheUserAsking(): void {
+		$this->noteStateMapper->method('findRemindersOf')
+			->with('bob')
+			->willReturn([$this->makeState(7, 'bob', '2026-08-02 08:00:00')]);
+		$this->noteMapper->method('findByIds')->willReturn([$this->makeNote(7, 'Pay the rent', 'alice')]);
+
+		$notes = $this->service->findNotesWithRemindersOf('bob');
+
+		$this->assertCount(1, $notes);
+		$this->assertSame('2026-08-02 08:00:00', $notes[0]->getReminderAt());
+	}
+
+	public function testNotesWithRemindersSkipsTheTrash(): void {
+		$trashed = $this->makeNote(7);
+		$trashed->setDeletedAt('2026-07-30 10:00:00');
+
+		$this->noteStateMapper->method('findRemindersOf')->willReturn([$this->makeState(7)]);
+		$this->noteMapper->method('findByIds')->willReturn([$trashed]);
+
+		$this->assertSame([], $this->service->findNotesWithRemindersOf('john'));
 	}
 
 }

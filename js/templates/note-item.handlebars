@@ -1,31 +1,42 @@
 <div class="note-grid-item">
-	<div class="quicknote noselect {{#if sharedBy.length}}shared{{/if}} {{#if sharedWith.length}}shareowner{{/if}}" style="background-color: {{color}}" data-id="{{ id }}" data-pinned={{#if isPinned}}1{{else}}0{{/if}} data-timestamp="{{ timestamp }}" >
+	<div class="quicknote noselect {{#if sharedBy}}shared{{/if}} {{#if sharedByMe}}shareowner{{/if}}" style="background-color: {{color}}" data-id="{{ id }}" data-pinned={{#if isPinned}}1{{else}}0{{/if}} data-timestamp="{{ timestamp }}" >
 		<div class='note-header'>
-			<div class='note-attachts'>
+			<div class='note-attachts' data-count="{{attachments.length}}" {{{attachtsExtra attachments}}}>
 				{{#each attachments}}
 					<div class='note-attach-grid'>
-						<div class="attach-preview note-attach" attach-file-id="{{file_id}}" data-background-image="{{preview_url}}"></div>
+						<div class="attach-preview note-attach {{#unless has_preview}}attach-is-icon{{/unless}}" attach-file-id="{{file_id}}" data-background-image="{{preview_url}}"></div>
 					</div>
 				{{/each}}
 			</div>
 		</div>
 		<div class='note-body'>
+			{{#if sharedBy}}
+				<div class="icon-header-note icon-qn-share" title="{{tSB sharedBy.displayName}}"></div>
+			{{/if}}
 			{{#unless trashView}}
-				{{#if isPinned}}
-					<div class="icon-header-note icon-pinned fixed-header-icon" title="{{t "quicknotes" "Unpin note"}}"></div>
-				{{else}}
-					<div class="icon-header-note icon-pin hide-header-icon" title="{{t "quicknotes" "Pin note"}}"></div>
+				{{#if canEdit}}
+					{{#if isPinned}}
+						<div class="icon-header-note icon-pinned fixed-header-icon" title="{{t "quicknotes" "Unpin note"}}"></div>
+					{{else}}
+						<div class="icon-header-note icon-pin hide-header-icon" title="{{t "quicknotes" "Pin note"}}"></div>
+					{{/if}}
 				{{/if}}
+				{{! Archiving is personal: it says where the note sits in your
+				    own grid, so it is offered on somebody else's note too. }}
 				{{#if archivedAt}}
 					<div class="icon-header-note icon-archived fixed-header-icon" title="{{t "quicknotes" "Unarchive"}}"></div>
 				{{else}}
 					<div class="icon-header-note hide-header-icon icon-archived" title="{{t "quicknotes" "Archive note"}}"></div>
 				{{/if}}
 			{{/unless}}
-			{{#if deletedAt}}
-				<div class="icon-header-note icon-delete-note fixed-header-icon" title="{{t "quicknotes" "Restore"}}"></div>
-			{{else}}
-				<div class="icon-header-note hide-header-icon icon-delete-note" title="{{t "quicknotes" "Move to trash"}}"></div>
+			{{#if isOwner}}
+				{{#if deletedAt}}
+					<div class="icon-header-note icon-delete-note fixed-header-icon" title="{{t "quicknotes" "Restore"}}"></div>
+				{{else}}
+					<div class="icon-header-note hide-header-icon icon-delete-note" title="{{t "quicknotes" "Move to trash"}}"></div>
+				{{/if}}
+			{{else if canLeave}}
+				<div class="icon-header-note hide-header-icon icon-delete-note" title="{{t "quicknotes" "Leave this shared note"}}"></div>
 			{{/if}}
 			<div class='note-title'>
 				{{{ title }}}
@@ -44,7 +55,7 @@
 			</div>
 			<div class='note-shares'>
 				{{#each sharedWith}}
-					<div class="slim-share" share-id="{{ shared_user }}" title="Shared with {{ display_name }}">{{{ display_name }}}</div>
+					<div class="slim-share {{#if isGroup}}slim-share-group{{/if}} {{#if canEdit}}slim-share-editable{{/if}}" share-id="{{ id }}" title="{{tShare this}}">{{ displayName }}</div>
 				{{/each}}
 			</div>
 			<div class='note-tags'>

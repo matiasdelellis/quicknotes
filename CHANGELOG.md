@@ -1,5 +1,128 @@
 # Changelog
 ## [Unreleased]
+- Add a "Filter notes" entry to the navigation: it looks like the others until
+  you click it, and then a field takes its place and narrows the notes on screen
+  as you type, matching the title, the body and the names of the tags. Case and
+  accents are ignored — "cafe" finds "Café" — and several words all have to
+  appear, in any order. It is a filter like the colour and tag ones, so it
+  applies to whichever list you are looking at; Escape or the × drops it and puts
+  the entry back, and it travels in the url as `?q=`.
+- Say "no notes match the filter" instead of leaving a blank area, which is also
+  what the colour, tag and reminder filters did when they matched nothing.
+- Fix opening the colour palette of a note breaking the rest of the editor: it
+  was added with `innerHTML +=`, which re-parses the whole note being edited, so
+  every field came back as a new element. The format toolbar stopped appearing
+  from then on, and what you typed afterwards no longer counted as a change.
+- Close the colour palette when the editor closes. It used to stay open, hanging
+  over the next note opened.
+- Give "Colors" in the navigation the same icon as the colour button of the
+  editor. It was showing a magnifying glass.
+- Fix the format toolbar of the editor being dressed by the wrong stylesheet:
+  the base styles of MediumEditor were loaded *after* the theme of the app that
+  is meant to override them, so the buttons kept a 15px padding that squashed
+  their icons — the link-to-a-note one visibly.
+- Stop leaving a share behind when the person who made it loses access: taking
+  a note back from somebody who had passed it on now takes their reshares with
+  it, all the way down a chain.
+- Leave archived and trashed notes out of the dashboard widget. They were shown
+  there all along, which only became obvious once archiving became personal.
+- Remove the `Errors` controller trait, which caught an exception class that
+  does not exist in this app. Nothing used it, and the documentation was
+  recommending it.
+- Sharing a note now shares its attachments. They used to vanish without a
+  trace for the people it was shared with — the app asked whether *they* could
+  reach the file, and answered by dropping the attachment from the note — with
+  a line in the share dialog telling them to go and share the files by hand.
+  The app serves them itself now, to anybody who can see the note, reading each
+  file with the authority of whoever attached it. Nothing is shared in Files:
+  there is no copy, nothing to keep in sync, and access ends when the note
+  stops being shared.
+- Attachments of a note you cannot reach in your own Files offer a download
+  instead of a link into Files, which is where they used to point at nothing.
+- Lay the attachments of a note out as a mosaic instead of a row that got
+  thinner with every file: one fills the space, two split it, three are one tall
+  plus two stacked, four are a 2x2, five are two over three, six are a 3x2.
+  Beyond that the note card shows six and counts the rest, and the editor shows
+  them all in rows of three.
+- Fix the "delete attachment" button of the editor showing no icon at all: it
+  asked for a class that never existed — the name of a CSS variable — so it was
+  a grey circle with nothing in it.
+- Show the icon of the file type for an attachment with no preview — a pdf, a
+  zip — instead of an empty tile.
+- Attachments open in the Nextcloud viewer, the ones somebody else attached
+  included — images, video and audio, which are the types the viewer itself
+  handles. Anything else keeps opening the way it did.
+- Anybody who can edit a shared note can attach files to it, not just its
+  owner: each file is served from the storage of whoever attached it, and only
+  they can take it off the note again. An attachment of somebody who is no
+  longer part of the note stops being shown and served with it.
+- Archiving is personal. Anybody who can see a note can take it out of their
+  own grid without touching anybody else's, which is the only way out for a
+  note shared with a group: that share is not theirs to leave. The existing
+  archived notes are kept, as archived by their owner.
+- The "leave" icon of a shared note is now only offered where leaving actually
+  works — a share made with you personally — instead of failing with an
+  explanation afterwards.
+- Deleting a note that is not yours answers "not found" instead of pretending
+  it worked.
+- Reminders are personal. Everybody who can see a note can set their own date
+  on it, including on a note shared read only, and nobody sees anybody else's:
+  the reminder moved from the note to the same per-user table as the pin. The
+  existing ones are kept, as reminders of the note's owner.
+- The reminder is saved the moment it is picked instead of waiting for the note
+  to be saved — which is what lets it work on a note you are not allowed to
+  edit.
+- The read-only editor of a shared note now offers the reminder button, the one
+  thing it can still do.
+- The virtual calendar shows each user their own reminders, on their notes and
+  on the ones shared with them.
+- Cancel the reminder of everybody, not just the owner's, when a note is
+  trashed or deleted; and drop one silently when the user turns out to have
+  lost access to the note in the meantime.
+- Fix rescheduling a reminder also dismissing the "shared with you"
+  notification of the same note: the two are told apart now.
+- Rewrite sharing. A note can now be shared **with permissions** — "can view",
+  "can edit" and "can reshare" — and with **groups**, not just with single
+  users. Editing a shared note is real collaboration: the recipient writes the
+  title and the content of the same note, and the owner keeps the colour, the
+  attachments, the reminder, archiving and deleting.
+- Shares are applied the moment they are made, instead of travelling inside the
+  note and being written on save. Sharing a note no longer depends on
+  remembering to save it, and an old browser tab can no longer revoke a share
+  made in another one.
+- New share dialog: the people and groups a note is shared with, with their
+  avatars and a menu to change what each of them may do. The user search runs
+  on the server through the collaborator search of Nextcloud, so it finds
+  groups and honours the sharing settings of the instance — and the app no
+  longer pulls every user of the instance on page load.
+- Pinning is now per user: pinning a note somebody shared with you no longer
+  pins it for them. Tags on a shared note were already personal and now behave
+  like it, showing yours rather than the owner's.
+- Refuse to overwrite an edit made elsewhere. Saving sends the state the note
+  was read in, and if somebody else saved in the meantime the app asks whether
+  to overwrite their version or reload. The grid also refreshes itself when the
+  tab comes back to the front.
+- Notify people when a note is shared with them, and withdraw the notification
+  when it is unshared.
+- Search now finds the notes shared with you, which only the dashboard did.
+- The v1 API is at 1.4: an attachment carries `download_url`, `link_url`,
+  `user_id`, `is_mine`, `basename` and `mime`, its `preview_url` is served by the app, and `redirect_url` /
+  `deep_link_url` are null for whoever cannot reach the file in their Files.
+- The v1 API is at 1.3: `archivedAt` is now the caller's rather than the
+  note's, `POST /notes/{id}/archive` and `/unarchive` answer to anybody who can
+  see the note, the payload gained `canLeave`, and `DELETE /notes/{id}` answers
+  404 on a note the caller does not own.
+- The v1 API is at 1.2: `reminderAt` and `reminderNotifiedAt` are now those of
+  whoever asks rather than the note's, and `PUT /notes/{id}/reminder` takes a
+  reminder from anybody who can see the note instead of only from its owner.
+- The v1 API is at 1.1: the note payload gained `permissions`, `canEdit`,
+  `canReshare`, `isOwner`, `owner`, `sharedByMe` and `etag`, `sharedBy` is now
+  an object instead of a list of one, and `sharedWith` carries shares rather
+  than user ids. `PUT /notes/{id}` takes everything but the title and the
+  content as optional, and still accepts `sharedWith` from the owner.
+- Ship the sharing icons with the app: the share button of the editor and the
+  badge of a shared note rendered blank since Nextcloud 34 stopped serving the
+  icon stylesheet.
 - Add note reminders: a note can carry a date, and a background job sends a
   Nextcloud notification when it falls due. Sending a note to the trash
   cancels its reminder; archiving does not.

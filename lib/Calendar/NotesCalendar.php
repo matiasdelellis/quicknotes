@@ -23,7 +23,6 @@
 namespace OCA\QuickNotes\Calendar;
 
 use OCA\QuickNotes\Db\Note;
-use OCA\QuickNotes\Db\NoteMapper;
 use OCA\QuickNotes\Service\ReminderService;
 
 use OCP\Calendar\ICalendar;
@@ -34,10 +33,14 @@ use Sabre\VObject\Component\VCalendar;
 use Sabre\VObject\Component\VEvent;
 
 /**
- * The notes of one user that carry a reminder, seen as a read-only calendar.
+ * The reminders of one user, seen as a read-only calendar.
  *
- * Nothing is stored: every read derives the events from `quicknotes_notes`
- * on the spot. That is the whole point of going through a provider instead of
+ * One calendar per principal, and since 0.9.2 reminders are personal, so this
+ * shows each user the dates *they* armed — on their own notes and on the ones
+ * shared with them — and never anybody else's.
+ *
+ * Nothing is stored: every read derives the events from the notes and the
+ * reminders on the spot. That is the whole point of going through a provider instead of
  * writing real events into a calendar of the user — editing or deleting a
  * note is reflected immediately, and there is no second copy to keep in sync
  * (and no way to keep it in sync either: OCP\Calendar has no update or delete
@@ -55,8 +58,8 @@ class NotesCalendar implements ICalendar {
 	/** Notes can be long; the event description is not the place for all of it. */
 	private const MAX_DESCRIPTION_LENGTH = 500;
 
-	/** @var NoteMapper */
-	private $noteMapper;
+	/** @var ReminderService */
+	private $reminderService;
 
 	/** @var IL10N */
 	private $l10n;
@@ -64,13 +67,13 @@ class NotesCalendar implements ICalendar {
 	/** @var string */
 	private $userId;
 
-	public function __construct(NoteMapper $noteMapper,
-	                            IL10N      $l10n,
-	                            string     $userId)
+	public function __construct(ReminderService $reminderService,
+	                            IL10N           $l10n,
+	                            string          $userId)
 	{
-		$this->noteMapper = $noteMapper;
-		$this->l10n       = $l10n;
-		$this->userId     = $userId;
+		$this->reminderService = $reminderService;
+		$this->l10n            = $l10n;
+		$this->userId          = $userId;
 	}
 
 	public function getKey(): string {
@@ -119,7 +122,8 @@ class NotesCalendar implements ICalendar {
 			return [];
 		}
 
-		$notes = $this->noteMapper->findWithReminders($this->userId);
+		// Each note comes carrying this user's own reminder date.
+		$notes = $this->reminderService->findNotesWithRemindersOf($this->userId);
 
 		$events = [];
 		foreach ($notes as $note) {
@@ -143,7 +147,7 @@ class NotesCalendar implements ICalendar {
 			$events[] = $this->toEvent($note, $start);
 		}
 
-		// findWithReminders() already ordered by date, which is the order
+		// The reminders come ordered by date, which is the order
 		// ICalendar::search() is expected to return.
 		if ($offset !== null || $limit !== null) {
 			$events = array_slice($events, $offset ?? 0, $limit);

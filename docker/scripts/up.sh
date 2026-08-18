@@ -50,3 +50,4 @@ fi
 echo
 echo "Done. Open http://localhost:${NEXTCLOUD_HTTP_PORT:-8080}"
 echo "User: ${NEXTCLOUD_ADMIN_USER:-admin}"
+echo "Password: ${NEXTCLOUD_ADMIN_PASSWORD:-changeme-admin}"

@@ -1,11 +1,16 @@
-<div class='note-attachts'>
+<div class='note-attachts' data-count="{{attachments.length}}">
 	{{#each attachments}}
 		<div class='note-attach-grid'>
-			<a target="_blank" href="{{redirect_url}}">
-				<div class="attach-preview note-attach" attach-file-id="{{file_id}}" data-background-image="{{preview_url}}"></div>
+			<a target="_blank" href="{{link_url}}">
+				<div class="attach-preview note-attach {{#unless has_preview}}attach-is-icon{{/unless}}" attach-file-id="{{file_id}}" data-attach-user="{{user_id}}" data-attach-name="{{basename}}" data-attach-mime="{{mime}}" data-attach-source="{{download_url}}" data-background-image="{{preview_url}}"></div>
 			</a>
+			{{! Only what you attached is yours to take off the note. The
+			    server enforces it anyway: a save only ever touches the
+			    attachment rows of whoever is saving. }}
 			{{#if ../can_delete}}
-				<div class="attach-remove original-icon-delete-dark" title="{{t "quicknotes" "Delete attachment"}}"></div>
+				{{#if is_mine}}
+					<div class="attach-remove" title="{{t "quicknotes" "Delete attachment"}}"></div>
+				{{/if}}
 			{{/if}}
 		</div>
 	{{/each}}

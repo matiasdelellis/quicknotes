@@ -15,3 +15,5 @@ translationtool.phar
 # Docker dev environment
 .env
 *.log
+# Python bytecode of the scripts in tests/browser/
+__pycache__/

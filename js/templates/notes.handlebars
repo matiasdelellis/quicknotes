@@ -2,20 +2,37 @@
 <div id="notes-grid-div" class="notes-grid">
 	{{#each notes}}
 	<div class="note-grid-item">
-		<div class="quicknote noselect {{#if sharedBy.length}}shared{{/if}} {{#if sharedWith.length}}shareowner{{/if}}" style="background-color: {{color}}" data-id="{{ id }}" data-pinned={{#if isPinned}}1{{else}}0{{/if}} data-timestamp="{{ timestamp }}" >
+		<div class="quicknote noselect {{#if sharedBy}}shared{{/if}} {{#if sharedByMe}}shareowner{{/if}}" style="background-color: {{color}}" data-id="{{ id }}" data-pinned={{#if isPinned}}1{{else}}0{{/if}} data-timestamp="{{ timestamp }}" >
 			<div class='note-header'>
-				<div class='note-attachts'>
+				<div class='note-attachts' data-count="{{attachments.length}}" {{{attachtsExtra attachments}}}>
 					{{#each attachments}}
 						<div class='note-attach-grid'>
-							<div class="attach-preview note-attach" attach-file-id="{{file_id}}" data-background-image="{{preview_url}}"></div>
+							<div class="attach-preview note-attach {{#unless has_preview}}attach-is-icon{{/unless}}" attach-file-id="{{file_id}}" data-background-image="{{preview_url}}"></div>
 						</div>
 					{{/each}}
 				</div>
 			</div>
 			<div class='note-body'>
 				{{#if sharedBy}}
-					<div class="icon-header-note icon-share" title="{{tSB sharedBy.0.display_name}}"></div>
-					<div class="icon-header-note hide-header-icon icon-delete-note" title="{{t "quicknotes" "Leave this shared note"}}"></div>
+					<div class="icon-header-note icon-qn-share" title="{{tSB sharedBy.displayName}}"></div>
+					{{#if canEdit}}
+						{{#if isPinned}}
+							<div class="icon-header-note icon-pinned fixed-header-icon" title="{{t "quicknotes" "Unpin note"}}"></div>
+						{{else}}
+							<div class="icon-header-note icon-pin hide-header-icon" title="{{t "quicknotes" "Pin note"}}"></div>
+						{{/if}}
+					{{/if}}
+					{{#if ../allView}}
+						<div class="icon-header-note hide-header-icon icon-archived" title="{{t "quicknotes" "Archive note"}}"></div>
+					{{else if ../archivedView}}
+						<div class="icon-header-note hide-header-icon icon-unarchive" title="{{t "quicknotes" "Unarchive"}}"></div>
+					{{/if}}
+					{{! A note that reaches you through a group is not yours to
+					    leave — the share belongs to the group — so archiving is
+					    the only way out of your own grid. }}
+					{{#if canLeave}}
+						<div class="icon-header-note hide-header-icon icon-delete-note" title="{{t "quicknotes" "Leave this shared note"}}"></div>
+					{{/if}}
 				{{else}}
 					{{#if ../allView}}
 						{{#if isPinned}}
@@ -52,7 +69,7 @@
 				</div>
 				<div class='note-shares'>
 					{{#each sharedWith}}
-						<div class="slim-share" share-id="{{ shared_user }}" title="{{tSW display_name}}">{{{ display_name }}}</div>
+						<div class="slim-share {{#if isGroup}}slim-share-group{{/if}} {{#if canEdit}}slim-share-editable{{/if}}" share-id="{{ id }}" title="{{tShare this}}">{{ displayName }}</div>
 					{{/each}}
 				</div>
 				<div class='note-tags'>
@@ -66,6 +83,10 @@
 		</div>
 	</div>
 	{{/each}}
+</div>
+<div id="no-matches" class="emptycontent">
+	<div class="icon-qn-search svg"></div>
+	<h3>{{ noMatchesMsg }}</h3>
 </div>
 <div id="modal-note-div" class="hide-modal-note modal-note-background">
 	<div class="modal-content">
@@ -87,12 +108,12 @@
 						<div class="icon-toggle-background" title="{{t "quicknotes" "Colors"}}"></div>
 					</button>
 					<button id='share-button' class='round-tool-button'>
-						<div class="icon-shared" title="{{t "quicknotes" "Share note"}}"></div>
+						<div class="icon-qn-shared" title="{{t "quicknotes" "Share note"}}"></div>
 					</button>
 					<button id='tag-button' class='round-tool-button'>
 						<div class="icon-tag" title="{{t "quicknotes" "Tags"}}"></div>
 					</button>
-					<button id='reminder-button' class='round-tool-button'>
+					<button id='reminder-button' class='round-tool-button reminder-button'>
 						<div class="icon-qn-reminder" title="{{t "quicknotes" "Remind me"}}"></div>
 					</button>
 					<button id='attach-button' class='round-tool-button'>
@@ -111,6 +132,11 @@
 				<div style="clear: both;"></div>
 			</div>
 			<div class="note-noneditable-options">
+				<div class="colors-toolbar">
+					<button class='round-tool-button reminder-button'>
+						<div class="icon-qn-reminder" title="{{t "quicknotes" "Remind me"}}"></div>
+					</button>
+				</div>
 				<div class="buttons-toolbar">
 					<button id='close-button'>{{t "quicknotes" "Close"}}</button>
 				</div>

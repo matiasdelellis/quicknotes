@@ -22,34 +22,13 @@
 (function (OC, $, undefined) {
 'use strict';
 
-// Defensive references: if a host page forgot to expose the OCS helpers,
-// the sharees API would throw on first use. Fall back to a manual
-// composition against the apps path.
-var ocsBasePath = (OC.linkToOCS && OC.linkToOCS('apps/files_sharing/api/v1/', 2))
-    || '/ocs/v2.php/apps/files_sharing/api/v1/';
-
-var shareesParams = {
-    format: 'json',
-    perPage: 200,
-    itemType: 0
-};
-
-// Convert the raw sharees API payload into a flat list of
-// {id, text} objects (or [shareWith, label] pairs).
-function parseSharees(shares) {
-    var users = [];
-    var d = shares && shares.ocs && shares.ocs.data;
-    if (!d) return users;
-    ['exact', ''].forEach(function (bucket) {
-        var list = bucket === 'exact' ? d.exact && d.exact.users : d.users;
-        if (list) {
-            list.forEach(function (user) {
-                users.push({id: user.value.shareWith, text: user.label});
-            });
-        }
-    });
-    return users;
-}
+// Who a note can be shared with used to be answered here, by asking the OCS
+// sharees API of files_sharing for every user on the instance as soon as the
+// app loaded, whether the user ever opened the share dialog or not. It is a
+// server side endpoint of this app now (`/notes/{id}/sharees`), searched as
+// the user types from the share dialog itself: it knows about groups, honours
+// the enumeration settings of the instance, and leaves out the people the note
+// is already shared with. See src/SharesService.js.
 
 // Throw a TypeError if `id` is not a positive integer; used to guard
 // URL composition against undefined/NaN/string ids. Accepts both numbers
@@ -71,9 +50,6 @@ var Notes = function (baseUrl) {
     this._archived = [];
     this._deleted = [];
     this._loaded = false;
-
-    this._usersSharing = [];
-    this._loadUsersSharing();
 };
 
 Notes.prototype = {
@@ -138,9 +114,6 @@ Notes.prototype = {
         });
         return Ccolors;
     },
-    getUsersSharing: function () {
-        return this._usersSharing;
-    },
     // Get the tags used in the active notes
     getTags: function () {
         var seen = {};
@@ -170,13 +143,33 @@ Notes.prototype = {
             || this._deleted.find(function (note) { return note.id === id; });
     },
     // CRUD Update
+    //
+    // `note.etag` is what the note looked like when it was read. It goes out
+    // as If-Match, so the server answers 412 instead of overwriting an edit
+    // somebody else made in the meantime — which is a real possibility now
+    // that a note can be shared for editing. A note without an etag (a
+    // freshly created one) is saved unconditionally, as before.
+    //
+    // The shares are deliberately *not* part of the payload: they have their
+    // own endpoints and are already applied by the time the note is saved.
+    // Sending the list the editor happens to hold would let an old tab revoke
+    // a share made from a new one.
     update: function (note) {
         var id = assertId(note.id);
-        return this._request('PUT', this._baseUrl + '/' + id, note, function (dbnote) {
+        var payload = {
+            title: note.title,
+            content: note.content,
+            color: note.color,
+            isPinned: note.isPinned,
+            tags: note.tags,
+            attachments: note.attachments
+        };
+        var headers = note.etag ? {'If-Match': '"' + note.etag + '"'} : undefined;
+        return this._request('PUT', this._baseUrl + '/' + id, payload, function (dbnote) {
             this._removeFromBuckets(id);
             this._notes.unshift(dbnote);
             return dbnote;
-        }.bind(this));
+        }.bind(this), headers);
     },
     // Archive a note: POST /notes/{id}/archive. Moves the note from
     // its current bucket to the archived one.
@@ -254,10 +247,12 @@ Notes.prototype = {
             this._removeFromBuckets(id);
         }.bind(this));
     },
-    // Delete a shared note (i.e. one shared with the current user).
+    // Leave a note somebody shared with the current user. Only a share made
+    // with them personally can be left: one that reaches them through a group
+    // is not theirs to drop, and the server answers 404 for it.
     forgetShare: function (note) {
         var id = assertId(note.id);
-        return this._request('DELETE', OC.generateUrl('/apps/quicknotes/share') + '/' + id, null, function () {
+        return this._request('DELETE', this._baseUrl + '/' + id + '/shares/self', null, function () {
             this._removeFromBuckets(id);
         }.bind(this));
     },
@@ -267,6 +262,22 @@ Notes.prototype = {
     // server side from the path the picker returns.
     getAttachmentInfo: function (path) {
         return $.get(OC.generateUrl('/apps/quicknotes/api/v1/attachments/info'), {path: path});
+    },
+    // Put a note the server sent back in the place of the copy held here,
+    // in whichever bucket its state says it belongs to. Used when a save is
+    // refused because the note changed elsewhere and the fresh copy comes
+    // back with the rejection.
+    replace: function (note) {
+        var id = assertId(note.id);
+        this._removeFromBuckets(id);
+        if (note.deletedAt) {
+            this._deleted.unshift(note);
+        } else if (note.archivedAt) {
+            this._archived.unshift(note);
+        } else {
+            this._notes.unshift(note);
+        }
+        return note;
     },
     // Helper: drop the note with the given id from whichever bucket
     // it currently lives in.
@@ -282,7 +293,7 @@ Notes.prototype = {
     // Perform a JSON request against the notes API and apply `onSuccess`
     // (with `this` bound to the Notes instance) to the response. `onSuccess`
     // is optional and its return value is forwarded to the caller.
-    _request: function (method, url, body, onSuccess) {
+    _request: function (method, url, body, onSuccess, headers) {
         var options = {
             url: url,
             method: method,
@@ -290,6 +301,9 @@ Notes.prototype = {
         };
         if (body !== null) {
             options.data = JSON.stringify(body);
+        }
+        if (headers) {
+            options.headers = headers;
         }
         var promise = $.ajax(options);
         if (onSuccess) {
@@ -299,34 +313,18 @@ Notes.prototype = {
         }
         return promise;
     },
-    // Get the users to share notes with.
-    _loadUsersSharing: function () {
-        this._usersSharing = [];
-        this._loadUsersSharingPage(1);
-    },
-    _loadUsersSharingPage: function (page) {
-        var self = this;
-        $.extend(shareesParams, {search: '', page: page});
-        return $.get(ocsBasePath + 'sharees', shareesParams, {headers: {'OCS-APIREQUEST': true}})
-            .then(function (shares) {
-                parseSharees(shares).forEach(function (u) {
-                    self._usersSharing.push([u.id, u.text]);
-                });
-            })
-            .fail(function () {
-                console.error("Could not get users to share.");
+    // A cheap description of everything currently loaded, used to tell
+    // whether a reload actually brought anything new before throwing the grid
+    // away and rendering it again. The etag covers the title and the content,
+    // so an edit by somebody else shows up here even within the same second.
+    signature: function () {
+        var parts = [];
+        [this._notes, this._archived, this._deleted].forEach(function (bucket) {
+            bucket.forEach(function (note) {
+                parts.push(note.id + ':' + note.etag + ':' + (note.isPinned ? 1 : 0));
             });
-    },
-    // Search users dynamically via the sharees API.
-    searchUsersSharing: function (query, callback) {
-        $.extend(shareesParams, {search: query, page: 1});
-        return $.get(ocsBasePath + 'sharees', shareesParams, {headers: {'OCS-APIREQUEST': true}})
-            .then(function (shares) {
-                callback(parseSharees(shares));
-            })
-            .fail(function () {
-                callback([]);
-            });
+        });
+        return parts.sort().join('|');
     }
 };
 

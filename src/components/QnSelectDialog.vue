@@ -20,13 +20,13 @@
 			<Multiselect v-model="selected"
 				class="qn-dialog__select"
 				:options="options"
-				:multiple="true"
+				:multiple="multiple"
 				:taggable="taggable"
 				:loading="loading"
 				:max-height="240"
 				open-direction="above"
-				:close-on-select="false"
-				:clear-on-select="false"
+				:close-on-select="!multiple"
+				:clear-on-select="!multiple"
 				:placeholder="placeholder"
 				:user-select="userSelect"
 				label="label"
@@ -40,6 +40,9 @@
 				</template>
 			</Multiselect>
 			<div class="qn-dialog__buttons">
+				<Button v-if="removeLabel" @click="remove">
+					{{ removeLabel }}
+				</Button>
 				<Button @click="cancel">
 					{{ t('quicknotes', 'Cancel') }}
 				</Button>
@@ -95,10 +98,23 @@ export default {
 			type: Boolean,
 			default: false,
 		},
+		/** Pick several entries (tags, users) or exactly one (a note to link). */
+		multiple: {
+			type: Boolean,
+			default: true,
+		},
 		/** Render the entries as users, with their avatar. */
 		userSelect: {
 			type: Boolean,
 			default: false,
+		},
+		/**
+		 * Label of a "remove" action shown next to Cancel/Done. When set, the
+		 * dialog is editing an existing link and offers to drop it.
+		 */
+		removeLabel: {
+			type: String,
+			default: '',
 		},
 		/**
 		 * Optional search callback, `fn(term)` returning a promise of
@@ -114,7 +130,11 @@ export default {
 	data() {
 		return {
 			options: this.initialOptions.slice(),
-			selected: this.initialSelected.slice(),
+			// A single-select (a note to link) holds one entry or null; the
+			// multi-select keeps an array, matching vue-multiselect's model.
+			selected: this.multiple
+				? this.initialSelected.slice()
+				: (this.initialSelected[0] || null),
 			loading: false,
 			searchTimer: null,
 			// True while the dropdown of the select is open.
@@ -137,6 +157,9 @@ export default {
 	methods: {
 		/** Add entries to the dropdown, skipping the ones already known. */
 		mergeOptions(entries) {
+			if (!entries) {
+				return
+			}
 			const known = new Set(this.options.map(option => String(option.id)))
 			entries.forEach(entry => {
 				if (!known.has(String(entry.id))) {
@@ -177,7 +200,14 @@ export default {
 		},
 
 		submit() {
-			this.$emit('submit', this.selected)
+			// Single-select models one entry (or null); callers always get an
+			// array so the callback shape stays the same either way.
+			const result = this.multiple
+				? this.selected
+				: (this.selected === null || this.selected === undefined
+					? []
+					: [this.selected])
+			this.$emit('submit', result)
 		},
 
 		cancel() {

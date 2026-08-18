@@ -57,7 +57,12 @@ function QnColorPick(parentSelector, onSelectColor) {
         var self = this;
 
         var parent = document.querySelector(this._parentSelector);
-        parent.innerHTML += this._template;
+        // Not `innerHTML +=`: that re-parses the whole parent, so every node
+        // inside it is thrown away and built again. The parent is the note
+        // being edited, and the editables coming back as new nodes left
+        // MediumEditor bound to detached ones — the format toolbar stopped
+        // appearing, and typing no longer marked the note as changed.
+        parent.insertAdjacentHTML('beforeend', this._template);
 
         var colors = document.querySelectorAll(".colorPickButton");
         colors.forEach (function(color) {

@@ -46,8 +46,38 @@ class Application extends App implements IBootstrap {
 	/** @var string */
 	public const APP_ID = 'quicknotes';
 
-	/** @var string */
-	public const API_VERSION = '1.0';
+	/**
+	 * Bumped to 1.4 in 0.9.4, when attachments started being served by the
+	 * app: `preview_url` points at `/notes/{id}/attachments/{fileId}/preview`
+	 * instead of the preview endpoint of the server, and an attachment gained
+	 * `download_url`, `link_url` (where clicking it should go), `user_id` (who
+	 * attached it) and `is_mine`. That `user_id` also travels *back* in a save:
+	 * it is what tells the attachments of the caller from everybody else's, now
+	 * that anybody who can edit a note can attach to it. `redirect_url` and `deep_link_url` are null for
+	 * somebody who cannot reach the file in their own Files, where they used
+	 * to make the attachment disappear from the response altogether.
+	 *
+	 * Bumped to 1.3 in 0.9.3, when archiving became personal: `archivedAt` is
+	 * the caller's, archive and unarchive answer to anybody who can see the
+	 * note, the payload gained `canLeave` (whether there is a share of theirs
+	 * to walk away from), and destroying a note that is not the caller's is a
+	 * 404 rather than a no-op.
+	 *
+	 * Bumped to 1.2 in 0.9.2, when reminders became personal: `reminderAt` and
+	 * `reminderNotifiedAt` are the ones of whoever asked — null on a note
+	 * somebody else armed a reminder on — and the reminder endpoint answers to
+	 * anybody who can see the note, not only to its owner.
+	 *
+	 * Bumped to 1.1 in 0.9.1 with the share rewrite. The note payload gained
+	 * `permissions`, `canEdit`, `canReshare`, `isOwner`, `owner`, `sharedByMe`
+	 * and `etag`, and two fields changed shape: `sharedBy` is now an object
+	 * (or null) instead of a list of one, and the entries of `sharedWith` are
+	 * shares — `{id, shareType, shareWith, displayName, permissions, …}` —
+	 * rather than `{shared_user, display_name}`.
+	 *
+	 * @var string
+	 */
+	public const API_VERSION = '1.4';
 
 	public function __construct(array $urlParams = []) {
 		parent::__construct(self::APP_ID, $urlParams);

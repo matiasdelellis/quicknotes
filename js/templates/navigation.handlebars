@@ -3,6 +3,20 @@
 		<button type="button" id="new-note" class="icon-button-add">{{newNoteTxt}}</button>
 	</div>
 </div>
+{{! A filter over the notes on screen, not a search of the server: the app
+    already has all of them in memory, and the unified search of Nextcloud is
+    the other thing — it lands here through `?n=<id>`.
+
+    Collapsed it is an entry like any other; clicking it swaps in the field. }}
+<div id="note-filter-fixed">
+	<input type="text" id="note-filter" autocomplete="off" placeholder="{{filterTxt}}" value="{{filterQuery}}">
+	<button type="button" id="note-filter-clear" title="{{clearFilterTxt}}">&times;</button>
+</div>
+<li id="filter-notes">
+	<a href="#" class="icon-qn-search svg">
+		{{filterTxt}}
+	</a>
+</li>
 <li id="all-notes">
 	<a href="#" class="icon-quicknotes svg">
 		{{allNotesTxt}}
@@ -15,19 +29,19 @@
 </li>
 <li id="shared-folder" class="collapsible open">
 	<button class="collapse"></button>
-	<a href="#" class="icon-share svg">{{t "quicknotes" "Shared" }}</a>
+	<a href="#" class="icon-qn-share svg">{{t "quicknotes" "Shared" }}</a>
 	<ul>
 		<li id="shared-by-you">
-			<a href="#" class="icon-share svg">{{t "quicknotes" "Shared with others" }}</a>
+			<a href="#" class="icon-qn-share svg">{{t "quicknotes" "Shared with others" }}</a>
 		</li>
 		<li id="shared-with-you">
-			<a href="#" class="icon-share svg">{{t "quicknotes" "Shared with you" }}</a>
+			<a href="#" class="icon-qn-share svg">{{t "quicknotes" "Shared with you" }}</a>
 		</li>
 	</ul>
 </li>
 <li id="colors-folder" class="collapsible open">
 	<button class="collapse"></button>
-	<a href="#" class="icon-search svg">{{colorsTxt}}</a>
+	<a href="#" class="icon-toggle-background svg">{{colorsTxt}}</a>
 	<ul>
 		<li class="color-filter">
 			<button class="circle-toolbar icon-filter-checkmark any-color-filter"></button>

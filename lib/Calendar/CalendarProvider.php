@@ -22,7 +22,7 @@
 
 namespace OCA\QuickNotes\Calendar;
 
-use OCA\QuickNotes\Db\NoteMapper;
+use OCA\QuickNotes\Service\ReminderService;
 use OCA\QuickNotes\Service\SettingsService;
 
 use OCP\Calendar\ICalendarProvider;
@@ -43,8 +43,8 @@ class CalendarProvider implements ICalendarProvider {
 	/** Prefix of the principals this provider answers for. */
 	private const USER_PRINCIPAL_PREFIX = 'principals/users/';
 
-	/** @var NoteMapper */
-	private $noteMapper;
+	/** @var ReminderService */
+	private $reminderService;
 
 	/** @var SettingsService */
 	private $settingsService;
@@ -52,11 +52,11 @@ class CalendarProvider implements ICalendarProvider {
 	/** @var IL10N */
 	private $l10n;
 
-	public function __construct(NoteMapper      $noteMapper,
+	public function __construct(ReminderService $reminderService,
 	                            SettingsService $settingsService,
 	                            IL10N           $l10n)
 	{
-		$this->noteMapper      = $noteMapper;
+		$this->reminderService = $reminderService;
 		$this->settingsService = $settingsService;
 		$this->l10n            = $l10n;
 	}
@@ -89,7 +89,7 @@ class CalendarProvider implements ICalendarProvider {
 			return [];
 		}
 
-		return [new NotesCalendar($this->noteMapper, $this->l10n, $userId)];
+		return [new NotesCalendar($this->reminderService, $this->l10n, $userId)];
 	}
 
 }

@@ -1,5 +1,5 @@
 <div class='note-shares'>
 	{{#each sharedWith}}
-		<div class="slim-share" share-id="{{ shared_user }}" title="{{tSW display_name}}">{{{ display_name }}}</div>
+		<div class="slim-share {{#if isGroup}}slim-share-group{{/if}} {{#if canEdit}}slim-share-editable{{/if}}" share-id="{{ id }}" title="{{tShare this}}">{{ displayName }}</div>
 	{{/each}}
 </div>

@@ -41,6 +41,7 @@ import Vue from 'vue'
 
 import QnReminderDialog from './components/QnReminderDialog.vue'
 import QnSelectDialog from './components/QnSelectDialog.vue'
+import QnShareDialog from './components/QnShareDialog.vue'
 
 Vue.mixin({ methods: { t, n } })
 
@@ -51,14 +52,15 @@ Vue.mixin({ methods: { t, n } })
  * @param {object} propsData properties for that component
  * @param {Function} onSubmit called with the result on "Done"
  * @param {Function} onCancel called when the dialog is dismissed
+ * @param {Function} [onRemove] called when a link is to be removed
  */
-function openDialog(component, propsData, onSubmit, onCancel) {
+function openDialog(component, propsData, onSubmit, onCancel, onRemove) {
 	const container = document.createElement('div')
 	document.body.appendChild(container)
 
 	const dialog = new (Vue.extend(component))({ propsData })
 
-	// Both handlers are wired to the same teardown, and only one of them can
+	// All handlers are wired to the same teardown, and only one of them can
 	// ever run: the first one takes the dialog off the page.
 	const close = (handler) => {
 		return (selected) => {
@@ -73,6 +75,9 @@ function openDialog(component, propsData, onSubmit, onCancel) {
 
 	dialog.$on('submit', close(onSubmit))
 	dialog.$on('cancel', close(onCancel))
+	if (onRemove) {
+		dialog.$on('remove', close(onRemove))
+	}
 
 	dialog.$mount(container)
 
@@ -80,8 +85,8 @@ function openDialog(component, propsData, onSubmit, onCancel) {
 }
 
 /** Mount a QnSelectDialog. */
-function open(propsData, onSubmit, onCancel) {
-	return openDialog(QnSelectDialog, propsData, onSubmit, onCancel)
+function open(propsData, onSubmit, onCancel, onRemove) {
+	return openDialog(QnSelectDialog, propsData, onSubmit, onCancel, onRemove)
 }
 
 /**
@@ -161,63 +166,26 @@ const QnDialogs = {
 	},
 
 	/**
-	 * Pick the users a note is shared with.
+	 * Manage who a note is shared with, and what they may do with it.
 	 *
-	 * @param {Array} availableUsers cached users, as [uid, displayName] pairs
-	 * @param {Array} selectedUsers users the note is shared with
-	 * @param {Function} searchFn `fn(term, cb)` searching users via the sharees API
-	 * @param {Function} callback called as `callback(confirmed, shares)`
+	 * Unlike the other dialogs here, this one does not hand a result back for
+	 * the caller to save: it writes every change through the share endpoints
+	 * as the user makes it. The callback is only told what the shares ended up
+	 * being, so the badges of the note can be redrawn.
+	 *
+	 * @param {number} noteId id of the note being shared
+	 * @param {Array} currentShares shares the editor already knows about
+	 * @param {boolean} canShare whether this user may share the note at all
+	 * @param {Function} callback called as `callback(shares)` when it closes
 	 */
-	shares(availableUsers, selectedUsers, searchFn, callback) {
-		const displayNames = {}
-		availableUsers.forEach(([uid, displayName]) => {
-			displayNames[uid] = displayName
-		})
-
-		const userToEntry = (user) => {
-			// Shares read back from the editor carry the user id in `id` and
-			// the display name in `shared_user`; the ones coming from the
-			// backend use `shared_user` / `display_name`.
-			const uid = user.id || user.shared_user
-			const label = user.display_name || displayNames[uid] || uid
-			return { id: uid, label, user: uid, displayName: label }
-		}
-
-		return open({
-			title: t('quicknotes', 'Share note'),
-			message: t('quicknotes', 'Select the users to share. By default you only share the note. Attachments should be shared from files so they can view it.'),
-			placeholder: t('quicknotes', 'Select the users to share'),
-			noResultText: t('quicknotes', 'No user found'),
-			initialOptions: availableUsers.map(([uid, displayName]) => {
-				return { id: uid, label: displayName, user: uid, displayName }
-			}),
-			initialSelected: selectedUsers.map(userToEntry),
-			userSelect: true,
-			searchFn: (term) => {
-				return new Promise((resolve) => {
-					searchFn(term, (users) => {
-						resolve(users.map(user => {
-							return {
-								id: user.id,
-								label: user.text,
-								user: user.id,
-								displayName: user.text,
-							}
-						}))
-					})
-				})
-			},
+	shares(noteId, currentShares, canShare, callback) {
+		return openDialog(QnShareDialog, {
+			noteId,
+			initialShares: currentShares || [],
+			canShare,
 		},
-		(selected) => {
-			callback(true, selected.map(entry => {
-				return {
-					id: entry.id,
-					shared_user: entry.id,
-					display_name: entry.label,
-				}
-			}))
-		},
-		() => callback(false, []))
+		(shares) => callback(shares),
+		() => callback(null))
 	},
 
 	/**
@@ -252,6 +220,53 @@ const QnDialogs = {
 		},
 		(date) => callback(true, date === null ? null : dateToUtcString(date)),
 		() => callback(false, null))
+	},
+
+	/**
+	 * Pick a single note for a wikilink from the current one.
+	 *
+	 * With `options.currentId` set the dialog edits an existing link instead of
+	 * inserting a new one: the target note comes preselected and a "Remove
+	 * link" action is offered. The callback then receives the picked note as
+	 * {id, label}, `false` to remove the link, or `null` if the user cancelled.
+	 *
+	 * @param {Array} currentNotes every linkable note, as {id, label}
+	 * @param {Function} callback called as `callback(note)` with the picked
+	 *        note as {id, label}, `false` for "remove link", or null to cancel
+	 * @param {object} [options]
+	 * @param {string|number} [options.currentId] id of the note the link
+	 *        currently points at, to preselect it
+	 * @param {string} [options.currentLabel] label of that note, used when it
+	 *        no longer exists so the dialog still shows what the link points at
+	 */
+	linkNote(currentNotes, callback, options = {}) {
+		const editing = options.currentId !== undefined && options.currentId !== null
+		let initialSelected = []
+		if (editing) {
+			const match = currentNotes.filter(n => String(n.id) === String(options.currentId))
+			initialSelected = match.length
+				? [match[0]]
+				// The target note may have been deleted; keep it on screen
+				// anyway so the dialog still shows what the link points at.
+				: [{ id: options.currentId, label: options.currentLabel }]
+		}
+		return open({
+			title: editing
+				? t('quicknotes', 'Edit the link to a note')
+				: t('quicknotes', 'Link to a note'),
+			message: editing
+				? t('quicknotes', 'Select the note to link, or remove the link')
+				: t('quicknotes', 'Select the note to link'),
+			placeholder: t('quicknotes', 'Select a note'),
+			noResultText: t('quicknotes', 'No notes found'),
+			initialOptions: currentNotes,
+			initialSelected,
+			multiple: false,
+			removeLabel: editing ? t('quicknotes', 'Remove link') : '',
+		},
+		(selected) => callback(selected.length ? selected[0] : null),
+		() => callback(null),
+		() => callback(false))
 	},
 
 	/**

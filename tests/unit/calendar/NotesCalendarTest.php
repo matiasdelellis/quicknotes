@@ -16,21 +16,21 @@ use OCP\IL10N;
 use PHPUnit\Framework\TestCase;
 
 use OCA\QuickNotes\Db\Note;
-use OCA\QuickNotes\Db\NoteMapper;
+use OCA\QuickNotes\Service\ReminderService;
 
 
 class NotesCalendarTest extends TestCase {
 
 	private $calendar;
-	private $noteMapper;
+	private $reminderService;
 
 	protected function setUp(): void {
-		$this->noteMapper = $this->createMock(NoteMapper::class);
+		$this->reminderService = $this->createMock(ReminderService::class);
 
 		$l10n = $this->createMock(IL10N::class);
 		$l10n->method('t')->willReturnArgument(0);
 
-		$this->calendar = new NotesCalendar($this->noteMapper, $l10n, 'john');
+		$this->calendar = new NotesCalendar($this->reminderService, $l10n, 'john');
 	}
 
 	private function makeNote(int $id,
@@ -44,13 +44,12 @@ class NotesCalendarTest extends TestCase {
 		$note->setContent($content);
 		$note->setTimestamp(1785500000);
 		$note->setColorId(1);
-		$note->setPinned(false);
 		$note->setReminderAt($reminderAt);
 		return $note;
 	}
 
 	private function withNotes(array $notes): void {
-		$this->noteMapper->method('findWithReminders')
+		$this->reminderService->method('findNotesWithRemindersOf')
 			->with('john')
 			->willReturn($notes);
 	}

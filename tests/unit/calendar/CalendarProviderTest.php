@@ -14,7 +14,7 @@ namespace OCA\QuickNotes\Calendar;
 use OCP\IL10N;
 use PHPUnit\Framework\TestCase;
 
-use OCA\QuickNotes\Db\NoteMapper;
+use OCA\QuickNotes\Service\ReminderService;
 use OCA\QuickNotes\Service\SettingsService;
 
 
@@ -30,7 +30,7 @@ class CalendarProviderTest extends TestCase {
 		$l10n->method('t')->willReturnArgument(0);
 
 		$this->provider = new CalendarProvider(
-			$this->createMock(NoteMapper::class),
+			$this->createMock(ReminderService::class),
 			$this->settingsService,
 			$l10n
 		);

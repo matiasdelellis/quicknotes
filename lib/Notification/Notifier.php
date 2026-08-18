@@ -42,6 +42,9 @@ class Notifier implements INotifier {
 	/** Subject of the "a note reminder is due" notification. */
 	public const SUBJECT_REMINDER = 'note_reminder';
 
+	/** Subject of the "somebody shared a note with you" notification. */
+	public const SUBJECT_SHARE = 'note_shared';
+
 	/** Object type every quicknotes notification is attached to. */
 	public const OBJECT_NOTE = 'note';
 
@@ -75,8 +78,10 @@ class Notifier implements INotifier {
 	 * @throws UnknownNotificationException
 	 */
 	public function prepare(INotification $notification, string $languageCode): INotification {
-		if ($notification->getApp() !== Application::APP_ID ||
-		    $notification->getSubject() !== self::SUBJECT_REMINDER) {
+		if ($notification->getApp() !== Application::APP_ID) {
+			throw new UnknownNotificationException();
+		}
+		if (!in_array($notification->getSubject(), [self::SUBJECT_REMINDER, self::SUBJECT_SHARE], true)) {
 			throw new UnknownNotificationException();
 		}
 
@@ -104,15 +109,39 @@ class Notifier implements INotifier {
 		// parsedSubject is mandatory: without it the manager throws
 		// IncompleteParsedNotificationException. richSubject is what current
 		// clients actually render.
+		$note = [
+			'type' => 'highlight',
+			'id'   => $notification->getObjectId(),
+			'name' => $title,
+		];
+
+		if ($notification->getSubject() === self::SUBJECT_SHARE) {
+			$sharedBy = $parameters['sharedBy'] ?? '';
+			$sharedByName = $parameters['sharedByDisplayName'] ?? $sharedBy;
+
+			$notification->setParsedSubject(
+				$l->t('%1$s shared the note %2$s with you', [$sharedByName, $title])
+			);
+			$notification->setRichSubject(
+				$l->t('{user} shared the note {note} with you'),
+				[
+					'user' => [
+						'type' => 'user',
+						'id'   => $sharedBy,
+						'name' => $sharedByName,
+					],
+					'note' => $note,
+				]
+			);
+
+			return $notification;
+		}
+
 		$notification->setParsedSubject($l->t('Reminder: %s', [$title]));
 		$notification->setRichSubject(
 			$l->t('Reminder: {note}'),
 			[
-				'note' => [
-					'type' => 'highlight',
-					'id'   => $notification->getObjectId(),
-					'name' => $title,
-				],
+				'note' => $note,
 			]
 		);
 

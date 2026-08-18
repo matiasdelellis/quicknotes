@@ -1,6 +1,6 @@
 <?php
 /*
- * @copyright 2020 Matias De lellis <mati86dl@gmail.com>
+ * @copyright 2020-2026 Matias De lellis <mati86dl@gmail.com>
  *
  * @author 2020 Matias De lellis <mati86dl@gmail.com>
  *
@@ -23,40 +23,101 @@
 namespace OCA\QuickNotes\Controller;
 
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
-use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\JSONResponse;
 use OCP\AppFramework\Controller;
 
 use OCP\IRequest;
 
 use OCA\QuickNotes\Db\NoteShare;
-use OCA\QuickNotes\Db\NoteShareMapper;
+use OCA\QuickNotes\Service\NoteService;
+use OCA\QuickNotes\Service\ShareService;
 
-use OCP\AppFramework\Db\DoesNotExistException;
-
+/**
+ * Sharing a note, for the app itself. The same endpoints live under
+ * `/api/v1` in `ShareApiController`; everything they do is in `ShareActions`.
+ */
 class ShareController extends Controller {
 
-	private $noteShareMapper;
+	use ShareActions;
+
+	/** @var NoteService */
+	private $noteService;
+
+	/** @var ShareService */
+	private $shareService;
+
+	/** @var string|null */
 	private $userId;
 
 	public function __construct(string $AppName,
-	                            IRequest        $request,
-	                            NoteShareMapper $noteShareMapper,
+	                            IRequest     $request,
+	                            NoteService  $noteService,
+	                            ShareService $shareService,
 	                            ?string $userId)
 	{
 		parent::__construct($AppName, $request);
 
-		$this->noteShareMapper = $noteShareMapper;
-		$this->userId          = $userId;
+		$this->noteService  = $noteService;
+		$this->shareService = $shareService;
+		$this->userId       = $userId;
 	}
 
 	/**
 	 * @param int $noteId
 	 */
 	#[NoAdminRequired]
-	public function forget(int $noteId): JSONResponse {
-		$this->noteShareMapper->forgetShareByNoteIdAndSharedUser($noteId, $this->userId);
-		return new JSONResponse([]);
+	public function index(int $noteId): JSONResponse {
+		return $this->handleIndex($noteId);
+	}
+
+	/**
+	 * @param int $noteId
+	 * @param int $shareType NoteShare::TYPE_USER or NoteShare::TYPE_GROUP
+	 * @param string $shareWith uid or gid
+	 * @param int|null $permissions bitmask, read only when not given
+	 */
+	#[NoAdminRequired]
+	public function create(int $noteId,
+	                       int $shareType = NoteShare::TYPE_USER,
+	                       string $shareWith = '',
+	                       ?int $permissions = null): JSONResponse
+	{
+		return $this->handleCreate($noteId, $shareType, $shareWith, $permissions);
+	}
+
+	/**
+	 * @param int $shareId
+	 * @param int $permissions
+	 */
+	#[NoAdminRequired]
+	public function update(int $shareId, int $permissions): JSONResponse {
+		return $this->handleUpdate($shareId, $permissions);
+	}
+
+	/**
+	 * @param int $shareId
+	 */
+	#[NoAdminRequired]
+	public function destroy(int $shareId): JSONResponse {
+		return $this->handleDestroy($shareId);
+	}
+
+	/**
+	 * @param int $noteId
+	 */
+	#[NoAdminRequired]
+	public function leave(int $noteId): JSONResponse {
+		return $this->handleLeave($noteId);
+	}
+
+	/**
+	 * @param int $noteId
+	 * @param string $search
+	 * @param int $limit
+	 */
+	#[NoAdminRequired]
+	public function sharees(int $noteId, string $search = '', int $limit = 25): JSONResponse {
+		return $this->handleSharees($noteId, $search, $limit);
 	}
 
 }

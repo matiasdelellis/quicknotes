@@ -35,21 +35,36 @@ class NoteMapper extends QBMapper {
 	}
 
 	/**
+	 * Notes matching a search term, for the search provider.
+	 *
+	 * `$sharedIds` are the notes somebody else shared with this user: they are
+	 * reachable from the app, so they are searchable too. Trashed notes are
+	 * left out — the trash is a place things are on their way out of, not
+	 * something to be offered as a result.
+	 *
 	 * @param string $userId
 	 * @param string $queryStr
+	 * @param int[] $sharedIds ids of the notes shared with the user
 	 * @param int|null $offset
 	 * @param int|null $limit
 	 *
-	 * @throws \OCP\AppFramework\Db\DoesNotExistException if not found
-	 * @throws \OCP\AppFramework\Db\MultipleObjectsReturnedException if more than one result
-	 *
 	 * @return Note[]
 	 */
-	public function findLike($userId, $queryStr, ?int $offset = null, ?int $limit = null): array {
+	public function findLike($userId, $queryStr, array $sharedIds = [], ?int $offset = null, ?int $limit = null): array {
 		$qb = $this->db->getQueryBuilder();
+
+		$reachable = $qb->expr()->eq('user_id', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR));
+		if (count($sharedIds) > 0) {
+			$reachable = $qb->expr()->orX(
+				$reachable,
+				$qb->expr()->in('id', $qb->createNamedParameter($sharedIds, IQueryBuilder::PARAM_INT_ARRAY))
+			);
+		}
+
 		$qb->select('*')
 			->from($this->tableName)
-			->where($qb->expr()->eq('user_id', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR)))
+			->where($reachable)
+			->andWhere($qb->expr()->isNull('deleted_at'))
 			->andWhere(
 				$qb->expr()->orX(
 					$qb->expr()->like($qb->func()->lower('title'), $qb->createParameter('query')),
@@ -83,6 +98,29 @@ class NoteMapper extends QBMapper {
 	}
 
 	/**
+	 * Several notes at once, whoever owns them. Feeds the list of notes
+	 * shared with a user, which is a set of ids resolved from the shares.
+	 *
+	 * Chunked for the same reason as `NoteShareMapper::findByNoteIds()`.
+	 *
+	 * @param int[] $ids
+	 * @return Note[]
+	 */
+	public function findByIds(array $ids): array {
+		$notes = [];
+		foreach (array_chunk(array_values(array_unique($ids)), 500) as $chunk) {
+			$qb = $this->db->getQueryBuilder();
+			$qb->select('*')
+				->from($this->tableName)
+				->where(
+					$qb->expr()->in('id', $qb->createNamedParameter($chunk, IQueryBuilder::PARAM_INT_ARRAY))
+				);
+			$notes = array_merge($notes, $this->findEntities($qb));
+		}
+		return $notes;
+	}
+
+	/**
 	 * @return Note[]
 	 */
 	public function findAll(string $userId): array {
@@ -109,35 +147,25 @@ class NoteMapper extends QBMapper {
 	}
 
 	/**
-	 * Update only the archive / soft-delete columns of a note in a
-	 * single SQL statement. Using the QueryBuilder directly avoids
-	 * the QBMapper / Entity update path, which would otherwise need
-	 * the columns to be registered via addType() and would re-write
-	 * every other field on the row.
+	 * Send a note to the trash, or bring it back, in a single SQL statement.
+	 * Using the QueryBuilder directly avoids the QBMapper / Entity update
+	 * path, which would otherwise need the column to be registered via
+	 * addType() and would re-write every other field on the row.
 	 *
-	 * Pass `null` to clear a column.
+	 * Pass `null` to restore.
 	 *
-	 * @param int    $id
-	 * @param string|null $archivedAt
-	 * @param string|null $deletedAt
+	 * The archive state used to be set here too, in the same call. It is per
+	 * user since 0.9.3 and lives in `quicknotes_note_states`; the trash is
+	 * still the note's, and the owner's.
 	 *
 	 * @return int the number of affected rows
 	 */
-	public function updateArchiveState(int $id, ?string $archivedAt, ?string $deletedAt): int {
+	public function updateDeletedAt(int $id, ?string $deletedAt): int {
 		$qb = $this->db->getQueryBuilder();
 		$qb->update($this->tableName)
-			->set('archived_at', $qb->createNamedParameter($archivedAt, IQueryBuilder::PARAM_STR))
-			->set('deleted_at',  $qb->createNamedParameter($deletedAt,  IQueryBuilder::PARAM_STR))
+			->set('deleted_at', $qb->createNamedParameter($deletedAt, IQueryBuilder::PARAM_STR))
 			->where($qb->expr()->eq('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT)));
 		return $qb->executeStatement();
-	}
-
-	/**
-	 * Clear both archive / soft-delete columns. Convenience wrapper
-	 * kept for symmetry with updateArchiveState.
-	 */
-	public function clearArchiveState(int $id): int {
-		return $this->updateArchiveState($id, null, null);
 	}
 
 	/**
@@ -162,90 +190,11 @@ class NoteMapper extends QBMapper {
 		return $this->findEntities($qb);
 	}
 
-	/**
-	 * Every note of a user that carries a reminder, whether it has already
-	 * fired or not. Notes in the trash are left out, the same way
-	 * findDueReminders() leaves them out.
-	 *
-	 * Feeds the virtual calendar, so it is ordered by the reminder date to
-	 * save the caller a sort.
-	 *
-	 * @return Note[]
+	/*
+	 * The reminders used to live here, on two columns of the note, and so did
+	 * findWithReminders() / findDueReminders() / updateReminder() /
+	 * markReminderNotified(). They belong to a user rather than to a note
+	 * since 0.9.2 and moved to NoteStateMapper with the columns.
 	 */
-	public function findWithReminders(string $userId): array {
-		$qb = $this->db->getQueryBuilder();
-		$qb->select('*')
-			->from($this->tableName)
-			->where(
-				$qb->expr()->eq('user_id', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR)),
-				$qb->expr()->isNotNull('reminder_at'),
-				$qb->expr()->isNull('deleted_at')
-			)
-			->orderBy('reminder_at', 'ASC');
-		return $this->findEntities($qb);
-	}
-
-	/**
-	 * Arm, move or clear the reminder of a note. Uses the QueryBuilder
-	 * directly for the same reason as updateArchiveState().
-	 *
-	 * Writing a reminder always clears `reminder_notified_at`, so moving a
-	 * reminder that already fired arms it again instead of staying silent.
-	 *
-	 * @param int         $id
-	 * @param string|null $reminderAt UTC 'Y-m-d H:i:s', or null to cancel
-	 *
-	 * @return int the number of affected rows
-	 */
-	public function updateReminder(int $id, ?string $reminderAt): int {
-		$qb = $this->db->getQueryBuilder();
-		$qb->update($this->tableName)
-			->set('reminder_at', $qb->createNamedParameter($reminderAt, IQueryBuilder::PARAM_STR))
-			->set('reminder_notified_at', $qb->createNamedParameter(null, IQueryBuilder::PARAM_STR))
-			->where($qb->expr()->eq('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT)));
-		return $qb->executeStatement();
-	}
-
-	/**
-	 * Record that the reminder notification for this note went out.
-	 *
-	 * @return int the number of affected rows
-	 */
-	public function markReminderNotified(int $id, \DateTime $when): int {
-		$qb = $this->db->getQueryBuilder();
-		$qb->update($this->tableName)
-			->set('reminder_notified_at', $qb->createNamedParameter(
-				$when->format('Y-m-d H:i:s'),
-				IQueryBuilder::PARAM_STR
-			))
-			->where($qb->expr()->eq('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT)));
-		return $qb->executeStatement();
-	}
-
-	/**
-	 * Find notes whose reminder is due and has not been notified yet. Used
-	 * by `NoteReminderJob`.
-	 *
-	 * Notes in the trash are skipped: sending to the trash cancels the
-	 * reminder. Archived notes are *not* skipped — archiving only takes a
-	 * note out of the active list, it is not a way to cancel a reminder.
-	 *
-	 * @return Note[]
-	 */
-	public function findDueReminders(\DateTime $now): array {
-		$qb = $this->db->getQueryBuilder();
-		$qb->select('*')
-			->from($this->tableName)
-			->where(
-				$qb->expr()->isNotNull('reminder_at'),
-				$qb->expr()->isNull('reminder_notified_at'),
-				$qb->expr()->isNull('deleted_at'),
-				$qb->expr()->lte('reminder_at', $qb->createNamedParameter(
-					$now->format('Y-m-d H:i:s'),
-					IQueryBuilder::PARAM_STR
-				))
-			);
-		return $this->findEntities($qb);
-	}
 
 }

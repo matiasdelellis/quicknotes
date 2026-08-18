@@ -35,6 +35,8 @@ use OCA\QuickNotes\Service\NoteService;
 
 class NoteController extends Controller {
 
+	use NoteResponses;
+
 	private $noteService;
 	private $userId;
 
@@ -67,9 +69,23 @@ class NoteController extends Controller {
 		return $response;
 	}
 
+	/**
+	 * The handful of notes the dashboard widget shows.
+	 *
+	 * Archived and trashed notes are left out. They were not until 0.9.5, which
+	 * was wrong all along and became visible once archiving turned personal:
+	 * taking a note out of your grid and finding it still on your dashboard is
+	 * not a widget being helpful.
+	 */
 	#[NoAdminRequired]
 	public function dashboard(): JSONResponse {
-		$notes = $this->noteService->getAll($this->userId);
+		$notes = array_filter(
+			$this->noteService->getAll($this->userId),
+			function ($note) {
+				return is_null($note->getArchivedAt()) && is_null($note->getDeletedAt());
+			}
+		);
+
 		if (count($notes) === 0) {
 			return new JSONResponse([
 				'notes' => []
@@ -105,17 +121,7 @@ class NoteController extends Controller {
 	 */
 	#[NoAdminRequired]
 	public function show(int $id): JSONResponse {
-		$note = $this->noteService->get($this->userId, $id);
-		if (is_null($note)) {
-			return new JSONResponse([], Http::STATUS_NOT_FOUND);
-		}
-
-		$etag = md5(json_encode($note));
-
-		$response = new JSONResponse($note);
-		$response->setETag($etag);
-
-		return $response;
+		return $this->respondWithNote($this->noteService->get($this->userId, $id));
 	}
 
 	/**
@@ -147,54 +153,39 @@ class NoteController extends Controller {
 		                                   $tags,
 		                                   $attachments);
 
-		$etag = md5(json_encode($note));
-
-		$response = new JSONResponse($note);
-		$response->setETag($etag);
-
-		return $response;
+		return $this->respondWithNote($note);
 	}
 
 	/**
+	 * Save a note. Everything but the title and the content is optional: a
+	 * field that is not sent is left alone, so a client does not have to
+	 * resend — and risk overwriting — what it did not mean to touch.
+	 *
+	 * Send the etag of the note as it was read in `If-Match` to be told (412)
+	 * instead of silently overwriting somebody else's edit.
+	 *
 	 * @param int $id
 	 * @param string $title
 	 * @param string $content
-	 * @param string $color
-	 * @param bool   $isPinned
-	 * @param array  $tags
-	 * @param array  $attachments
-	 * @param array  $sharedWith
+	 * @param string|null $color owner only
+	 * @param bool|null   $isPinned personal to the caller
+	 * @param array|null  $tags personal to the caller
+	 * @param array|null  $attachments owner only
+	 * @param array|null  $sharedWith owner only, superseded by the share endpoints
 	 */
 	#[NoAdminRequired]
 	public function update(int $id,
-	                       string $title,
-	                       string $content,
-	                       string $color,
-	                       bool   $isPinned,
-	                       array  $tags,
-	                       array  $attachments,
-	                       array  $sharedWith): JSONResponse
+	                       string  $title,
+	                       string  $content,
+	                       ?string $color = null,
+	                       ?bool   $isPinned = null,
+	                       ?array  $tags = null,
+	                       ?array  $attachments = null,
+	                       ?array  $sharedWith = null): JSONResponse
 	{
-		$note = $this->noteService->update($this->userId,
-		                                   $id,
-		                                   $title,
-		                                   $content,
-		                                   $color,
-		                                   $isPinned,
-		                                   $tags,
-		                                   $attachments,
-		                                   $sharedWith);
-
-		if (is_null($note)) {
-			return new JSONResponse([], Http::STATUS_NOT_FOUND);
-		}
-
-		$etag = md5(json_encode($note));
-
-		$response = new JSONResponse($note);
-		$response->setETag($etag);
-
-		return $response;
+		return $this->saveNote($this->noteService, $this->userId, $id, $title,
+		                       $content, $color, $isPinned, $tags, $attachments,
+		                       $sharedWith);
 	}
 
 	/**
@@ -202,7 +193,9 @@ class NoteController extends Controller {
 	 */
 	#[NoAdminRequired]
 	public function destroy(int $id): JSONResponse {
-		$this->noteService->destroy($this->userId, $id);
+		if (!$this->noteService->destroy($this->userId, $id)) {
+			return new JSONResponse([], Http::STATUS_NOT_FOUND);
+		}
 		return new JSONResponse([]);
 	}
 
@@ -212,14 +205,7 @@ class NoteController extends Controller {
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
 	public function archive(int $id): JSONResponse {
-		$note = $this->noteService->archive($this->userId, $id);
-		if (is_null($note)) {
-			return new JSONResponse([], Http::STATUS_NOT_FOUND);
-		}
-
-		$response = new JSONResponse($note);
-		$response->setETag(md5(json_encode($note)));
-		return $response;
+		return $this->respondWithNote($this->noteService->archive($this->userId, $id));
 	}
 
 	/**
@@ -228,14 +214,7 @@ class NoteController extends Controller {
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
 	public function trash(int $id): JSONResponse {
-		$note = $this->noteService->trash($this->userId, $id);
-		if (is_null($note)) {
-			return new JSONResponse([], Http::STATUS_NOT_FOUND);
-		}
-
-		$response = new JSONResponse($note);
-		$response->setETag(md5(json_encode($note)));
-		return $response;
+		return $this->respondWithNote($this->noteService->trash($this->userId, $id));
 	}
 
 	/**
@@ -244,14 +223,7 @@ class NoteController extends Controller {
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
 	public function unarchive(int $id): JSONResponse {
-		$note = $this->noteService->unarchive($this->userId, $id);
-		if (is_null($note)) {
-			return new JSONResponse([], Http::STATUS_NOT_FOUND);
-		}
-
-		$response = new JSONResponse($note);
-		$response->setETag(md5(json_encode($note)));
-		return $response;
+		return $this->respondWithNote($this->noteService->unarchive($this->userId, $id));
 	}
 
 	/**
@@ -260,14 +232,7 @@ class NoteController extends Controller {
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
 	public function restore(int $id): JSONResponse {
-		$note = $this->noteService->restore($this->userId, $id);
-		if (is_null($note)) {
-			return new JSONResponse([], Http::STATUS_NOT_FOUND);
-		}
-
-		$response = new JSONResponse($note);
-		$response->setETag(md5(json_encode($note)));
-		return $response;
+		return $this->respondWithNote($this->noteService->restore($this->userId, $id));
 	}
 
 	/**
@@ -282,13 +247,7 @@ class NoteController extends Controller {
 			return new JSONResponse(['message' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
 		}
 
-		if (is_null($note)) {
-			return new JSONResponse([], Http::STATUS_NOT_FOUND);
-		}
-
-		$response = new JSONResponse($note);
-		$response->setETag(md5(json_encode($note)));
-		return $response;
+		return $this->respondWithNote($note);
 	}
 
 }
