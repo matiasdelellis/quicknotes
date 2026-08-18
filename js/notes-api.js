@@ -247,6 +247,14 @@ Notes.prototype = {
             this._removeFromBuckets(id);
         }.bind(this));
     },
+    // Empty the trash: hard DELETE /notes/trash. Everything the user has in
+    // there goes at once, and the local bucket is emptied with it.
+    emptyTrash: function () {
+        return this._request('DELETE', this._baseUrl + '/trash', null, function (answer) {
+            this._deleted = [];
+            return answer;
+        }.bind(this));
+    },
     // Leave a note somebody shared with the current user. Only a share made
     // with them personally can be left: one that reaches them through a group
     // is not theirs to drop, and the server answers 404 for it.

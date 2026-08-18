@@ -279,6 +279,31 @@ class NoteApiControllerTest extends TestCase {
 		$this->assertSame(Http::STATUS_NOT_FOUND, $response->getStatus());
 	}
 
+	// empty trash -----------------------------------------------------------
+
+	public function testEmptyTrash(): void {
+		$this->noteService->expects($this->once())
+			->method('emptyTrash')
+			->with($this->userId)
+			->willReturn(3);
+
+		$response = $this->controller->emptyTrash();
+
+		$this->assertInstanceOf(JSONResponse::class, $response);
+		$this->assertSame(Http::STATUS_OK, $response->getStatus());
+		$this->assertSame(['destroyed' => 3], $response->getData());
+	}
+
+	/** Asking for an empty trash to be emptied is not an error. */
+	public function testEmptyTrashWithNothingInIt(): void {
+		$this->noteService->method('emptyTrash')->willReturn(0);
+
+		$response = $this->controller->emptyTrash();
+
+		$this->assertSame(Http::STATUS_OK, $response->getStatus());
+		$this->assertSame(['destroyed' => 0], $response->getData());
+	}
+
 	// archive / unarchive / trash / restore --------------------------------
 
 	public function testArchive(): void {

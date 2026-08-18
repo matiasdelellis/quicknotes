@@ -401,6 +401,7 @@ View.prototype = {
             tagTxt: t('quicknotes', 'Tags'),
             cancelTxt: t('quicknotes', 'Cancel'),
             saveTxt: t('quicknotes', 'Save'),
+            emptyTrashTxt: t('quicknotes', 'Empty trash'),
             loadingMsg: t('quicknotes', 'Looking for your notes'),
             loadingIcon: OC.imagePath('core', 'loading.gif'),
             emptyMsg: emptyMsg,
@@ -594,6 +595,14 @@ View.prototype = {
             }
 
             self._trashNote(note, gridnote);
+        });
+
+        // Empty the trash in one go. The bar it lives on is only rendered in
+        // that view, and only when there is something in there.
+        $('#empty-trash').click(function (event) {
+            event.stopPropagation();
+            if (self._currentView !== 'trash') return;
+            self._emptyTrash();
         });
 
         // Restore a note from the trash. The template only renders
@@ -2056,6 +2065,25 @@ View.prototype = {
                     }
                 }).fail(function () {
                     QnDialogs.error(t('quicknotes', 'Could not delete note, not found'));
+                });
+            },
+            true
+        );
+    },
+    // Destroy everything in the trash at once. _purgeNote() is the same
+    // thing for a single note; the background job does it a week later for
+    // whoever never comes back here.
+    _emptyTrash: function () {
+        var self = this;
+        OC.dialogs.confirm(
+            t('quicknotes', 'Permanently delete every note in the trash? This cannot be undone.'),
+            t('quicknotes', 'Empty trash'),
+            function (result) {
+                if (!result) return;
+                self._notes.emptyTrash().done(function () {
+                    self.render();
+                }).fail(function () {
+                    QnDialogs.error(t('quicknotes', 'Could not empty the trash'));
                 });
             },
             true

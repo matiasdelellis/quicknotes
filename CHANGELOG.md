@@ -9,6 +9,10 @@
   the entry back, and it travels in the url as `?q=`.
 - Say "no notes match the filter" instead of leaving a blank area, which is also
   what the colour, tag and reminder filters did when they matched nothing.
+- Empty the trash in one go, from a button that shows up in that view when
+  there is something in it. Until now a note could only be purged one at a
+  time, or left for the weekly cleanup. The API has it as
+  `DELETE /notes/trash`, which answers how many notes went.
 - Fix opening the colour palette of a note breaking the rest of the editor: it
   was added with `innerHTML +=`, which re-parses the whole note being edited, so
   every field came back as a new element. The format toolbar stopped appearing

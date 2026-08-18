@@ -169,6 +169,27 @@ class NoteMapper extends QBMapper {
 	}
 
 	/**
+	 * The notes of a user that are sitting in the trash.
+	 *
+	 * The trash is the note's, and the owner's: a note somebody else shared
+	 * with you is never in yours, so this asks by `user_id` and not through
+	 * the shares.
+	 *
+	 * @return Note[]
+	 */
+	public function findDeletedByUser(string $userId): array {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')
+			->from($this->tableName)
+			->where(
+				$qb->expr()->eq('user_id', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR)),
+				$qb->expr()->isNotNull('deleted_at')
+			)
+			->orderBy('deleted_at', 'ASC');
+		return $this->findEntities($qb);
+	}
+
+	/**
 	 * Find notes that have been soft-deleted (have a `deleted_at`)
 	 * strictly before the given cutoff. Used by the hourly
 	 * `PurgeOldTrashJob` to hard-delete notes the user left in the

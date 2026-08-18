@@ -200,6 +200,19 @@ class NoteController extends Controller {
 	}
 
 	/**
+	 * Empty the trash: destroy every note of the caller that is in it.
+	 *
+	 * Answers how many went, so the client can say so, and 200 with a zero on
+	 * an empty trash — asking for nothing to be left is not an error when
+	 * there was nothing there.
+	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
+	public function emptyTrash(): JSONResponse {
+		return new JSONResponse(['destroyed' => $this->noteService->emptyTrash($this->userId)]);
+	}
+
+	/**
 	 * @param int $id
 	 */
 	#[NoAdminRequired]

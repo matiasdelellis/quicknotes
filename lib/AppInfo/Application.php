@@ -47,6 +47,11 @@ class Application extends App implements IBootstrap {
 	public const APP_ID = 'quicknotes';
 
 	/**
+	 * Bumped to 1.5 in 0.9.5 with `DELETE /notes/trash`, which destroys every
+	 * note of the caller that is in the trash and answers how many went. The
+	 * trash could only be emptied one note at a time before, or waited on:
+	 * `PurgeOldTrashJob` clears what has been in there for a week.
+	 *
 	 * Bumped to 1.4 in 0.9.4, when attachments started being served by the
 	 * app: `preview_url` points at `/notes/{id}/attachments/{fileId}/preview`
 	 * instead of the preview endpoint of the server, and an attachment gained
@@ -77,7 +82,7 @@ class Application extends App implements IBootstrap {
 	 *
 	 * @var string
 	 */
-	public const API_VERSION = '1.4';
+	public const API_VERSION = '1.5';
 
 	public function __construct(array $urlParams = []) {
 		parent::__construct(self::APP_ID, $urlParams);

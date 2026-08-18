@@ -499,6 +499,26 @@ class NoteService {
 	}
 
 	/**
+	 * Empty the trash of a user: destroy every note of theirs that is in it.
+	 *
+	 * The same door "Delete permanently" goes through, one note at a time, so
+	 * the shares, tags, reminders, attachments and orphan colours of each go
+	 * with it. Nothing anybody else owns is touched, whatever it was shared
+	 * with the caller as.
+	 *
+	 * @return int how many notes were destroyed
+	 */
+	public function emptyTrash(string $userId): int {
+		$destroyed = 0;
+		foreach ($this->notemapper->findDeletedByUser($userId) as $note) {
+			if ($this->destroy($userId, $note->getId())) {
+				$destroyed++;
+			}
+		}
+		return $destroyed;
+	}
+
+	/**
 	 * Destroy a note and everything that hangs off it.
 	 *
 	 * Only the owner can: the note is theirs, and the people it was shared

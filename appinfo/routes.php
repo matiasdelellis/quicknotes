@@ -17,6 +17,19 @@ return ['resources' =>
 			'url' => '/notes/dashboard',
 			'verb' => 'GET',
 		],
+		// Emptying the trash. Declared here rather than as another action of
+		// the note resource: the explicit routes are matched first, so this
+		// answers before `note#destroy` reads "trash" as a note id.
+		[
+			'name' => 'note#emptyTrash',
+			'url' => '/notes/trash',
+			'verb' => 'DELETE',
+		],
+		[
+			'name' => 'noteApi#emptyTrash',
+			'url' => '/api/v1/notes/trash',
+			'verb' => 'DELETE',
+		],
 		// Shares of a note. Their own resource since 0.9.1: they used to be
 		// a list inside the note payload, applied on save, which meant a
 		// share existed only once the note was saved and that an old browser

@@ -401,7 +401,11 @@ reaches a note by id.
   `NoteMapper::updateDeletedAt()` is what is left of the old
   `updateArchiveState()`. `NoteService::destroy()` returns a bool so the
   controllers can answer 404 to somebody destroying a note that is not theirs,
-  instead of a cheerful 200 after doing nothing.
+  instead of a cheerful 200 after doing nothing. `emptyTrash()` is that same
+  `destroy()` over `NoteMapper::findDeletedByUser()`, one note at a time, so
+  there is a single cascade to keep right; it hangs off `DELETE /notes/trash`,
+  declared among the explicit routes so it answers before `note#destroy` reads
+  "trash" as a note id.
 - **`hydrate()` takes the viewer and nothing on the entity may be cached.**
   Two users asking for the same row get two different payloads: their own tags,
   their own pin, their permissions, and `sharedWith` only if they are the owner

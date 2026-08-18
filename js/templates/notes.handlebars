@@ -1,4 +1,11 @@
 {{#if notes.length}}
+{{! The trash empties itself a week after each note landed there. This is for
+    whoever would rather not wait, and it is the only place it shows up. }}
+{{#if trashView}}
+<div id="trash-bar">
+	<button id="empty-trash" class="icon-delete">{{emptyTrashTxt}}</button>
+</div>
+{{/if}}
 <div id="notes-grid-div" class="notes-grid">
 	{{#each notes}}
 	<div class="note-grid-item">

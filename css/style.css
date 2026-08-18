@@ -309,6 +309,26 @@ Button.circle-toolbar {
    border-color: var(--color-primary-element);
 }
 
+/* Emptying the trash. Only rendered in that view, and only when there is
+   something to empty, so it never sits over the other lists. */
+
+#trash-bar {
+    display: flex;
+    justify-content: flex-end;
+    padding: 15px 15px 0;
+}
+
+#trash-bar button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+#trash-bar button.icon-delete {
+    background-position: 12px center;
+    padding-left: 34px;
+}
+
 /* Isotope Grid */
 
 .notes-grid {
