@@ -1,5 +1,45 @@
 # Changelog
-## [Unreleased]
+## [1.0.0] 2026-08-18
+
+**Sharing, rebuilt.** A note can be shared with people and with groups, and every
+share says what it allows: can view, can edit, or pass the note on to somebody
+else. Shares apply the moment you make them instead of waiting for the note to be
+saved. Editing a shared note is real collaboration — and if two people save at
+once, the second one is told about it rather than quietly overwriting the first.
+
+**What is yours stays yours.** The title, the content, the colour and the
+attachments belong to the note and are the same for everybody. Your pin, your
+tags, your reminder and whether you archived it are yours: pinning a note
+somebody shared with you does not pin it for them, and two people can be reminded
+of the same note at their own time.
+
+**Attachments travel with the note.** Whoever can see it can see them and
+download them, and images, video and audio open in the Nextcloud viewer. The
+files themselves stay where they are in your Files and are not shared there.
+Anybody who can edit a note can attach to it, and several attachments are laid
+out as a mosaic instead of a strip that got thinner with every file.
+
+**Finding a note.** "Filter notes" narrows the board as you type, across titles,
+text and tags, ignoring case and accents — `cafe` finds *Café*.
+
+**Trash.** It can now be emptied in one go, not only one note at a time or by
+waiting for the weekly cleanup.
+
+**Fixes.** Opening the colour palette no longer breaks the editor — the format
+toolbar stopped appearing and further typing was not counted as a change. The
+palette closes with the note. The delete-attachment icon and the format toolbar
+icons are drawn properly again, and the dashboard widget no longer shows archived
+or trashed notes.
+
+**Translations.** Twelve strings — the whole reminder, sorting and archive
+vocabulary — could never reach translators and were in English in every language;
+they are translatable now. Spanish is complete.
+
+**For developers.** The REST API is documented in `doc/openapi.yml`, and
+`api_version` is 1.5.
+
+In detail:
+
 - Add a "Filter notes" entry to the navigation: it looks like the others until
   you click it, and then a field takes its place and narrows the notes on screen
   as you type, matching the title, the body and the names of the tags. Case and
