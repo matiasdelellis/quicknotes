@@ -54,9 +54,15 @@
 }
 
 #app-navigation:not(.vue) > ul > li > a, #app-navigation:not(.vue) > ul > li > ul > li > a {
-  background-size: 16px 16px;
-  background-position: 14px center;
-  background-repeat: no-repeat;
+  /* The icon no longer rides on the entry: it is painted by the `::before`
+     below, where the theme filter can be applied to the glyph alone. The
+     background-image and filter that the icon classes carry are neutralised
+     here — this selector wins on specificity — so a filter can never reach
+     the label text (inverting `--color-main-text` along with the icon made
+     the sidebar labels invisible in dark mode). */
+  background-image: none;
+  filter: none;
+  position: relative;
   display: block;
   justify-content: space-between;
   line-height: 44px;
@@ -70,6 +76,27 @@
   color: var(--color-main-text);
   flex: 1 1 0px;
   z-index: 100;
+}
+
+#app-navigation:not(.vue) > ul > li > a::before,
+#app-navigation:not(.vue) > ul > li > ul > li > a::before {
+  content: '';
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  width: 16px;
+  height: 16px;
+  -webkit-transform: translateY(-50%);
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 16px 16px;
+  /* The sidebar follows the theme, so the glyph has to follow it too. Only
+     this pseudo-element is filtered: a filter on the `a` inverts the label
+     text as well (measured in a browser), which is why the icon lives here. */
+  filter: var(--background-invert-if-dark);
+  pointer-events: none;
 }
 
 #app-navigation:not(.vue) > ul > li, #app-navigation:not(.vue) > ul > li > ul > li {
@@ -144,7 +171,15 @@
   margin: 0;
   padding: 0;
   background: none;
-  background-image: var(--icon-triangle-s-dark);
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNNy40MSw4LjU4TDEyLDEzLjE3TDE2LjU5LDguNThMMTgsMTBMMTIsMTZMNiwxMEw3LjQxLDguNThaIi8+PC9zdmc+");
+  /* The caret sits on the sidebar, which follows the theme, so it is inverted
+     like every other glyph of the navigation. It used to come from
+     `--icon-triangle-s-dark`; that was **not** broken — measured, the server
+     resolves it per theme through its `[data-themes*=…]` blocks and only falls
+     back to `prefers-color-scheme` when the theme is left at *system*. Inlined
+     for uniformity, so the sidebar has one source and one mechanism for its
+     glyphs, not because it was wrong. */
+  filter: var(--background-invert-if-dark);
   background-size: 16px;
   background-repeat: no-repeat;
   background-position: center;
@@ -176,7 +211,15 @@
   left: 0;
 }
 
-#app-navigation:not(.vue) .collapsible:hover > a, #app-navigation:not(.vue) .collapsible:focus > a {
+/* Hovering a collapsible swaps its icon for the collapse caret. The caret is
+   `.collapsible::before` above — absolute with no `left`, so it lands at the
+   start of the `li`, 44px wide with the glyph centred at x=22 — and the entry
+   icon is the `a::before`, at `left: 14px` and 16px wide, centred at x=22 too.
+   They overlap exactly, and the caret only wins on z-index (105 over 100), so
+   the icon has to go away rather than be painted over. Targets the
+   pseudo-element: this rule said `background-image: none` on the `a` itself
+   until the icons moved off it, and was silently doing nothing. */
+#app-navigation:not(.vue) .collapsible:hover > a::before, #app-navigation:not(.vue) .collapsible:focus > a::before {
   background-image: none;
 }
 

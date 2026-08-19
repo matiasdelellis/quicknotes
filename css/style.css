@@ -7,7 +7,7 @@
 }
 
 .icon-archived {
-    background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjxzdmcgeG1sbnM6aW5rc2NhcGU9Imh0dHA6Ly93d3cuaW5rc2NhcGUub3JnL25hbWVzcGFjZXMvaW5rc2NhcGUiIHhtbG5zOnNvZGlwb2RpPSJodHRwOi8vc29kaXBvZGkuc291cmNlZm9yZ2UubmV0L0RURC9zb2RpcG9kaS0wLmR0ZCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczpzdmc9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZlcnNpb249IjEuMSIgdmlld2JveD0iMCAwIDE2IDE2IiB2aWV3Qm94PSIwIDAgMjQgMjQiIGlkPSJzdmcxIj4KICA8ZGVmcyBpZD0iZGVmczEiPjwvZGVmcz4KICA8cGF0aCBkPSJNMjAuNTQgNS4yM2wtMS4zOS0xLjY4QzE4Ljg4IDMuMjEgMTguNDcgMyAxOCAzSDZjLS40NyAwLS44OC4yMS0xLjE2LjU1TDMuNDYgNS4yM0MzLjE3IDUuNTcgMyA2LjAyIDMgNi41VjE5YzAgMS4xLjkgMiAyIDJoMTRjMS4xIDAgMi0uOSAyLTJWNi41YzAtLjQ4LS4xNy0uOTMtLjQ2LTEuMjd6TTYuMjQgNWgxMS41MmwuODMgMUg1LjQybC44Mi0xek01IDE5VjhoMTR2MTFINXptMTEtNS41bC00IDQtNC00IDEuNDEtMS40MUwxMSAxMy42N1YxMGgydjMuNjdsMS41OS0xLjU5TDE2IDEzLjV6IiBpZD0icGF0aDEiPjwvcGF0aD4KPC9zdmc+Cg==")
+    background-image: var(--qn-icon-archived)
 }
 
 .icon-unarchive {
@@ -139,11 +139,56 @@
     background-image: var(--original-icon-checkmark-dark);
 }
 
+/* "Any colour" sits in a row of note colours and is one more swatch, so it is a
+   fixed light one rather than a theme colour. It used to take
+   `--color-primary-element-text`, white under a light theme and near black under
+   a dark one, and `.icon-filter-checkmark` above is a plain dark glyph — right
+   on every other swatch in the row, invisible on this one. Inverting the glyph
+   instead is not an option: the same class marks the selected colour on real
+   swatches, in the colour picker of a note and in the settings, and those are
+   light whatever the theme. */
 .color-filter > .any-color-filter {
-    background-color: var(--color-primary-element-text);
+    background-color: #ffffff;
 }
 
+/* A note is a light island, in every theme.
+ *
+ * Its colour is one the user picked and it is stored on the note, so it does not
+ * follow the theme — and until this was written, everything *inside* it did.
+ * Under a dark theme the result was a note nobody could read: `--color-main-text`
+ * resolved to #ebebeb over the #f7eb96 of the card (measured: luma 235 on 231),
+ * and the pill behind every `.slim-*` badge and every `.icon-header-note` took
+ * `--color-background-hover` and went almost black, with the plain dark glyphs
+ * the badges carry on purpose now invisible on top of it.
+ *
+ * The fix is at the root of the island rather than on each of its pieces:
+ * the variables are pinned here to the values the light theme gives them, so
+ * every rule below — and every rule of the server that lands inside a note —
+ * resolves the same way under any theme. `--background-invert-if-dark` is
+ * pinned too, to the same deliberately invalid value the light theme uses, so a
+ * filter written for the sidebar can never invert something sitting on a note.
+ *
+ * The two knobs a note *should* follow the theme with, and does not: nothing.
+ * If something in here ever has to be dark under a dark theme, it does not
+ * belong on the note. */
 .quicknote {
+    --color-main-text: #222222;
+    --color-text-maxcontrast: #6b6b6b;
+    --color-background-hover: #f5f5f5;
+    --color-background-dark: #ededed;
+    --color-border: #ededed;
+    --color-main-background: #ffffff;
+    --color-primary-element: #00679e;
+    --color-primary-element-light: #e5eff5;
+    /* Cancel / Save / Close are plain `button`s, and the server paints those
+       with `--color-primary-element-light` behind and
+       `--color-primary-element-light-text` on top (core/css/inputs.css). Both
+       have to be pinned or the pair splits: pinning only the background left a
+       light blue label on a light blue button. */
+    --color-primary-element-light-text: #00293f;
+    --color-primary-element-text: #ffffff;
+    --background-invert-if-dark: no;
+
     color: var(--color-main-text);
     min-height: 150px;
     width: 250px;

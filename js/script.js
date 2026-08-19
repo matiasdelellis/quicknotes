@@ -381,7 +381,7 @@ View.prototype = {
             case 'trash':
                 currentNotes = this._notes.getDeleted();
                 emptyMsg = t('quicknotes', 'Trash is empty');
-                emptyIcon = 'icon-delete';
+                emptyIcon = 'icon-qn-trash';
                 break;
             case 'all':
             default:

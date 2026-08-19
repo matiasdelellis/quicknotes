@@ -3,13 +3,57 @@
   --original-icon-quicknotes-white: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjxzdmcKICAgdmlld0JveD0iMCAwIDMyIDMyIgogICBmaWxsPSIjZmZmZmZmIgogICB2ZXJzaW9uPSIxLjEiCiAgIGlkPSJzdmcxIgogICB3aWR0aD0iMzIiCiAgIGhlaWdodD0iMzIiCiAgIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICAgeG1sbnM6c3ZnPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPGRlZnMKICAgICBpZD0iZGVmczEiIC8+CiAgPGcKICAgICBpZD0iZzMiCiAgICAgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMS40MDEzODExZS00LDQuOTg2MTg5MmUtNSkiPgogICAgPHBhdGgKICAgICAgIGQ9Im0gMjguMTk4LDI1LjIzMSBjIC0wLjEwMzUyLDEuNTE2MSAtMS42NTUyLDIuNTM5MiAtMy4wODQxLDIuMzM5NyAtNy4yNjcyLC0wLjAwODYgLTE0LjUzNSwtMC4wMjI2IC0yMS44MDIsLTAuMDUzMTggLTEuMzI1NCwtMC4wOTA2NiAtMi4yMTM1LC0xLjI0NDYgLTIuMjg2NSwtMi40OTkyIC0xLjQ5ZS00LDAuOTU2NjUgMC4wMDEyLDEuOTE0OCAwLDIuODcxNCAtMC4xOTk3NiwxLjQzMTcgMC43Njg4OCwyLjk4MDQgMi4yODY1LDMuMDg0MSA3LjI4MDQsMC4wMzA2MSAxNC41NzQsLTAuMDA4NiAyMS44NTUsMCAxLjQzMTcsMC4xOTk3NiAyLjk4MDQsLTAuNzY4ODggMy4wODQxLC0yLjI4NjUgbCAtMC4wNTMxOCwtMy40NTY0IHoiCiAgICAgICBpZD0icGF0aDEiIC8+CiAgICA8cGF0aAogICAgICAgZD0iTSAzLjU3ODQsMy43NDg2IEMgMi4zMDUzLDMuNzI2NjI2IDEuMTgyNCw0LjU3Nzg5IDEuMDc5Miw1LjYwOTcgMS4wNDg2NCwxMS41MTkgMS4wMzQ3NSwxNy40MDY3IDEuMDI2MDMsMjMuMzE2NyBjIC0wLjE5OTM4LDEuMTYyIDAuNzcxNzYsMi40MTUgMi4yODY1LDIuNDk5MiA3LjI2NjYsMC4wMjQ4NCAxNC41MzQsMC4wNDYwOCAyMS44MDIsMC4wNTMxOCAxLjQyOSwwLjE2MjE0IDIuOTgwNiwtMC42MjkzMSAzLjA4NDEsLTEuODYxMSAwLjAyNjQ1LC01LjExMzEgMC4wNTIzMiwtMTAuMjU0IDAuMDUzMTgsLTE1LjM2NyBsIC04LjU2MTEsOC41NjExIGMgLTAuNjM4MDksMC42MzgwOCAtMS40MjM1LDAuODY3MTEgLTIuMjMzMywwLjkwMzk3IC0wLjM5MjQ4LDAuMzIxMiAtMC43ODEyLDAuNjMyNjIgLTEuMjc2MiwwLjc5NzYyIC0wLjY3MTI2LDAuMjIzNzYgLTEuNzEwMiwwLjMxMDQyIC0yLjU1MjQsLTAuNTMxNzUgLTAuODQyMTYsLTAuODQyMTYgLTAuNzU1NSwtMS44ODExIC0wLjUzMTc1LC0yLjU1MjQgMC4xNjUsLTAuNDk0OTkgMC40NzY0MiwtMC44ODM3MiAwLjc5NzYyLC0xLjI3NjIgMC4wMzY4NSwtMC44MDk4NiAwLjI2NTg4LC0xLjU5NTIgMC45MDM5NywtMi4yMzMzIGwgOC41NjExLC04LjU2MTEgYyAtNi41Nzk2LC0wLjAxMzM1NyAtMTMuMjAxLDAuMDA2MjYgLTE5Ljc4MSwwIHoiCiAgICAgICBpZD0icGF0aDIiIC8+CiAgICA8cGF0aAogICAgICAgZD0ibSAxNi4wNjIsMTMuNTMyIGMgLTAuNDQwNDksMC40NDA0OSAtMC41NTUyOSwxLjA1NTggLTAuNDEzNiwxLjYxNjggbCAtMC4xODgsMC4xODggYyAtMC42NjY1OCwwLjY2NjU4IC0wLjkzNDg5LDEuNDcxNSAtMC42MDE2LDEuODA0OCAwLjMzMzI5LDAuMzMzMjkgMS4xMzgyLDAuMDY0OTcgMS44MDQ4LC0wLjYwMTYgbCAwLjE4OCwtMC4xODggYyAwLjU2MDk2LDAuMTQxNjkgMS4xNzYzLDAuMDI2ODggMS42MTY4LC0wLjQxMzYgbCAxMi4wMzIsLTEyLjAzMiBjIDAuNjY2NTgsLTAuNjY2NTggMC42NjY1OCwtMS43Mzk4IDAsLTIuNDA2NCAtMC42NjY1NywtMC42NjY1OCAtMS43Mzk4LC0wLjY2NjU4IC0yLjQwNjQsMCB6IgogICAgICAgaWQ9InBhdGgzIiAvPgogIDwvZz4KPC9zdmc+Cg==");
 }
 
+/* Every glyph the app owns, declared once.
+ *
+ * They are needed in two places each — on the class, and on the `::before` of
+ * the navigation entry, which is where the theme filter goes — and keeping two
+ * copies of a base64 payload in sync by hand does not work: the copy under
+ * `#app-navigation .icon-archived::before` was pasted with the `viewBox`
+ * attribute twice, which makes the svg invalid XML, so the browser silently
+ * refused to decode it and the Archived entry had no icon at all.
+ * `getComputedStyle` still reports the url, so only loading the image finds it.
+ *
+ * `--qn-icon-*` is the app's own namespace. That is not a contradiction of the
+ * rule against `var(--original-icon-…)` below: what that rule is about is not
+ * using variables, it is not depending on identifiers the *server* owns and
+ * redefines per theme. Nobody but this file writes these. */
+:root {
+  --qn-icon-reminder: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTcgMTJoLTV2NWg1di01ek0xNiAxdjJIOFYxSDZ2Mkg1Yy0xLjExIDAtMS45OS45LTEuOTkgMkwzIDE5YzAgMS4xLjg5IDIgMiAyaDE0YzEuMSAwIDItLjkgMi0yVjVjMC0xLjEtLjktMi0yLTJoLTFWMWgtMnptMyAxOEg1VjhoMTR2MTF6Ii8+PC9zdmc+");
+  --qn-icon-share: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTggMTYuMDhjLS43NiAwLTEuNDQuMy0xLjk2Ljc3TDguOTEgMTIuN2MuMDUtLjIzLjA5LS40Ni4wOS0uN3MtLjA0LS40Ny0uMDktLjdsNy4wNS00LjExYy41NC41IDEuMjUuODEgMi4wNC44MSAxLjY2IDAgMy0xLjM0IDMtM3MtMS4zNC0zLTMtMy0zIDEuMzQtMyAzYzAgLjI0LjA0LjQ3LjA5LjdMOC4wNCA5LjgxQzcuNSA5LjMxIDYuNzkgOSA2IDljLTEuNjYgMC0zIDEuMzQtMyAzczEuMzQgMyAzIDNjLjc5IDAgMS41LS4zMSAyLjA0LS44MWw3LjEyIDQuMTZjLS4wNS4yMS0uMDguNDMtLjA4LjY1IDAgMS42MSAxLjMxIDIuOTIgMi45MiAyLjkyIDEuNjEgMCAyLjkyLTEuMzEgMi45Mi0yLjkyIDAtMS42MS0xLjMxLTIuOTItMi45Mi0yLjkyeiIvPjwvc3ZnPg==");
+  --qn-icon-tag: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMjEuNDEsMTEuNThsLTksLTlDMTIuMDUsMi4yMiAxMS41NSwyIDExLDJINEMyLjksMiAyLDIuOSAyLDR2N2MwLDAuNTUgMC4yMiwxLjA1IDAuNTksMS40Mmw5LDlDMTEuOTUsMjEuNzggMTIuNDUsMjIgMTMsMjJjMC41NSwwIDEuMDUsLTAuMjIgMS40MSwtMC41OWw3LC03QzIxLjc4LDE0LjA1IDIyLDEzLjU1IDIyLDEzYzAsLTAuNTUgLTAuMjIsLTEuMDUgLTAuNTksLTEuNDF6TTUuNSw3QzQuNjcsNyA0LDYuMzMgNCw1LjVTNC42Nyw0IDUuNSw0IDcsNC42NyA3LDUuNSA2LjMzLDcgNS41LDd6Ii8+PC9zdmc+");
+  --qn-icon-colors: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTIsM0E5LDkgMCAwLDAgMywxMkE5LDkgMCAwLDAgMTIsMjFIMTRBMiwyIDAgMCwwIDE2LDE5QzE2LDE4LjUgMTUuNzgsMTggMTUuNDEsMTcuNThDMTUuMDksMTcuMjIgMTUsMTYuNzUgMTUsMTYuMjhDMTUsMTUuMDIgMTYuMDIsMTQgMTcuMjgsMTRIMjBBMiwyIDAgMCwwIDIyLDEyQzIyLDYuNSAxNy41LDMgMTIsM002LjUsMTJBMS41LDEuNSAwIDAsMSA1LDEwLjVBMS41LDEuNSAwIDAsMSA2LjUsOUExLjUsMS41IDAgMCwxIDgsMTAuNUExLjUsMS41IDAgMCwxIDYuNSwxMk05LjUsOEExLjUsMS41IDAgMCwxIDgsNi41QTEuNSwxLjUgMCAwLDEgOS41LDVBMS41LDEuNSAwIDAsMSAxMSw2LjVBMS41LDEuNSAwIDAsMSA5LjUsOE0xNC41LDhBMS41LDEuNSAwIDAsMSAxMyw2LjVBMS41LDEuNSAwIDAsMSAxNC41LDVBMS41LDEuNSAwIDAsMSAxNiw2LjVBMS41LDEuNSAwIDAsMSAxNC41LDhNMTcuNSwxMkExLjUsMS41IDAgMCwxIDE2LDEwLjVBMS41LDEuNSAwIDAsMSAxNy41LDlBMS41LDEuNSAwIDAsMSAxOSwxMC41QTEuNSwxLjUgMCAwLDEgMTcuNSwxMloiLz48L3N2Zz4=");
+  --qn-icon-picture: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTksM0g1QTIsMiAwIDAsMCAzLDVWMTlBMiwyIDAgMCwwIDUsMjFIMTlBMiwyIDAgMCwwIDIxLDE5VjVBMiwyIDAgMCwwIDE5LDNNMTksMTlINVY1SDE5VjE5TTEzLjk2LDEyLjI5TDExLjIxLDE1LjgzTDkuMjUsMTMuNDdMNi41LDE3SDE3LjVMMTMuOTYsMTIuMjlaIi8+PC9zdmc+");
+  --qn-icon-trash: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNNiwxOUEyLDIgMCAwLDAgOCwyMUgxNkEyLDIgMCAwLDAgMTgsMTlWN0g2VjE5TTguNDYsMTEuODhMOS44OCwxMC40NkwxMiwxMi41OUwxNC4xMiwxMC40NkwxNS41NCwxMS44OEwxMy40MSwxNEwxNS41NCwxNi4xMkwxNC4xMiwxNy41NEwxMiwxNS40MUw5Ljg4LDE3LjU0TDguNDYsMTYuMTJMMTAuNTksMTRMOC40NiwxMS44OE0xNS41LDRMMTQuNSwzSDkuNUw4LjUsNEg1VjZIMTlWNEgxNS41WiIvPjwvc3ZnPg==");
+  --qn-icon-archived: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjxzdmcgeG1sbnM6aW5rc2NhcGU9Imh0dHA6Ly93d3cuaW5rc2NhcGUub3JnL25hbWVzcGFjZXMvaW5rc2NhcGUiIHhtbG5zOnNvZGlwb2RpPSJodHRwOi8vc29kaXBvZGkuc291cmNlZm9yZ2UubmV0L0RURC9zb2RpcG9kaS0wLmR0ZCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczpzdmc9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZlcnNpb249IjEuMSIgdmlld2JveD0iMCAwIDE2IDE2IiB2aWV3Qm94PSIwIDAgMjQgMjQiIGlkPSJzdmcxIj4KICA8ZGVmcyBpZD0iZGVmczEiPjwvZGVmcz4KICA8cGF0aCBkPSJNMjAuNTQgNS4yM2wtMS4zOS0xLjY4QzE4Ljg4IDMuMjEgMTguNDcgMyAxOCAzSDZjLS40NyAwLS44OC4yMS0xLjE2LjU1TDMuNDYgNS4yM0MzLjE3IDUuNTcgMyA2LjAyIDMgNi41VjE5YzAgMS4xLjkgMiAyIDJoMTRjMS4xIDAgMi0uOSAyLTJWNi41YzAtLjQ4LS4xNy0uOTMtLjQ2LTEuMjd6TTYuMjQgNWgxMS41MmwuODMgMUg1LjQybC44Mi0xek01IDE5VjhoMTR2MTFINXptMTEtNS41bC00IDQtNC00IDEuNDEtMS40MUwxMSAxMy42N1YxMGgydjMuNjdsMS41OS0xLjU5TDE2IDEzLjV6IiBpZD0icGF0aDEiPjwvcGF0aD4KPC9zdmc+Cg==");
+}
+
+/* The app's own mark. Every place it lands — the empty states of the grid,
+ * the loading screen and the dashboard widget — sits on a background that
+ * follows the theme, so it follows the theme too. (The navigation entry is
+ * handled further down: its icon lives on the `::before` of the entry, and
+ * `filter: none` keeps this rule away from the label.) It used to be a
+ * `@media (prefers-color-scheme: dark)` swap, which tracked the *browser*
+ * rather than the theme the user picked in Nextcloud — a dark theme on a
+ * light OS rendered a dark glyph on a dark sidebar. */
 .icon-quicknotes,
 .icon-quicknotes-dark {
   background-image: var(--original-icon-quicknotes-dark);
+  filter: var(--background-invert-if-dark);
 }
 
 .icon-quicknotes-white {
   background-image: var(--original-icon-quicknotes-white);
+}
+
+/* Belt and braces, not the working rule: the navigation paints the mark on the
+ * `::before` of the entry and `#app-navigation:not(.vue) > ul > li > a` in
+ * css/not-vue.css already puts `filter: none` on the `a` itself — at (1,1,1),
+ * which outranks this (1,1,0), so this never actually decides anything. It is
+ * here because this file is loaded on *every* page (BeforeTemplateRenderedListener)
+ * while not-vue.css is loaded only on the app's own, and a filter reaching the
+ * `a` would invert the label text along with the glyph. */
+#app-navigation .icon-quicknotes {
+  filter: none;
 }
 
 /* Reminders entry of the navigation, and reminder button of the note editor.
@@ -26,7 +70,7 @@
  * a name the server does not use (`icon-pin`, `icon-archived`, `icon-restore`)
  * and a direct `url(data:…)`. Do that for anything new. */
 .icon-qn-reminder {
-  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTcgMTJoLTV2NWg1di01ek0xNiAxdjJIOFYxSDZ2Mkg1Yy0xLjExIDAtMS45OS45LTEuOTkgMkwzIDE5YzAgMS4xLjg5IDIgMiAyaDE0YzEuMSAwIDItLjkgMi0yVjVjMC0xLjEtLjktMi0yLTJoLTFWMWgtMnptMyAxOEg1VjhoMTR2MTF6Ii8+PC9zdmc+");
+  background-image: var(--qn-icon-reminder);
 }
 
 /* Sharing: the button of the note editor, and the badge a note carries when
@@ -38,21 +82,98 @@
  * `icon-qn-reminder` above: the app's own name, a direct `url(data:…)`, and a
  * plain dark glyph with no filter, because a note keeps its light colour under
  * every theme. */
+/* Deliberately the same glyph as `.icon-qn-share` for now: these were the
+ * server's `icon-shared` and `icon-share`, two different pictures, and the
+ * distinction did not survive being inlined. The badge that names a person
+ * has its own glyph — `.slim-share` in css/style.css. */
 .icon-qn-shared {
-  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTggMTYuMDhjLS43NiAwLTEuNDQuMy0xLjk2Ljc3TDguOTEgMTIuN2MuMDUtLjIzLjA5LS40Ni4wOS0uN3MtLjA0LS40Ny0uMDktLjdsNy4wNS00LjExYy41NC41IDEuMjUuODEgMi4wNC44MSAxLjY2IDAgMy0xLjM0IDMtM3MtMS4zNC0zLTMtMy0zIDEuMzQtMyAzYzAgLjI0LjA0LjQ3LjA5LjdMOC4wNCA5LjgxQzcuNSA5LjMxIDYuNzkgOSA2IDljLTEuNjYgMC0zIDEuMzQtMyAzczEuMzQgMyAzIDNjLjc5IDAgMS41LS4zMSAyLjA0LS44MWw3LjEyIDQuMTZjLS4wNS4yMS0uMDguNDMtLjA4LjY1IDAgMS42MSAxLjMxIDIuOTIgMi45MiAyLjkyIDEuNjEgMCAyLjkyLTEuMzEgMi45Mi0yLjkyIDAtMS42MS0xLjMxLTIuOTItMi45Mi0yLjkyeiIvPjwvc3ZnPg==");
+  background-image: var(--qn-icon-share);
 }
 
 .icon-qn-share {
-  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTggMTYuMDhjLS43NiAwLTEuNDQuMy0xLjk2Ljc3TDguOTEgMTIuN2MuMDUtLjIzLjA5LS40Ni4wOS0uN3MtLjA0LS40Ny0uMDktLjdsNy4wNS00LjExYy41NC41IDEuMjUuODEgMi4wNC44MSAxLjY2IDAgMy0xLjM0IDMtM3MtMS4zNC0zLTMtMy0zIDEuMzQtMyAzYzAgLjI0LjA0LjQ3LjA5LjdMOC4wNCA5LjgxQzcuNSA5LjMxIDYuNzkgOSA2IDljLTEuNjYgMC0zIDEuMzQtMyAzczEuMzQgMyAzIDNjLjc5IDAgMS41LS4zMSAyLjA0LS44MWw3LjEyIDQuMTZjLS4wNS4yMS0uMDguNDMtLjA4LjY1IDAgMS42MSAxLjMxIDIuOTIgMi45MiAyLjkyIDEuNjEgMCAyLjkyLTEuMzEgMi45Mi0yLjkyIDAtMS42MS0xLjMxLTIuOTItMi45Mi0yLjkyeiIvPjwvc3ZnPg==");
+  background-image: var(--qn-icon-share);
 }
 
-/* The one place where inverting is right: the navigation sits on a background
- * that does follow the theme, unlike a note, which stays light under all of
- * them. `--background-invert-if-dark` is invert(100%) under [data-theme-dark]
- * and a deliberately invalid value otherwise, so this follows what the user
- * picked in Nextcloud rather than what their browser prefers. */
-#app-navigation .icon-qn-share {
-  filter: var(--background-invert-if-dark);
+/* Tags, Colors and Trash in the navigation, and the Colors / Tags / Attach
+ * buttons of the note editor, all leaned on icons the server owns (`icon-tag`,
+ * `icon-toggle-background`, `icon-picture`).
+ *
+ * Those resolve through `body .icon-tag { background-image: var(--icon-tag-dark) }`
+ * in the server's dist/icons.css, and that variable is defined four times: on
+ * `body`, on `body` inside `@media (prefers-color-scheme: dark)`, and again
+ * under `[data-themes*=light]` and `[data-themes*=dark]`, which win on
+ * specificity. So they follow the theme, and fall back to the browser only when
+ * the theme is left at *system* — the same rule `--background-invert-if-dark`
+ * obeys. Measured by drawing each glyph to a canvas: white under a dark theme
+ * whatever the browser prefers, dark under a light one.
+ *
+ * Which makes them right on the sidebar and wrong on the **editor toolbar**,
+ * because that sits on a note, and a note is hard-coded light
+ * (`background-color: #F7EB96`) under every theme: a dark theme turned those
+ * three buttons white on pale yellow and nothing about the theme could rescue
+ * them. The navigation entries were not broken; they are here so that every
+ * glyph of the sidebar comes from one place and goes through one mechanism.
+ *
+ * Same rules as every other icon of the app: an app-owned name and an inlined
+ * dark svg, no filter and no media query. The navigation block below is what
+ * makes these follow the theme, and only there. */
+.icon-qn-tag {
+  background-image: var(--qn-icon-tag);
+}
+
+.icon-qn-colors {
+  background-image: var(--qn-icon-colors);
+}
+
+/* Attach a file, in the editor toolbar. Never lands on the navigation, so it
+ * has no `::before` rule below. */
+.icon-qn-picture {
+  background-image: var(--qn-icon-picture);
+}
+
+.icon-qn-trash {
+  background-image: var(--qn-icon-trash);
+}
+
+/* The navigation sits on a background that follows the theme, unlike a note,
+ * which stays light under all of them. Its icons are painted on the `::before`
+ * of each entry, never on the entry itself: a filter on the `a` inverts the
+ * label text along with the glyph (measured in a browser), so only the
+ * pseudo-element carries one — the base rule lives in css/not-vue.css. The
+ * glyphs are the same app-owned dark svgs the classes carry elsewhere.
+ * `--background-invert-if-dark` is invert(100%) under a dark theme and a
+ * deliberately invalid value otherwise, so this follows what the user picked
+ * in Nextcloud rather than what their browser prefers. */
+#app-navigation .icon-qn-search::before {
+  background-image: var(--qn-icon-search);
+}
+
+#app-navigation .icon-quicknotes::before {
+  background-image: var(--original-icon-quicknotes-dark);
+}
+
+#app-navigation .icon-qn-reminder::before {
+  background-image: var(--qn-icon-reminder);
+}
+
+#app-navigation .icon-qn-share::before {
+  background-image: var(--qn-icon-share);
+}
+
+#app-navigation .icon-qn-tag::before {
+  background-image: var(--qn-icon-tag);
+}
+
+#app-navigation .icon-qn-colors::before {
+  background-image: var(--qn-icon-colors);
+}
+
+#app-navigation .icon-qn-trash::before {
+  background-image: var(--qn-icon-trash);
+}
+
+#app-navigation .icon-archived::before {
+  background-image: var(--qn-icon-archived);
 }
 
 /* The magnifier of the text filter: the field in the navigation and the empty
@@ -80,16 +201,18 @@
     filter: var(--background-invert-if-dark);
 }
 
-@media (prefers-color-scheme: dark) {
-  .icon-quicknotes,
-  .icon-quicknotes-dark {
-    background-image: var(--original-icon-quicknotes-white);
-  }
-  .icon-quicknotes-white {
-    background-image: var(--original-icon-quicknotes-dark);
-  }
-  /* Nothing for icon-qn-reminder here on purpose: every other icon of the app
-     is a plain dark svg with no media query and no filter, and singling this
-     one out is what made it look different from its neighbours. Dark mode for
-     the icons is worth closing across the app in one pass. */
+/* The empty states of the grid sit on the theme background (`#app-content`),
+ * so their icons follow the theme the same way the navigation does. These are
+ * textless, so filtering the element itself is safe — the note cards, which
+ * stay light under every theme, are not matched here.
+ *
+ * Only two names need it: `icon-quicknotes` (loading state) and `icon-qn-search`
+ * (`#no-matches`) already carry the filter on their own class, because every
+ * other place they land follows the theme too. `icon-archived` and
+ * `icon-qn-trash` cannot — `icon-archived` is also the archive button of a note
+ * card, which stays light — so they are filtered here, scoped to the empty
+ * state. `View.renderContent()` in js/script.js picks between the three. */
+.emptycontent .icon-archived,
+.emptycontent .icon-qn-trash {
+  filter: var(--background-invert-if-dark);
 }
