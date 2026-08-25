@@ -1,4 +1,31 @@
 # Changelog
+## [1.0.1] 2026-08-25
+
+**Search finds what the board finds.** The unified search of Nextcloud now
+matches a note's tags too, and ignores case and accents the way the "Filter
+notes" entry of the board does — `cafe` finds *Café*, in the title, the body or
+a tag. Notes you archived no longer come up as results, the same way the
+dashboard widget leaves them out.
+
+**For developers.** The frontend code is linted now: ESLint for the Vue sources
+and Stylelint for the stylesheets, wired into CI.
+
+In detail:
+
+- Search a note's tags from the unified search of Nextcloud, not only its title
+  and body. Until now a note could only be found by a word it said, not by the
+  tags you organised it with.
+- Ignore case and accents in the unified search, matching the behaviour of the
+  "Filter notes" entry of the board: `cafe` finds *Café*, in the title, the
+  body or a tag. The search read the database with a plain case-insensitive
+  `LIKE`, which is exactly the accent-strictness the board deliberately does
+  not have.
+- Leave archived notes out of the unified search. They were returned as results
+  even though the dashboard widget already left them out; a note you put away
+  is not something to offer back as a result.
+- Lint the frontend: ESLint over the Vue sources and Stylelint over the
+  stylesheets, both wired into CI so they run on every push and pull request.
+
 ## [1.0.0] 2026-08-18
 
 **Sharing, rebuilt.** A note can be shared with people and with groups, and every

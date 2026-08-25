@@ -1,6 +1,6 @@
 {
 	"name": "quicknotes",
-	"version": "0.8.1",
+	"version": "1.0.1",
 	"description": "Quick notes with a basic rich text",
 	"main": "script.js",
 	"directories": {
