@@ -84,7 +84,14 @@ function openDialog(component, propsData, onSubmit, onCancel, onRemove) {
 	return dialog
 }
 
-/** Mount a QnSelectDialog. */
+/**
+ * Mount a QnSelectDialog.
+ *
+ * @param {object} propsData properties for the dialog
+ * @param {Function} onSubmit called with the result on "Done"
+ * @param {Function} onCancel called when the dialog is dismissed
+ * @param {Function} onRemove called when a link is to be removed
+ */
 function open(propsData, onSubmit, onCancel, onRemove) {
 	return openDialog(QnSelectDialog, propsData, onSubmit, onCancel, onRemove)
 }
@@ -116,7 +123,12 @@ function utcStringToDate(value) {
 	return isNaN(date.getTime()) ? null : date
 }
 
-/** Tags of a note, as stored by the app, to dropdown entries. */
+/**
+ * Tags of a note, as stored by the app, to dropdown entries.
+ *
+ * @param {object} tag a tag as {id, name}
+ * @return {object} a dropdown entry as {id, label}
+ */
 function tagToEntry(tag) {
 	// A tag that only exists in the editor (one the user just typed) has no
 	// numeric id yet, and the backend identifies it by name.
@@ -124,7 +136,12 @@ function tagToEntry(tag) {
 	return { id, label: tag.name }
 }
 
-/** Dropdown entries back to the shape `js/script.js` expects for tags. */
+/**
+ * Dropdown entries back to the shape `js/script.js` expects for tags.
+ *
+ * @param {object} entry a dropdown entry as {id, label}
+ * @return {object} a tag as {id, name}
+ */
 function entryToTag(entry) {
 	return { id: entry.id, name: entry.label }
 }
@@ -233,7 +250,7 @@ const QnDialogs = {
 	 * @param {Array} currentNotes every linkable note, as {id, label}
 	 * @param {Function} callback called as `callback(note)` with the picked
 	 *        note as {id, label}, `false` for "remove link", or null to cancel
-	 * @param {object} [options]
+	 * @param {object} [options] options for the dialog
 	 * @param {string|number} [options.currentId] id of the note the link
 	 *        currently points at, to preselect it
 	 * @param {string} [options.currentLabel] label of that note, used when it

@@ -8,7 +8,11 @@
 		"test": "tests"
 	},
 	"scripts": {
-		"build": "webpack --node-env production --progress"
+		"build": "webpack --node-env production --progress",
+		"lint": "eslint src",
+		"lint:fix": "eslint src --fix",
+		"stylelint": "stylelint css \"src/**/*.vue\"",
+		"stylelint:fix": "stylelint css \"src/**/*.vue\" --fix"
 	},
 	"repository": {
 		"type": "git",

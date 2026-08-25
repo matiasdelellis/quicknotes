@@ -2,6 +2,12 @@ import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
 import { showError } from '@nextcloud/dialogs'
 
+/**
+ * Build an app url.
+ *
+ * @param {string} url path inside the app
+ * @return {string} absolute url
+ */
 function url(url) {
 	url = `apps/quicknotes${url}`
 	return generateUrl(url)
@@ -23,8 +29,8 @@ export const getDashboardData = () => {
 export const postNewNote = (title, content) => {
 	return axios
 		.post(url('/notes'), {
-			title: title,
-			content: content,
+			title,
+			content,
 		})
 		.then(response => {
 			return response.data

@@ -1,214 +1,214 @@
 #app-navigation:not(.vue) {
-  --border-radius-pill: calc(var(--default-clickable-area) / 2);
-  width: 300px;
-  z-index: 500;
-  overflow-y: auto;
-  overflow-x: hidden;
-  background-color: var(--color-main-background-blur);
-  backdrop-filter: var(--filter-background-blur);
-  -webkit-backdrop-filter: var(--filter-background-blur);
-  -webkit-user-select: none;
-  position: sticky;
-  height: 100%;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-  display: flex;
-  flex-direction: column;
-  flex-grow: 0;
-  flex-shrink: 0;
+	--border-radius-pill: calc(var(--default-clickable-area) / 2);
+	width: 300px;
+	z-index: 500;
+	overflow-y: auto;
+	overflow-x: hidden;
+	background-color: var(--color-main-background-blur);
+	backdrop-filter: var(--filter-background-blur);
+	-webkit-backdrop-filter: var(--filter-background-blur);
+	-webkit-user-select: none;
+	position: sticky;
+	height: 100%;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	display: flex;
+	flex-direction: column;
+	flex-grow: 0;
+	flex-shrink: 0;
 }
 
 #app-navigation:not(.vue) > ul {
-  position: relative;
-  height: 100%;
-  width: 100%;
-  overflow-x: hidden;
-  overflow-y: auto;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  padding: calc(var(--default-grid-baseline) * 2);
-  padding-bottom: 0;
+	position: relative;
+	height: 100%;
+	width: 100%;
+	overflow-x: hidden;
+	overflow-y: auto;
+	box-sizing: border-box;
+	display: flex;
+	flex-direction: column;
+	padding: calc(var(--default-grid-baseline) * 2);
+	padding-bottom: 0;
 }
 
 #app-navigation:not(.vue) > ul > li, #app-navigation:not(.vue) > ul > li > ul > li {
-  position: relative;
-  box-sizing: border-box;
+	position: relative;
+	box-sizing: border-box;
 }
 
 #app-navigation:not(.vue) > ul > li {
-  display: inline-flex;
-  flex-wrap: wrap;
-  order: 1;
-  flex-shrink: 0;
-  margin: 0;
-  margin-bottom: 0px;
-  margin-bottom: 3px;
-  width: 100%;
-  border-radius: var(--border-radius-pill);
+	display: inline-flex;
+	flex-wrap: wrap;
+	order: 1;
+	flex-shrink: 0;
+	margin: 0;
+	margin-bottom: 0px;
+	margin-bottom: 3px;
+	width: 100%;
+	border-radius: var(--border-radius-pill);
 }
 
 #app-navigation:not(.vue) > ul > li > a.svg, #app-navigation:not(.vue) > ul > li > ul > li > a.svg {
-  padding: 0 12px 0 44px;
+	padding: 0 12px 0 44px;
 }
 
 #app-navigation:not(.vue) > ul > li > a, #app-navigation:not(.vue) > ul > li > ul > li > a {
-  /* The icon no longer rides on the entry: it is painted by the `::before`
+	/* The icon no longer rides on the entry: it is painted by the `::before`
      below, where the theme filter can be applied to the glyph alone. The
      background-image and filter that the icon classes carry are neutralised
      here — this selector wins on specificity — so a filter can never reach
      the label text (inverting `--color-main-text` along with the icon made
      the sidebar labels invisible in dark mode). */
-  background-image: none;
-  filter: none;
-  position: relative;
-  display: block;
-  justify-content: space-between;
-  line-height: 44px;
-  min-height: 44px;
-  padding: 0 12px 0 14px;
-  overflow: hidden;
-  box-sizing: border-box;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  border-radius: var(--border-radius-pill);
-  color: var(--color-main-text);
-  flex: 1 1 0px;
-  z-index: 100;
+	background-image: none;
+	filter: none;
+	position: relative;
+	display: block;
+	justify-content: space-between;
+	line-height: 44px;
+	min-height: 44px;
+	padding: 0 12px 0 14px;
+	overflow: hidden;
+	box-sizing: border-box;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	border-radius: var(--border-radius-pill);
+	color: var(--color-main-text);
+	flex: 1 1 0px;
+	z-index: 100;
 }
 
 #app-navigation:not(.vue) > ul > li > a::before,
 #app-navigation:not(.vue) > ul > li > ul > li > a::before {
-  content: '';
-  position: absolute;
-  left: 14px;
-  top: 50%;
-  width: 16px;
-  height: 16px;
-  -webkit-transform: translateY(-50%);
-  -ms-transform: translateY(-50%);
-  transform: translateY(-50%);
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: 16px 16px;
-  /* The sidebar follows the theme, so the glyph has to follow it too. Only
+	content: '';
+	position: absolute;
+	left: 14px;
+	top: 50%;
+	width: 16px;
+	height: 16px;
+	-webkit-transform: translateY(-50%);
+	-ms-transform: translateY(-50%);
+	transform: translateY(-50%);
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: 16px 16px;
+	/* The sidebar follows the theme, so the glyph has to follow it too. Only
      this pseudo-element is filtered: a filter on the `a` inverts the label
      text as well (measured in a browser), which is why the icon lives here. */
-  filter: var(--background-invert-if-dark);
-  pointer-events: none;
+	filter: var(--background-invert-if-dark);
+	pointer-events: none;
 }
 
 #app-navigation:not(.vue) > ul > li, #app-navigation:not(.vue) > ul > li > ul > li {
-  position: relative;
-  box-sizing: border-box;
+	position: relative;
+	box-sizing: border-box;
 }
 
 #app-navigation:not(.vue) > ul > li {
-  display: inline-flex;
-  flex-wrap: wrap;
-  order: 1;
-  flex-shrink: 0;
-  margin: 0;
-  margin-bottom: 0px;
-  margin-bottom: 3px;
-  width: 100%;
-  border-radius: var(--border-radius-pill);
+	display: inline-flex;
+	flex-wrap: wrap;
+	order: 1;
+	flex-shrink: 0;
+	margin: 0;
+	margin-bottom: 0px;
+	margin-bottom: 3px;
+	width: 100%;
+	border-radius: var(--border-radius-pill);
 }
 
 #app-navigation:not(.vue) .collapsible .collapse {
-  opacity: 0;
-  position: absolute;
-  width: 44px;
-  height: 44px;
-  margin: 0;
-  z-index: 110;
-  left: 0;
+	opacity: 0;
+	position: absolute;
+	width: 44px;
+	height: 44px;
+	margin: 0;
+	z-index: 110;
+	left: 0;
 }
 
 #app-navigation:not(.vue) > ul > li > ul {
-  flex: 0 1 auto;
-  width: 100%;
-  position: relative;
+	flex: 0 1 auto;
+	width: 100%;
+	position: relative;
 }
 
 #app-navigation:not(.vue) > ul > li > ul > li {
-  display: inline-flex;
-  flex-wrap: wrap;
-  padding-left: 44px;
-  width: 100%;
-  margin-bottom: 3px;
+	display: inline-flex;
+	flex-wrap: wrap;
+	padding-left: 44px;
+	width: 100%;
+	margin-bottom: 3px;
 }
 
 #app-navigation:not(.vue) > ul > li > ul > li:hover, #app-navigation:not(.vue) > ul > li > ul > li:hover > a, #app-navigation:not(.vue) > ul > li > ul > li:focus, #app-navigation:not(.vue) > ul > li > ul > li:focus > a {
-  border-radius: var(--border-radius-pill);
-  background-color: var(--color-background-hover);
+	border-radius: var(--border-radius-pill);
+	background-color: var(--color-background-hover);
 }
 
 #app-navigation:not(.vue) > ul > li a:hover, #app-navigation:not(.vue) > ul > li a:hover > a, #app-navigation:not(.vue) > ul > li a:focus, #app-navigation:not(.vue) > ul > li a:focus > a {
-  background-color: var(--color-background-hover);
+	background-color: var(--color-background-hover);
 }
 
 #app-navigation:not(.vue) > ul > li > ul > li.active, #app-navigation:not(.vue) > ul > li > ul > li.active > a, #app-navigation:not(.vue) > ul > li > ul > li a.selected, #app-navigation:not(.vue) > ul > li > ul > li a.selected > a {
-  border-radius: var(--border-radius-pill);
-  background-color: var(--color-primary-element-light);
+	border-radius: var(--border-radius-pill);
+	background-color: var(--color-primary-element-light);
 }
 
 #app-navigation:not(.vue) > ul > li.deleted > ul, #app-navigation:not(.vue) > ul > li.collapsible:not(.open) > ul {
-  display: none;
+	display: none;
 }
 
 #app-navigation:not(.vue) .collapsible.open::before {
-  -webkit-transform: rotate(0);
-  -ms-transform: rotate(0);
-  transform: rotate(0);
+	-webkit-transform: rotate(0);
+	-ms-transform: rotate(0);
+	transform: rotate(0);
 }
 
 #app-navigation:not(.vue) .collapsible::before {
-  position: absolute;
-  height: 44px;
-  width: 44px;
-  margin: 0;
-  padding: 0;
-  background: none;
-  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNNy40MSw4LjU4TDEyLDEzLjE3TDE2LjU5LDguNThMMTgsMTBMMTIsMTZMNiwxMEw3LjQxLDguNThaIi8+PC9zdmc+");
-  /* The caret sits on the sidebar, which follows the theme, so it is inverted
+	position: absolute;
+	height: 44px;
+	width: 44px;
+	margin: 0;
+	padding: 0;
+	background: none;
+	background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNNy40MSw4LjU4TDEyLDEzLjE3TDE2LjU5LDguNThMMTgsMTBMMTIsMTZMNiwxMEw3LjQxLDguNThaIi8+PC9zdmc+');
+	/* The caret sits on the sidebar, which follows the theme, so it is inverted
      like every other glyph of the navigation. It used to come from
      `--icon-triangle-s-dark`; that was **not** broken — measured, the server
      resolves it per theme through its `[data-themes*=…]` blocks and only falls
      back to `prefers-color-scheme` when the theme is left at *system*. Inlined
      for uniformity, so the sidebar has one source and one mechanism for its
      glyphs, not because it was wrong. */
-  filter: var(--background-invert-if-dark);
-  background-size: 16px;
-  background-repeat: no-repeat;
-  background-position: center;
-  border: none;
-  border-radius: 0;
-  outline: none !important;
-  box-shadow: none;
-  content: " ";
-  opacity: 0;
-  -webkit-transform: rotate(-90deg);
-  -ms-transform: rotate(-90deg);
-  transform: rotate(-90deg);
-  z-index: 105;
-  border-radius: 50%;
-  transition: opacity 100ms ease-in-out;
+	filter: var(--background-invert-if-dark);
+	background-size: 16px;
+	background-repeat: no-repeat;
+	background-position: center;
+	border: none;
+	border-radius: 0;
+	outline: none !important;
+	box-shadow: none;
+	content: ' ';
+	opacity: 0;
+	-webkit-transform: rotate(-90deg);
+	-ms-transform: rotate(-90deg);
+	transform: rotate(-90deg);
+	z-index: 105;
+	border-radius: 50%;
+	transition: opacity 100ms ease-in-out;
 }
 
 #app-navigation:not(.vue) .collapsible:hover::before, #app-navigation:not(.vue) .collapsible:focus::before {
-  opacity: 1;
+	opacity: 1;
 }
 
 #app-navigation:not(.vue) .collapsible .collapse {
-  opacity: 0;
-  position: absolute;
-  width: 44px;
-  height: 44px;
-  margin: 0;
-  z-index: 110;
-  left: 0;
+	opacity: 0;
+	position: absolute;
+	width: 44px;
+	height: 44px;
+	margin: 0;
+	z-index: 110;
+	left: 0;
 }
 
 /* Hovering a collapsible swaps its icon for the collapse caret. The caret is
@@ -220,7 +220,7 @@
    pseudo-element: this rule said `background-image: none` on the `a` itself
    until the icons moved off it, and was silently doing nothing. */
 #app-navigation:not(.vue) .collapsible:hover > a::before, #app-navigation:not(.vue) .collapsible:focus > a::before {
-  background-image: none;
+	background-image: none;
 }
 
 /* mobile.css */
@@ -233,68 +233,68 @@
 
 @media only screen and (width < 1024px) {
 
-  #app-navigation:not(.vue) {
-    transform: translateX(-300px);
-    position: fixed;
-    height: var(--body-height);
-    transition: transform 100ms ease-in-out;
-  }
+	#app-navigation:not(.vue) {
+		transform: translateX(-300px);
+		position: fixed;
+		height: var(--body-height);
+		transition: transform 100ms ease-in-out;
+	}
 
-  .snapjs-left #app-navigation,
-  .qn-nav-open #app-navigation {
-    transform: translateX(0);
-    /* The server gives #app-content a z-index of 1000, and snap.js used to
+	.snapjs-left #app-navigation,
+	.qn-nav-open #app-navigation {
+		transform: translateX(0);
+		/* The server gives #app-content a z-index of 1000, and snap.js used to
      * slide the content aside rather than layer over it, so the navigation
      * has to be lifted above the notes to be clickable. */
-    z-index: 1100;
-    box-shadow: 0 0 10px var(--color-box-shadow);
-  }
+		z-index: 1100;
+		box-shadow: 0 0 10px var(--color-box-shadow);
+	}
 
-  /* Dim the notes while the navigation is open. Clicking the backdrop lands
+	/* Dim the notes while the navigation is open. Clicking the backdrop lands
    * on #app-content, which closes the navigation again (js/script.js). */
-  .snapjs-left #app-content::before,
-  .qn-nav-open #app-content::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    z-index: 1050;
-    background-color: rgba(0, 0, 0, 0.3);
-  }
+	.snapjs-left #app-content::before,
+	.qn-nav-open #app-content::before {
+		content: '';
+		position: fixed;
+		inset: 0;
+		z-index: 1050;
+		background-color: rgba(0, 0, 0, 0.3);
+	}
 
-  #app-navigation:not(.hidden) + #app-content {
-    margin-left: 0;
-  }
+	#app-navigation:not(.hidden) + #app-content {
+		margin-left: 0;
+	}
 
-  #app-navigation-toggle {
-    position: fixed;
-    display: inline-block !important;
-    left: 0;
-    width: 44px;
-    height: 44px;
-    z-index: 1050;
-    cursor: pointer;
-    opacity: 0.6;
-    border: none;
-    border-radius: 0;
-    background-color: transparent;
-    color: var(--color-main-text);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
+	#app-navigation-toggle {
+		position: fixed;
+		display: inline-block !important;
+		left: 0;
+		width: 44px;
+		height: 44px;
+		z-index: 1050;
+		cursor: pointer;
+		opacity: 0.6;
+		border: none;
+		border-radius: 0;
+		background-color: transparent;
+		color: var(--color-main-text);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
 
-  #app-navigation-toggle:hover,
-  #app-navigation-toggle:focus {
-    opacity: 1;
-  }
+	#app-navigation-toggle:hover,
+	#app-navigation-toggle:focus {
+		opacity: 1;
+	}
 
 }
 
 /* The toggle only makes sense while the navigation is off canvas. */
 @media only screen and (width >= 1024px) {
 
-  #app-navigation-toggle {
-    display: none !important;
-  }
+	#app-navigation-toggle {
+		display: none !important;
+	}
 
 }

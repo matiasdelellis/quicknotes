@@ -1,9 +1,9 @@
 .medium-toolbar-arrow-under:after {
-  border-color: var(--color-main-background-translucent, #000) transparent transparent transparent;
-  top: 40px; }
+	border-color: var(--color-main-background-translucent, #000) transparent transparent transparent;
+	top: 40px; }
 
 .medium-toolbar-arrow-over:before {
-  border-color: transparent transparent var(--color-main-background-translucent, #000) transparent; }
+	border-color: transparent transparent var(--color-main-background-translucent, #000) transparent; }
 
 /* This file is the *theme* of MediumEditor: it overrides the base stylesheet
    property by property, at the same specificity, so `templates/main.php` has to
@@ -23,73 +23,85 @@
    that the order is right, and stays as insurance: getting it wrong makes the
    toolbar invisible rather than ugly, which is much harder to notice. */
 .medium-editor-toolbar {
-  z-index: 9999 !important;
-  background-color: var(--color-main-background-translucent, #000);
-  border: none;
-  border-radius: 50px; }
-  .medium-editor-toolbar li button {
-    background-color: transparent;
-    border: none;
-    box-sizing: border-box;
-    color: var(--color-main-text, #ccc);
-    height: 40px;
-    min-width: 40px;
-    padding: 5px 12px;
-    -webkit-transition: background-color .2s ease-in, color .2s ease-in;
-            transition: background-color .2s ease-in, color .2s ease-in; }
-    .medium-editor-toolbar li button:hover {
-      background-color: var(--color-background-hover, #000);
-      color: var(--color-primary-element, #a2d7c7); }
-  .medium-editor-toolbar li .medium-editor-button-first {
-    border-bottom-left-radius: 50px;
-    border-top-left-radius: 50px;
-    padding-left: 24px; }
-  .medium-editor-toolbar li .medium-editor-button-last {
-    border-bottom-right-radius: 50px;
-    border-right: none;
-    border-top-right-radius: 50px;
-    padding-right: 24px; }
-  .medium-editor-toolbar li .medium-editor-button-active {
-    background-color: var(--color-background-dark, #000);
-    color: var(--color-primary-element, #a2d7c7); }
+	z-index: 9999 !important;
+	background-color: var(--color-main-background-translucent, #000);
+	border: none;
+	border-radius: 50px; }
+
+.medium-editor-toolbar li button {
+	background-color: transparent;
+	border: none;
+	box-sizing: border-box;
+	color: var(--color-main-text, #ccc);
+	height: 40px;
+	min-width: 40px;
+	padding: 5px 12px;
+	-webkit-transition: background-color .2s ease-in, color .2s ease-in;
+	transition: background-color .2s ease-in, color .2s ease-in; }
+
+.medium-editor-toolbar li button:hover {
+	background-color: var(--color-background-hover, #000);
+	color: var(--color-primary-element, #a2d7c7); }
+
+.medium-editor-toolbar li .medium-editor-button-first {
+	border-bottom-left-radius: 50px;
+	border-top-left-radius: 50px;
+	padding-left: 24px; }
+
+.medium-editor-toolbar li .medium-editor-button-last {
+	border-bottom-right-radius: 50px;
+	border-right: none;
+	border-top-right-radius: 50px;
+	padding-right: 24px; }
+
+.medium-editor-toolbar li .medium-editor-button-active {
+	background-color: var(--color-background-dark, #000);
+	color: var(--color-primary-element, #a2d7c7); }
 
 .medium-editor-toolbar-form {
-  background: var(--color-main-background-translucent, #000);
-  border-radius: 50px;
-  color: var(--color-main-text, #ccc);
-  overflow: hidden; }
-  .medium-editor-toolbar-form .medium-editor-toolbar-input {
-    background: var(--color-main-background-translucent, #000);
-    box-sizing: border-box;
-    color: var(--color-main-text, #ccc);
-    height: 40px;
-    padding-left: 16px;
-    width: 220px; }
-    .medium-editor-toolbar-form .medium-editor-toolbar-input::-webkit-input-placeholder {
-      color: var(--color-text-maxcontrast, #f8f5f3); }
-    .medium-editor-toolbar-form .medium-editor-toolbar-input:-moz-placeholder {
-      /* Firefox 18- */
-      color: var(--color-text-maxcontrast, #f8f5f3); }
-    .medium-editor-toolbar-form .medium-editor-toolbar-input::-moz-placeholder {
-      /* Firefox 19+ */
-      color: var(--color-text-maxcontrast, #f8f5f3); }
-    .medium-editor-toolbar-form .medium-editor-toolbar-input:-ms-input-placeholder {
-      color: var(--color-text-maxcontrast, #f8f5f3); }
-  .medium-editor-toolbar-form a {
-    color: var(--color-main-text, #ccc);
-    -webkit-transform: translateY(2px);
-            transform: translateY(2px); }
-  .medium-editor-toolbar-form .medium-editor-toolbar-close {
-    margin-right: 16px; }
+	background: var(--color-main-background-translucent, #000);
+	border-radius: 50px;
+	color: var(--color-main-text, #ccc);
+	overflow: hidden; }
+
+.medium-editor-toolbar-form .medium-editor-toolbar-input {
+	background: var(--color-main-background-translucent, #000);
+	box-sizing: border-box;
+	color: var(--color-main-text, #ccc);
+	height: 40px;
+	padding-left: 16px;
+	width: 220px; }
+
+.medium-editor-toolbar-form .medium-editor-toolbar-input::-webkit-input-placeholder {
+	color: var(--color-text-maxcontrast, #f8f5f3); }
+
+.medium-editor-toolbar-form .medium-editor-toolbar-input:-moz-placeholder {
+	/* Firefox 18- */
+	color: var(--color-text-maxcontrast, #f8f5f3); }
+
+.medium-editor-toolbar-form .medium-editor-toolbar-input::-moz-placeholder {
+	/* Firefox 19+ */
+	color: var(--color-text-maxcontrast, #f8f5f3); }
+
+.medium-editor-toolbar-form .medium-editor-toolbar-input:-ms-input-placeholder {
+	color: var(--color-text-maxcontrast, #f8f5f3); }
+
+.medium-editor-toolbar-form a {
+	color: var(--color-main-text, #ccc);
+	-webkit-transform: translateY(2px);
+	transform: translateY(2px); }
+
+.medium-editor-toolbar-form .medium-editor-toolbar-close {
+	margin-right: 16px; }
 
 .medium-editor-toolbar-anchor-preview {
-  background: var(--color-main-background-translucent, #000);
-  border-radius: 50px;
-  padding: 5px 12px; }
+	background: var(--color-main-background-translucent, #000);
+	border-radius: 50px;
+	padding: 5px 12px; }
 
 .medium-editor-anchor-preview a {
-  color: var(--color-primary-element, #ccc);
-  text-decoration: none; }
+	color: var(--color-primary-element, #ccc);
+	text-decoration: none; }
 
 .medium-editor-toolbar-actions li, .medium-editor-toolbar-actions button {
-  border-radius: 50px; }
+	border-radius: 50px; }

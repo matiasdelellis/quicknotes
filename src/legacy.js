@@ -42,7 +42,7 @@ import QnDialogs from './dialogs.js'
 // core/src/jquery/requesttoken.js up to Nextcloud 33). Without it every
 // request of the app comes back as "412 Precondition failed", because it
 // carries no CSRF token.
-$(document).on('ajaxSend', function (elm, xhr, settings) {
+$(document).on('ajaxSend', function(elm, xhr, settings) {
 	if (settings.crossDomain === false) {
 		xhr.setRequestHeader('requesttoken', getRequestToken())
 		xhr.setRequestHeader('OCS-APIREQUEST', 'true')

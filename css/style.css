@@ -1,45 +1,45 @@
 .icon-pin {
-    background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZlcnNpb249IjEuMSIgdmlld2JveD0iMCAwIDE2IDE2IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Im0xMS41NzEgMi40djQuOWwxLjQyODYgMi4xdjEuNGgtNC4yODU3djMuNWwtMC43MTQyOSAwLjctMC43MTQyOS0wLjd2LTMuNWgtNC4yODU3di0xLjRsMS40Mjg2LTIuMXYtNC45YzAtMC43NyAwLjY0Mjg2LTEuNCAxLjQyODYtMS40aDQuMjg1N2MwLjc5Mjg2IDAgMS40Mjg2IDAuNjIzIDEuNDI4NiAxLjR6bS01LjcxNDMgMHY1LjQyNWwtMS4wNzE0IDEuNTc1aDYuNDI4NmwtMS4wNzE0LTEuNTc1di01LjQyNXoiIHN0cm9rZS13aWR0aD0iLjcwNzExIi8+PC9zdmc+Cg==")
+	background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZlcnNpb249IjEuMSIgdmlld2JveD0iMCAwIDE2IDE2IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Im0xMS41NzEgMi40djQuOWwxLjQyODYgMi4xdjEuNGgtNC4yODU3djMuNWwtMC43MTQyOSAwLjctMC43MTQyOS0wLjd2LTMuNWgtNC4yODU3di0xLjRsMS40Mjg2LTIuMXYtNC45YzAtMC43NyAwLjY0Mjg2LTEuNCAxLjQyODYtMS40aDQuMjg1N2MwLjc5Mjg2IDAgMS40Mjg2IDAuNjIzIDEuNDI4NiAxLjR6bS01LjcxNDMgMHY1LjQyNWwtMS4wNzE0IDEuNTc1aDYuNDI4NmwtMS4wNzE0LTEuNTc1di01LjQyNXoiIHN0cm9rZS13aWR0aD0iLjcwNzExIi8+PC9zdmc+Cg==')
 }
 
 .icon-pinned {
-    background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZlcnNpb249IjEuMSIgdmlld2JveD0iMCAwIDE2IDE2IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Im0xMS41NzIgMi40YTEuNDI4NiAxLjQgMCAwIDAtMS40Mjg2LTEuNGgtNC4yODU3Yy0wLjc4NTcxIDAtMS40Mjg2IDAuNjMtMS40Mjg2IDEuNHY0LjlsLTEuNDI4NiAyLjF2MS40aDQuMjg1N3YzLjVsMC43MTQyOSAwLjcgMC43MTQyOS0wLjd2LTMuNWg0LjI4NTd2LTEuNGwtMS40Mjg2LTIuMXoiIHN0cm9rZS13aWR0aD0iLjcwNzExIi8+PC9zdmc+Cg==")
+	background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZlcnNpb249IjEuMSIgdmlld2JveD0iMCAwIDE2IDE2IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Im0xMS41NzIgMi40YTEuNDI4NiAxLjQgMCAwIDAtMS40Mjg2LTEuNGgtNC4yODU3Yy0wLjc4NTcxIDAtMS40Mjg2IDAuNjMtMS40Mjg2IDEuNHY0LjlsLTEuNDI4NiAyLjF2MS40aDQuMjg1N3YzLjVsMC43MTQyOSAwLjcgMC43MTQyOS0wLjd2LTMuNWg0LjI4NTd2LTEuNGwtMS40Mjg2LTIuMXoiIHN0cm9rZS13aWR0aD0iLjcwNzExIi8+PC9zdmc+Cg==')
 }
 
 .icon-archived {
-    background-image: var(--qn-icon-archived)
+	background-image: var(--qn-icon-archived)
 }
 
 .icon-unarchive {
-    background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJtMjAuNTQgNS4yMy0xLjM5LTEuNjhDMTguODggMy4yMSAxOC40NyAzIDE4IDNINmMtLjQ3IDAtLjg4LjIxLTEuMTYuNTVMMy40NiA1LjIzQzMuMTcgNS41NyAzIDYuMDIgMyA2LjVWMTljMCAxLjEuOSAyIDIgMmgxNGMxLjEgMCAyLS45IDItMlY2LjVjMC0uNDgtLjE3LS45My0uNDYtMS4yN002LjI0IDVoMTEuNTJsLjgzIDFINS40MnpNNSAxOVY4aDE0djExem0zLTUuNSA0LTQgNCA0LTEuNDEgMS40MUwxMyAxMy4zM1YxN2gtMnYtMy42N2wtMS41OSAxLjU5eiIvPjwvc3ZnPg==);
+	background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJtMjAuNTQgNS4yMy0xLjM5LTEuNjhDMTguODggMy4yMSAxOC40NyAzIDE4IDNINmMtLjQ3IDAtLjg4LjIxLTEuMTYuNTVMMy40NiA1LjIzQzMuMTcgNS41NyAzIDYuMDIgMyA2LjVWMTljMCAxLjEuOSAyIDIgMmgxNGMxLjEgMCAyLS45IDItMlY2LjVjMC0uNDgtLjE3LS45My0uNDYtMS4yN002LjI0IDVoMTEuNTJsLjgzIDFINS40MnpNNSAxOVY4aDE0djExem0zLTUuNSA0LTQgNCA0LTEuNDEgMS40MUwxMyAxMy4zM1YxN2gtMnYtMy42N2wtMS41OSAxLjU5eiIvPjwvc3ZnPg==);
 }
 
 .icon-restore {
-    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTEzLjUsOEgxMlYxM0wxNi4yOCwxNS41NEwxNywxNC4zM0wxMy41LDEyLjI1VjhNMTMsM0E5LDkgMCAwLDAgNCwxMkgxTDQuOTYsMTYuMDNMOSwxMkg2QTcsNyAwIDAsMSAxMyw1QTcsNyAwIDAsMSAyMCwxMkE3LDcgMCAwLDEgMTMsMTlDMTEuMDcsMTkgOS4zMiwxOC4yMSA4LjA2LDE2Ljk0TDYuNjQsMTguMzZDOC4yNywyMCAxMC41LDIxIDEzLDIxQTksOSAwIDAsMCAyMiwxMkE5LDkgMCAwLDAgMTMsMyI+PC9wYXRoPjwvc3ZnPg==");
+	background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTEzLjUsOEgxMlYxM0wxNi4yOCwxNS41NEwxNywxNC4zM0wxMy41LDEyLjI1VjhNMTMsM0E5LDkgMCAwLDAgNCwxMkgxTDQuOTYsMTYuMDNMOSwxMkg2QTcsNyAwIDAsMSAxMyw1QTcsNyAwIDAsMSAyMCwxMkE3LDcgMCAwLDEgMTMsMTlDMTEuMDcsMTkgOS4zMiwxOC4yMSA4LjA2LDE2Ljk0TDYuNjQsMTguMzZDOC4yNywyMCAxMC41LDIxIDEzLDIxQTksOSAwIDAsMCAyMiwxMkE5LDkgMCAwLDAgMTMsMyI+PC9wYXRoPjwvc3ZnPg==');
 }
 
 
 #app-content-wrapper {
-    height: 100%;
+	height: 100%;
 }
 
 #new-note {
-    background-color: var(--color-primary-element);
-    color: var(--color-primary-element-text);
-    width: 100%;
-    min-height: 44px;
-    text-align: left;
-    margin: 0;
-    padding-left: 44px;
-    background-position: 16px center;
+	background-color: var(--color-primary-element);
+	color: var(--color-primary-element-text);
+	width: 100%;
+	min-height: 44px;
+	text-align: left;
+	margin: 0;
+	padding-left: 44px;
+	background-position: 16px center;
 }
 
 #new-note-fixed {
-    z-index: 111; /* navigation menu is 110 ;-) */
-    line-height: 44px;
-    min-height: 44px;
-    margin-bottom: 4px;
-    position: relative;
+	z-index: 111; /* navigation menu is 110 ;-) */
+	line-height: 44px;
+	min-height: 44px;
+	margin-bottom: 4px;
+	position: relative;
 }
 
 /* The text filter of the grid. Collapsed it is an entry of the navigation like
@@ -49,61 +49,61 @@
    somebody looking for a note looks, and because the alternative, the app
    content area, is where the notes themselves have to be. */
 #note-filter-fixed {
-    position: relative;
-    display: none;
-    align-items: center;
-    /* Lines up with the 44px rows of the navigation entry it replaces, so
+	position: relative;
+	display: none;
+	align-items: center;
+	/* Lines up with the 44px rows of the navigation entry it replaces, so
        swapping one for the other does not move anything below. */
-    min-height: 44px;
-    margin: 0 8px;
+	min-height: 44px;
+	margin: 0 8px;
 }
 
 #note-filter-fixed.open {
-    display: flex;
+	display: flex;
 }
 
 #note-filter-fixed::before {
-    content: '';
-    position: absolute;
-    left: 10px;
-    width: 16px;
-    height: 16px;
-    background-image: var(--qn-icon-search);
-    background-repeat: no-repeat;
-    background-position: center;
-    /* The navigation follows the theme, so here the glyph has to follow it too.
+	content: '';
+	position: absolute;
+	left: 10px;
+	width: 16px;
+	height: 16px;
+	background-image: var(--qn-icon-search);
+	background-repeat: no-repeat;
+	background-position: center;
+	/* The navigation follows the theme, so here the glyph has to follow it too.
        On the pseudo-element and not on the input, which would invert the text
        the user is typing along with it. */
-    filter: var(--background-invert-if-dark);
-    opacity: 0.5;
-    pointer-events: none;
+	filter: var(--background-invert-if-dark);
+	opacity: 0.5;
+	pointer-events: none;
 }
 
 #note-filter {
-    width: 100%;
-    /* Room for the magnifier on the left and the clear button on the right. */
-    padding-left: 32px;
-    padding-right: 32px;
-    margin: 0;
-    text-overflow: ellipsis;
+	width: 100%;
+	/* Room for the magnifier on the left and the clear button on the right. */
+	padding-left: 32px;
+	padding-right: 32px;
+	margin: 0;
+	text-overflow: ellipsis;
 }
 
 #note-filter-clear {
-    position: absolute;
-    right: 2px;
-    width: 28px;
-    min-width: 28px;
-    height: 28px;
-    padding: 0;
-    border: none;
-    background-color: transparent;
-    font-size: 18px;
-    line-height: 1;
-    opacity: 0.6;
+	position: absolute;
+	right: 2px;
+	width: 28px;
+	min-width: 28px;
+	height: 28px;
+	padding: 0;
+	border: none;
+	background-color: transparent;
+	font-size: 18px;
+	line-height: 1;
+	opacity: 0.6;
 }
 
 #note-filter-clear:hover {
-    opacity: 1;
+	opacity: 1;
 }
 
 /* Isotope sizes the grid itself, and with everything filtered out its fitWidth
@@ -112,31 +112,31 @@
    a grid with nothing in it. Capping it is one line and covers any other layout
    where that math overshoots. */
 #notes-grid-div {
-    max-width: 100%;
+	max-width: 100%;
 }
 
 /* Isotope hides what a filter leaves out, so an empty result looks exactly like
    an empty app until something says otherwise. Hidden here and toggled from
    `View._afterFilter()`. */
 #no-matches {
-    display: none;
+	display: none;
 }
 
 #no-matches .icon-qn-search {
-    background-size: 64px;
-    height: 128px;
+	background-size: 64px;
+	height: 128px;
 }
 
 #app-navigation:not(.vue) > ul > li > ul > .color-filter {
-    display: flex;
-    min-height: 44px;
-    justify-content: center;
-    padding-top: 4px;
-    padding-left: unset;
+	display: flex;
+	min-height: 44px;
+	justify-content: center;
+	padding-top: 4px;
+	padding-left: unset;
 }
 
 .icon-filter-checkmark {
-    background-image: var(--original-icon-checkmark-dark);
+	background-image: var(--original-icon-checkmark-dark);
 }
 
 /* "Any colour" sits in a row of note colours and is one more swatch, so it is a
@@ -148,7 +148,7 @@
    swatches, in the colour picker of a note and in the settings, and those are
    light whatever the theme. */
 .color-filter > .any-color-filter {
-    background-color: #ffffff;
+	background-color: #ffffff;
 }
 
 /* A note is a light island, in every theme.
@@ -172,54 +172,53 @@
  * If something in here ever has to be dark under a dark theme, it does not
  * belong on the note. */
 .quicknote {
-    --color-main-text: #222222;
-    --color-text-maxcontrast: #6b6b6b;
-    --color-background-hover: #f5f5f5;
-    --color-background-dark: #ededed;
-    --color-border: #ededed;
-    --color-main-background: #ffffff;
-    --color-primary-element: #00679e;
-    --color-primary-element-light: #e5eff5;
-    /* Cancel / Save / Close are plain `button`s, and the server paints those
+	--color-main-text: #222222;
+	--color-text-maxcontrast: #6b6b6b;
+	--color-background-hover: #f5f5f5;
+	--color-background-dark: #ededed;
+	--color-border: #ededed;
+	--color-main-background: #ffffff;
+	--color-primary-element: #00679e;
+	--color-primary-element-light: #e5eff5;
+	/* Cancel / Save / Close are plain `button`s, and the server paints those
        with `--color-primary-element-light` behind and
        `--color-primary-element-light-text` on top (core/css/inputs.css). Both
        have to be pinned or the pair splits: pinning only the background left a
        light blue label on a light blue button. */
-    --color-primary-element-light-text: #00293f;
-    --color-primary-element-text: #ffffff;
-    --background-invert-if-dark: no;
-
-    color: var(--color-main-text);
-    min-height: 150px;
-    width: 250px;
-    border-radius: 8px;
+	--color-primary-element-light-text: #00293f;
+	--color-primary-element-text: #ffffff;
+	--background-invert-if-dark: no;
+	color: var(--color-main-text);
+	min-height: 150px;
+	width: 250px;
+	border-radius: 8px;
 }
 
 .quicknote:hover {
-    box-shadow: 0px 0px 4px var(--color-box-shadow);
+	box-shadow: 0px 0px 4px var(--color-box-shadow);
 }
 
 #title-editable:empty:before {
-    content: attr(data-placeholder);
+	content: attr(data-placeholder);
 }
 
 .quicknote ul {
-    list-style: initial;
-    margin-left: 20px;
+	list-style: initial;
+	margin-left: 20px;
 }
 
 .quicknote ol {
-    margin-left: 20px;
+	margin-left: 20px;
 }
 
 .quicknote blockquote {
-    margin: 0px 0px 0px 10px;
-    border-left: 1px dotted;
-    padding-left: 1ex;
+	margin: 0px 0px 0px 10px;
+	border-left: 1px dotted;
+	padding-left: 1ex;
 }
 
 .quicknote a {
-    color: var(--color-primary-element);
+	color: var(--color-primary-element);
 }
 
 /* Wikilinks are links to other notes. The pill background tells them apart
@@ -227,162 +226,162 @@
    every theme, so a translucent neutral tint reads on all of them without
    following the theme. */
 .note-content a.qn-wikilink {
-    padding: 1px 6px;
-    border-radius: 3px;
-    background-color: rgba(127, 127, 127, 0.15);
-    text-decoration: none;
+	padding: 1px 6px;
+	border-radius: 3px;
+	background-color: rgba(127, 127, 127, 0.15);
+	text-decoration: none;
 }
 
 .note-content a.qn-wikilink:hover {
-    background-color: rgba(127, 127, 127, 0.28);
+	background-color: rgba(127, 127, 127, 0.28);
 }
 
 .note-active {
-  z-index: 10;
-  height: 100%;
-  width: 100%;
+	z-index: 10;
+	height: 100%;
+	width: 100%;
 }
 
 .save-button #unshare-button {
-    display: none;
+	display: none;
 }
 
 #div-content .buttons-toolbar {
-    float: right;
-    display: flex;
-    /*padding-right: 8px;*/
-    /*padding-bottom: 5px;*/
+	float: right;
+	display: flex;
+	/*padding-right: 8px;*/
+	/*padding-bottom: 5px;*/
 }
 
 #div-content textarea {
-    border: 0;
-    overflow-y: auto;
-    /*resize: none;*/
-    background: inherit;
+	border: 0;
+	overflow-y: auto;
+	/*resize: none;*/
+	background: inherit;
 }
 
 /* Grid Note */
 
 #div-content {
-    width: 100%;
+	width: 100%;
 }
 
 #div-content .note-title {
-   font-size: 18px;
-   font-weight: bold;
-   overflow-wrap: break-word;
+	font-size: 18px;
+	font-weight: bold;
+	overflow-wrap: break-word;
 }
 
 .note-content {
-    margin: 4px;
-    overflow-wrap: break-word;
-    min-height: 75px;
+	margin: 4px;
+	overflow-wrap: break-word;
+	min-height: 75px;
 }
 
 .icon-button-add {
-    background-image: var(--original-icon-add-white);
+	background-image: var(--original-icon-add-white);
 }
 
 .icon-delete-note {
-    background-image: var(--original-icon-delete-dark);
+	background-image: var(--original-icon-delete-dark);
 }
 
 .icon-delete-note:hover {
-    background-image: var(--icon-delete-color-red);
+	background-image: var(--icon-delete-color-red);
 }
 
 .icon-header-note {
-    cursor: pointer;
-    float: right;
-    margin-left: 2px;
-    padding: 12px;
-    background-color: var(--color-background-hover);
-    background-size: 22px;
-    min-width: 28px;
-    min-height: 28px;
-    border-radius: 50%;
-    -moz-transition: opacity 0.218s ease-in;
-    transition: opacity 0.218s ease-in;
+	cursor: pointer;
+	float: right;
+	margin-left: 2px;
+	padding: 12px;
+	background-color: var(--color-background-hover);
+	background-size: 22px;
+	min-width: 28px;
+	min-height: 28px;
+	border-radius: 50%;
+	-moz-transition: opacity 0.218s ease-in;
+	transition: opacity 0.218s ease-in;
 }
 
 .icon-header-note:hover {
-    background-color: var(--color-background-dark);
-    opacity: 0.87;
+	background-color: var(--color-background-dark);
+	opacity: 0.87;
 }
 
 .hide-header-icon {
-    opacity: 0;
+	opacity: 0;
 }
 
 .fixed-header-icon,
 .show-header-icon {
-    opacity: 0.54;
+	opacity: 0.54;
 }
 
 .noselect {
-   -webkit-touch-callout: none; /* iOS Safari */
-   -webkit-user-select: none;   /* Chrome/Safari/Opera */
-   -khtml-user-select: none;    /* Konqueror */
-   -moz-user-select: none;      /* Firefox */
-   -ms-user-select: none;       /* Internet Explorer/Edge */
-   user-select: none;           /* Non-prefixed version, currently
+	-webkit-touch-callout: none; /* iOS Safari */
+	-webkit-user-select: none;   /* Chrome/Safari/Opera */
+	-khtml-user-select: none;    /* Konqueror */
+	-moz-user-select: none;      /* Firefox */
+	-ms-user-select: none;       /* Internet Explorer/Edge */
+	user-select: none;           /* Non-prefixed version, currently
                                   not supported by any browser */
 }
 
 .colors-toolbar {
-   float: left;
+	float: left;
 }
 
 Button.circle-toolbar {
-  padding: 14px;
-  min-height: 20px;
+	padding: 14px;
+	min-height: 20px;
 }
 
 .colorPickButton,
 .circle-toolbar {
-   display:inline-block;
-   width:20px;
-   height:20px;
-   min-width: 20px;
-   min-height: 20px;
-   padding: unset;
-   border-radius:10px;
-   border: 1px solid rgba(0, 0, 0, 0.2);
+	display:inline-block;
+	width:20px;
+	height:20px;
+	min-width: 20px;
+	min-height: 20px;
+	padding: unset;
+	border-radius:10px;
+	border: 1px solid rgba(0, 0, 0, 0.2);
 }
 
 .circle-toolbar:hover {
-   border-color: var(--color-primary-element);
+	border-color: var(--color-primary-element);
 }
 
 /* Emptying the trash. Only rendered in that view, and only when there is
    something to empty, so it never sits over the other lists. */
 
 #trash-bar {
-    display: flex;
-    justify-content: flex-end;
-    padding: 15px 15px 0;
+	display: flex;
+	justify-content: flex-end;
+	padding: 15px 15px 0;
 }
 
 #trash-bar button {
-    display: flex;
-    align-items: center;
-    gap: 6px;
+	display: flex;
+	align-items: center;
+	gap: 6px;
 }
 
 #trash-bar button.icon-delete {
-    background-position: 12px center;
-    padding-left: 34px;
+	background-position: 12px center;
+	padding-left: 34px;
 }
 
 /* Isotope Grid */
 
 .notes-grid {
-    margin: 0 auto;
-    padding: 15px;
+	margin: 0 auto;
+	padding: 15px;
 }
 
 .note-grid-item {
-  margin-bottom: 14px;
+	margin-bottom: 14px;
 }
 
 /* Modal Note */
@@ -390,102 +389,102 @@ Button.circle-toolbar {
 /* The Modal (background) */
 
 .modal-note-background {
-    position: fixed; /* Stay in place */
-    z-index: 9998; /* Match NC33 NcModal .modal-mask z-index */
-    padding-top: 100px; /* Location of the box */
-    left: 0;
-    top: 0;
-    width: 100%; /* Full width */
-    height: 100%; /* Full height */
-    overflow: visible; /* Match NC33 .modal-mask (no scroll restriction) */
-    background-color: rgba(0,0,0,0.5);
+	position: fixed; /* Stay in place */
+	z-index: 9998; /* Match NC33 NcModal .modal-mask z-index */
+	padding-top: 100px; /* Location of the box */
+	left: 0;
+	top: 0;
+	width: 100%; /* Full width */
+	height: 100%; /* Full height */
+	overflow: visible; /* Match NC33 .modal-mask (no scroll restriction) */
+	background-color: rgba(0,0,0,0.5);
 }
 
 .hide-modal-note {
-    display: none;
+	display: none;
 }
 
 .show-modal-note {
-    display: block;
+	display: block;
 }
 
-div[contenteditable="true"] {
-   margin: 0px;
-   padding: 0px;
-   min-height: auto;
+div[contenteditable='true'] {
+	margin: 0px;
+	padding: 0px;
+	min-height: auto;
 }
 
 #title-editable:active, #title-editable:hover, #title-editable:focus,
 #content-editable:active, #content-editable:hover, #content-editable:focus {
-    background-color: transparent !important;
-    box-shadow: none;
+	background-color: transparent !important;
+	box-shadow: none;
 }
 
 #content-editable {
-    width: 100%;
-    padding: 4px;
-    min-height: 50px;
-    word-wrap: break-word;
-    background: none;
-    color: unset;
-    border: none;
+	width: 100%;
+	padding: 4px;
+	min-height: 50px;
+	word-wrap: break-word;
+	background: none;
+	color: unset;
+	border: none;
 }
 
 #title-editable {
-    width: 100%;
-    background: none;
-    color: unset;
-    border: none;
+	width: 100%;
+	background: none;
+	color: unset;
+	border: none;
 }
 
 .note-editable-options,
 .note-noneditable-options {
-    padding: 8px;
-    padding-top: 0px;
+	padding: 8px;
+	padding-top: 0px;
 }
 
 #note-share-options {
-    display: none;
-    padding-bottom: 5px;
+	display: none;
+	padding-bottom: 5px;
 }
 
 .selected-share:hover, .unselected-share:hover, .selected-share span:hover, .unselected-share span:hover {
-    cursor: pointer;
+	cursor: pointer;
 }
 
 .selected-share, .unselected-share {
-    padding-left: 5px;
+	padding-left: 5px;
 }
 
 .note-share-select {
-    width: 100%;
-    opacity: 0.5;
+	width: 100%;
+	opacity: 0.5;
 }
 
 .slim-reminder,
 .slim-share,
 .slim-tag {
-    background-repeat: no-repeat;
-    display: inline-block;
-    cursor: pointer;
-    padding: 0px 6px 0 24px;
-    background-color: var(--color-background-hover);
-    background-position: 8px center;
-    opacity: 0.87;
-    border-radius: 10px;
-    font-size: 90%;
+	background-repeat: no-repeat;
+	display: inline-block;
+	cursor: pointer;
+	padding: 0px 6px 0 24px;
+	background-color: var(--color-background-hover);
+	background-position: 8px center;
+	opacity: 0.87;
+	border-radius: 10px;
+	font-size: 90%;
 }
 
 .slim-reminder:hover,
 .slim-share:hover,
 .slim-tag:hover {
-    background-color: var(--color-background-dark);
+	background-color: var(--color-background-dark);
 }
 
 .note-reminder > .slim-reminder,
 .note-shares > .slim-share,
 .note-tags > .slim-tag {
-    margin-top: 5px;
+	margin-top: 5px;
 }
 
 /* Inlined for the same reason as .slim-reminder below: this used to point at
@@ -494,24 +493,24 @@ div[contenteditable="true"] {
    A note keeps its light colour in every theme, so the glyph is plain dark
    with no filter and no media query. */
 .slim-share {
-    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTIgNGE0IDQgMCAwIDEgNCA0IDQgNCAwIDAgMS00IDQgNCA0IDAgMCAxLTQtNCA0IDQgMCAwIDEgNC00bTAgMTBjNC40MiAwIDggMS43OSA4IDR2Mkg0di0yYzAtMi4yMSAzLjU4LTQgOC00eiIvPjwvc3ZnPg==");
+	background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTIgNGE0IDQgMCAwIDEgNCA0IDQgNCAwIDAgMS00IDQgNCA0IDAgMCAxLTQtNCA0IDQgMCAwIDEgNC00bTAgMTBjNC40MiAwIDggMS43OSA4IDR2Mkg0di0yYzAtMi4yMSAzLjU4LTQgOC00eiIvPjwvc3ZnPg==');
 }
 
 /* A share with a whole group says so, since the name in the badge is a group
    name and would otherwise read as yet another person. */
 .slim-share-group {
-    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTYgMTd2Mkgydi0yczAtNCA3LTQgNyA0IDcgNG0tMy41LTkuNUEzLjUgMy41IDAgMSAwIDkgMTFhMy41IDMuNSAwIDAgMCAzLjUtMy41bTMuNDQgNS41QTUuMzIgNS4zMiAwIDAgMSAxOCAxN3YyaDR2LTJzMC0zLjYzLTYuMDYtNE0xNSA0YTMuMzkgMy4zOSAwIDAgMC0xLjkzLjU5IDUgNSAwIDAgMSAwIDUuODJBMy4zOSAzLjM5IDAgMCAwIDE1IDExYTMuNSAzLjUgMCAwIDAgMC03eiIvPjwvc3ZnPg==");
+	background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTYgMTd2Mkgydi0yczAtNCA3LTQgNyA0IDcgNG0tMy41LTkuNUEzLjUgMy41IDAgMSAwIDkgMTFhMy41IDMuNSAwIDAgMCAzLjUtMy41bTMuNDQgNS41QTUuMzIgNS4zMiAwIDAgMSAxOCAxN3YyaDR2LTJzMC0zLjYzLTYuMDYtNE0xNSA0YTMuMzkgMy4zOSAwIDAgMC0xLjkzLjU5IDUgNSAwIDAgMSAwIDUuODJBMy4zOSAzLjM5IDAgMCAwIDE1IDExYTMuNSAzLjUgMCAwIDAgMC03eiIvPjwvc3ZnPg==');
 }
 
 /* A share that can write back is worth telling apart from one that can only
    read: the outline is the badge saying so at a glance, the tooltip spells it
    out, and the dialog is where it is changed. */
 .slim-share-editable {
-    box-shadow: inset 0 0 0 1px var(--color-primary-element);
+	box-shadow: inset 0 0 0 1px var(--color-primary-element);
 }
 
 .slim-tag {
-    background-image: var(--original-icon-tag-dark);
+	background-image: var(--original-icon-tag-dark);
 }
 
 /* Inlined rather than reached through `--original-icon-calendar-dark`: that name
@@ -519,24 +518,24 @@ div[contenteditable="true"] {
    note — always light, whatever the theme — would follow the theme and turn
    white. See the note next to .icon-qn-reminder in css/icons.css. */
 .slim-reminder {
-    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTcgMTJoLTV2NWg1di01ek0xNiAxdjJIOFYxSDZ2Mkg1Yy0xLjExIDAtMS45OS45LTEuOTkgMkwzIDE5YzAgMS4xLjg5IDIgMiAyaDE0YzEuMSAwIDItLjkgMi0yVjVjMC0xLjEtLjktMi0yLTJoLTFWMWgtMnptMyAxOEg1VjhoMTR2MTF6Ii8+PC9zdmc+");
+	background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTcgMTJoLTV2NWg1di01ek0xNiAxdjJIOFYxSDZ2Mkg1Yy0xLjExIDAtMS45OS45LTEuOTkgMkwzIDE5YzAgMS4xLjg5IDIgMiAyaDE0YzEuMSAwIDItLjkgMi0yVjVjMC0xLjEtLjktMi0yLTJoLTFWMWgtMnptMyAxOEg1VjhoMTR2MTF6Ii8+PC9zdmc+');
 }
 
 /* A reminder whose notification already went out is history, not a pending
    thing, so it is toned down instead of removed — the date is still useful. */
 .slim-reminder-sent {
-    opacity: 0.5;
-    text-decoration: line-through;
+	opacity: 0.5;
+	text-decoration: line-through;
 }
 
 /* Modal Content */
 
 .modal-content {
-    position: relative;
-    margin: auto;
-    width: 60%;
-    height: auto;
-    min-height: unset;
+	position: relative;
+	margin: auto;
+	width: 60%;
+	height: auto;
+	min-height: unset;
 }
 
 /* The mosaic of attachments.
@@ -564,10 +563,10 @@ div[contenteditable="true"] {
  * The cells stay roughly square or 3:2 in every shape, which is why the same
  * `background-size` works throughout. */
 .note-attachts {
-    position: relative;
-    display: grid;
-    gap: 2px;
-    grid-auto-rows: 1fr;
+	position: relative;
+	display: grid;
+	gap: 2px;
+	grid-auto-rows: 1fr;
 }
 
 /* No attachments: no strip, no gap, nothing. The container is in the markup
@@ -575,50 +574,54 @@ div[contenteditable="true"] {
    down for nothing. */
 .note-attachts:empty,
 .note-attachts:not([data-count]),
-.note-attachts[data-count=""],
-.note-attachts[data-count="0"] {
-    display: none;
+.note-attachts[data-count=''],
+.note-attachts[data-count='0'] {
+	display: none;
 }
 
 .note-attachts[data-count] {
-    aspect-ratio: 3 / 2;
-    /* The strip used to round its outer corners by hand, on the first and last
+	aspect-ratio: 3 / 2;
+	/* The strip used to round its outer corners by hand, on the first and last
        tile of the row — which only worked because there was exactly one row.
        Clipping the whole container does the same for every shape. */
-    overflow: hidden;
-    border-top-left-radius: 8px;
-    border-top-right-radius: 8px;
+	overflow: hidden;
+	border-top-left-radius: 8px;
+	border-top-right-radius: 8px;
 }
 
-.note-attachts[data-count="1"] { grid-template-columns: 1fr; }
-.note-attachts[data-count="2"] { grid-template-columns: 1fr 1fr; }
+.note-attachts[data-count='1'] { grid-template-columns: 1fr; }
+
+.note-attachts[data-count='2'] { grid-template-columns: 1fr 1fr; }
 
 /* One tall on the left, two stacked on the right. */
-.note-attachts[data-count="3"] {
-    grid-template-columns: 2fr 1fr;
-    grid-template-rows: 1fr 1fr;
-}
-.note-attachts[data-count="3"] > :first-child {
-    grid-row: 1 / span 2;
+.note-attachts[data-count='3'] {
+	grid-template-columns: 2fr 1fr;
+	grid-template-rows: 1fr 1fr;
 }
 
-.note-attachts[data-count="4"] {
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr;
+.note-attachts[data-count='3'] > :first-child {
+	grid-row: 1 / span 2;
+}
+
+.note-attachts[data-count='4'] {
+	grid-template-columns: 1fr 1fr;
+	grid-template-rows: 1fr 1fr;
 }
 
 /* Six columns is the smallest grid that divides into both halves and thirds,
    which is what lets two sit on top of three. */
-.note-attachts[data-count="5"] {
-    grid-template-columns: repeat(6, 1fr);
-    grid-template-rows: 1fr 1fr;
+.note-attachts[data-count='5'] {
+	grid-template-columns: repeat(6, 1fr);
+	grid-template-rows: 1fr 1fr;
 }
-.note-attachts[data-count="5"] > :nth-child(-n+2) { grid-column: span 3; }
-.note-attachts[data-count="5"] > :nth-child(n+3)  { grid-column: span 2; }
 
-.note-attachts[data-count="6"] {
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: 1fr 1fr;
+.note-attachts[data-count='5'] > :nth-child(-n+2) { grid-column: span 3; }
+
+.note-attachts[data-count='5'] > :nth-child(n+3)  { grid-column: span 2; }
+
+.note-attachts[data-count='6'] {
+	grid-template-columns: repeat(3, 1fr);
+	grid-template-rows: 1fr 1fr;
 }
 
 /* Seven or more: rows of three, and the container grows instead of squashing.
@@ -631,66 +634,66 @@ div[contenteditable="true"] {
    In the grid of notes only the first six are shown and the rest are counted
    (see [data-more] below), so there it is exactly two rows; the editor shows
    them all, because that is where an attachment is removed. */
-.note-attachts[data-count]:not([data-count="1"]):not([data-count="2"]):not([data-count="3"]):not([data-count="4"]):not([data-count="5"]):not([data-count="6"]) {
-    aspect-ratio: auto;
-    grid-template-columns: repeat(3, 1fr);
+.note-attachts[data-count]:not([data-count='1']):not([data-count='2']):not([data-count='3']):not([data-count='4']):not([data-count='5']):not([data-count='6']) {
+	aspect-ratio: auto;
+	grid-template-columns: repeat(3, 1fr);
 }
 
-.note-attachts[data-count]:not([data-count="1"]):not([data-count="2"]):not([data-count="3"]):not([data-count="4"]):not([data-count="5"]):not([data-count="6"]) > .note-attach-grid {
-    aspect-ratio: 1;
+.note-attachts[data-count]:not([data-count='1']):not([data-count='2']):not([data-count='3']):not([data-count='4']):not([data-count='5']):not([data-count='6']) > .note-attach-grid {
+	aspect-ratio: 1;
 }
 
 #notes-grid-div .note-attachts[data-more] > :nth-child(n+7) {
-    display: none;
+	display: none;
 }
 
 /* "+3" over the corner of the card. Not over the sixth tile: the tile is a
    background image the browser may still be loading, and the corner reads the
    same without having to guess which cell is last. */
 #notes-grid-div .note-attachts[data-more]::after {
-    content: "+" attr(data-more);
-    position: absolute;
-    right: 4px;
-    bottom: 4px;
-    padding: 1px 8px;
-    border-radius: 10px;
-    background-color: rgba(30, 30, 30, .55);
-    color: #fff;
-    font-size: 90%;
+	content: '+' attr(data-more);
+	position: absolute;
+	right: 4px;
+	bottom: 4px;
+	padding: 1px 8px;
+	border-radius: 10px;
+	background-color: rgba(30, 30, 30, .55);
+	color: #fff;
+	font-size: 90%;
 }
 
 .note-attach-grid {
-    position: relative;
-    overflow: hidden;
-    min-width: 0;
-    min-height: 0;
+	position: relative;
+	overflow: hidden;
+	min-width: 0;
+	min-height: 0;
 }
 
 .note-attach {
-    width: 100%;
-    height: 100%;
-    background-repeat: no-repeat;
-    background-position: center;
-    /* A real thumbnail fills its cell, cropped, so the mosaic reads as one
+	width: 100%;
+	height: 100%;
+	background-repeat: no-repeat;
+	background-position: center;
+	/* A real thumbnail fills its cell, cropped, so the mosaic reads as one
        block of images. The icon of a file type does not: blown up to cover a
        cell it looks like something went wrong, so it stays its own size in the
        middle. */
-    background-size: cover;
+	background-size: cover;
 }
 
 .note-attach.attach-is-icon {
-    background-size: 40%;
+	background-size: 40%;
 }
 
 /* A single attachment is not a mosaic — there is nothing to line it up with,
    and cropping the only thing on the note to a 3:2 rectangle loses more than
    it gains. */
-.note-attachts[data-count="1"] .note-attach {
-    background-size: contain;
+.note-attachts[data-count='1'] .note-attach {
+	background-size: contain;
 }
 
 .attach-preview {
-    background-color: rgba(210, 210, 210, .5);
+	background-color: rgba(210, 210, 210, .5);
 }
 
 /* Take an attachment off a note.
@@ -704,34 +707,34 @@ div[contenteditable="true"] {
  * Plain dark svg, no filter and no media query, like every other icon that sits
  * on a note: a note keeps its light colour under every theme. */
 .attach-remove {
-    position: absolute;
-    bottom: 8px;
-    right: 8px;
-    padding: 12px;
-    background-color: rgba(210, 210, 210, .4);
-    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTkgNGgtMy41bC0xLTFoLTVsLTEgMUg1djJoMTRWNHpNNiAxOWEyIDIgMCAwIDAgMiAyaDhhMiAyIDAgMCAwIDItMlY3SDZ2MTJ6Ii8+PC9zdmc+");
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: 16px;
-    opacity: 0.54;
-    border-radius: 50%;
+	position: absolute;
+	bottom: 8px;
+	right: 8px;
+	padding: 12px;
+	background-color: rgba(210, 210, 210, .4);
+	background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTkgNGgtMy41bC0xLTFoLTVsLTEgMUg1djJoMTRWNHpNNiAxOWEyIDIgMCAwIDAgMiAyaDhhMiAyIDAgMCAwIDItMlY3SDZ2MTJ6Ii8+PC9zdmc+');
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: 16px;
+	opacity: 0.54;
+	border-radius: 50%;
 }
 
 .attach-remove:hover {
-    cursor: pointer;
-    background-color: rgba(210, 210, 210, .5);
-    opacity: 0.87;
+	cursor: pointer;
+	background-color: rgba(210, 210, 210, .5);
+	opacity: 0.87;
 }
 
 .note-body {
-    padding: 10px;
+	padding: 10px;
 }
 
 .round-tool-button {
-    width: 32px !important;
-    height: 32px;
-    padding: 0px !important;
-    border-radius: 50%;
+	width: 32px !important;
+	height: 32px;
+	padding: 0px !important;
+	border-radius: 50%;
 }
 
 /**
@@ -751,25 +754,25 @@ div[contenteditable="true"] {
  * and #app-navigation (500). Semi-transparent overlay covers entire viewport.
  */
 body:has(#modal-note-div.show-modal-note) #content {
-    position: relative !important;
-    overflow: visible !important;
+	position: relative !important;
+	overflow: visible !important;
 }
 
 body:has(#modal-note-div.show-modal-note) #app-content {
-    z-index: auto !important;
+	z-index: auto !important;
 }
 
 #archived-notes > a,
 #trash-notes > a {
-    opacity: 0.7;
+	opacity: 0.7;
 }
 
 #archived-notes.active > a,
 #trash-notes.active > a {
-    opacity: 1;
-    font-weight: bold;
+	opacity: 1;
+	font-weight: bold;
 }
 
 #archived-notes {
-    margin-top: auto !important;
+	margin-top: auto !important;
 }

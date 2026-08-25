@@ -1,8 +1,7 @@
 import Vue from 'vue'
 
-import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
-import { showError, showSuccess } from '@nextcloud/dialogs'
+import { showSuccess } from '@nextcloud/dialogs'
 
 import { postNewNote } from './NotesService.js'
 
@@ -18,7 +17,7 @@ window.addEventListener('DOMContentLoaded', () => {
 	window.OCA.Talk.registerMessageAction({
 		label: t('quicknotes', 'Save as a note'),
 		icon: 'icon-quicknotes',
-		async callback({message: { message, id: messageId, messageParameters, actorDisplayName }, metadata: { name: conversationName, token: conversationToken }}) {
+		async callback({ message: { message, id: messageId, messageParameters, actorDisplayName }, metadata: { name: conversationName, token: conversationToken } }) {
 			const parsedMessage = message.replace(/{[a-z0-9-_]+}/gi, function(parameter) {
 				const parameterName = parameter.substr(1, parameter.length - 2)
 				if (messageParameters[parameterName]) {
@@ -48,7 +47,7 @@ window.addEventListener('DOMContentLoaded', () => {
 			content += '<p><a href="' + callLink + '" rel="noopener noreferrer" target="_blank">' + callLink + '</a></p>'
 
 			postNewNote(title, content).then(data => {
-				const noteUrl = generateUrl('apps/quicknotes/?n={noteId}', {noteId: data.id})
+				const noteUrl = generateUrl('apps/quicknotes/?n={noteId}', { noteId: data.id })
 				showSuccess(t('quicknotes', 'Message saved as a new note. <a target="_blank" rel="noreferrer noopener" href="{link}" >See that. ↗</a>', {
 					link: noteUrl,
 				}), {
