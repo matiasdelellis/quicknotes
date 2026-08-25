@@ -49,6 +49,35 @@ class TagMapper extends QBMapper {
 		return true;
 	}
 
+	/**
+	 * The names of the tags one user put on several notes, keyed by note id.
+	 *
+	 * The search provider matches against these — a note's tags are as much
+	 * part of what it says as its title — and one query for the whole batch is
+	 * cheaper than one per note.
+	 *
+	 * @param int[] $noteIds
+	 * @return array<int, string[]>
+	 */
+	public function getTagNamesForNotes(string $userId, array $noteIds): array {
+		$tags = [];
+		foreach (array_chunk(array_values(array_unique($noteIds)), 500) as $chunk) {
+			$qb = $this->db->getQueryBuilder();
+			$qb->select('NT.note_id', 'T.name')
+				->from('quicknotes_tags', 'T')
+				->innerJoin('T', 'quicknotes_note_tags', 'NT', $qb->expr()->eq('T.id', 'NT.tag_id'))
+				->where($qb->expr()->eq('NT.user_id', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR)))
+				->andWhere($qb->expr()->in('NT.note_id', $qb->createNamedParameter($chunk, IQueryBuilder::PARAM_INT_ARRAY)));
+
+			$result = $qb->executeQuery();
+			while ($row = $result->fetch()) {
+				$tags[(int)$row['note_id']][] = (string)$row['name'];
+			}
+			$result->closeCursor();
+		}
+		return $tags;
+	}
+
 	public function dropOld (): void {
 		$sub = $this->db->getQueryBuilder();
 		$sub->select('tag_id')

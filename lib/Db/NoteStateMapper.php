@@ -78,6 +78,31 @@ class NoteStateMapper extends QBMapper {
 	}
 
 	/**
+	 * The notes this user has archived.
+	 *
+	 * Search leaves them out, the way the dashboard widget does: a note in the
+	 * archive is out of their grid, so offering it back as a result is not
+	 * helping. The trash needs no such list — it is a column of the note.
+	 *
+	 * @return int[]
+	 */
+	public function findArchivedNoteIds(string $userId): array {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('note_id')
+			->from($this->getTableName())
+			->where(
+				$qb->expr()->eq('user_id', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR)),
+				$qb->expr()->isNotNull('archived_at')
+			);
+
+		$ids = [];
+		foreach ($this->findEntities($qb) as $state) {
+			$ids[] = (int)$state->getNoteId();
+		}
+		return $ids;
+	}
+
+	/**
 	 * Pin or unpin a note for one user.
 	 */
 	public function setPinned(string $userId, int $noteId, bool $pinned): void {

@@ -35,22 +35,21 @@ class NoteMapper extends QBMapper {
 	}
 
 	/**
-	 * Notes matching a search term, for the search provider.
+	 * Every note a user could find through search: their own and the ones
+	 * shared with them, minus the trash and minus whatever they archived.
 	 *
-	 * `$sharedIds` are the notes somebody else shared with this user: they are
-	 * reachable from the app, so they are searchable too. Trashed notes are
-	 * left out — the trash is a place things are on their way out of, not
-	 * something to be offered as a result.
+	 * The text matching itself is not done here — `NoteSearchProvider` does it,
+	 * because it has to ignore case *and* accents, and no SQL that is portable
+	 * across the databases Nextcloud runs on does that. This only hands back
+	 * the candidates, ordered so the result is stable between pages.
 	 *
 	 * @param string $userId
-	 * @param string $queryStr
-	 * @param int[] $sharedIds ids of the notes shared with the user
-	 * @param int|null $offset
-	 * @param int|null $limit
+	 * @param int[] $sharedIds ids of the notes somebody else shared with the user
+	 * @param int[] $archivedIds ids of the notes the user archived
 	 *
 	 * @return Note[]
 	 */
-	public function findLike($userId, $queryStr, array $sharedIds = [], ?int $offset = null, ?int $limit = null): array {
+	public function findReachable(string $userId, array $sharedIds = [], array $archivedIds = []): array {
 		$qb = $this->db->getQueryBuilder();
 
 		$reachable = $qb->expr()->eq('user_id', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR));
@@ -64,19 +63,13 @@ class NoteMapper extends QBMapper {
 		$qb->select('*')
 			->from($this->tableName)
 			->where($reachable)
-			->andWhere($qb->expr()->isNull('deleted_at'))
-			->andWhere(
-				$qb->expr()->orX(
-					$qb->expr()->like($qb->func()->lower('title'), $qb->createParameter('query')),
-					$qb->expr()->like($qb->func()->lower('content'), $qb->createParameter('query'))
-				)
-			);
+			->andWhere($qb->expr()->isNull('deleted_at'));
 
-		$query = '%' . $this->db->escapeLikeParameter(strtolower($queryStr)) . '%';
-		$qb->setParameter('query', $query);
+		if (count($archivedIds) > 0) {
+			$qb->andWhere($qb->expr()->notIn('id', $qb->createNamedParameter($archivedIds, IQueryBuilder::PARAM_INT_ARRAY)));
+		}
 
-		$qb->setFirstResult($offset);
-		$qb->setMaxResults($limit);
+		$qb->orderBy('timestamp', 'DESC');
 
 		return $this->findEntities($qb);
 	}
