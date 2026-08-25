@@ -7,6 +7,11 @@ notes" entry of the board does — `cafe` finds *Café*, in the title, the body 
 a tag. Notes you archived no longer come up as results, the same way the
 dashboard widget leaves them out.
 
+**Dark theme fixed.** The sidebar of the navigation follows the theme again:
+its icons are inverted under a dark theme without inverting the labels, and the
+editor toolbar keeps its icons dark on the note, which stays light under every
+theme. The Archived entry has its icon back.
+
 **For developers.** The frontend code is linted now: ESLint for the Vue sources
 and Stylelint for the stylesheets, wired into CI.
 
@@ -23,6 +28,17 @@ In detail:
 - Leave archived notes out of the unified search. They were returned as results
   even though the dashboard widget already left them out; a note you put away
   is not something to offer back as a result.
+- Fix the navigation under a dark theme: the icon of each entry now lives on
+  its own element, with the theme filter applied to the glyph alone, so the
+  labels of the sidebar no longer turn invisible when the theme inverts them
+  along with the icon. The app mark and the collapse caret follow the theme
+  the same way, and track the theme picked in Nextcloud rather than what the
+  browser prefers.
+- Give the editor toolbar its own icons for colors, tags and attachments. They
+  used the server's, which turn white under a dark theme — on a note, which is
+  hard-coded light, so they vanished. The Archived entry of the navigation
+  also gets its icon back: it had none, because its icon was stored with a
+  duplicated attribute that made it invalid.
 - Lint the frontend: ESLint over the Vue sources and Stylelint over the
   stylesheets, both wired into CI so they run on every push and pull request.
 
