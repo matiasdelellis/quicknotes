@@ -236,10 +236,30 @@
 	background-color: rgba(127, 127, 127, 0.28);
 }
 
+/* The note being edited.
+ *
+ * It is bounded by the viewport and it is *the* thing that scrolls: a note of
+ * a hundred lines used to grow the box straight off the bottom of the screen
+ * with nothing to scroll — half the text, and the Save button with it, simply
+ * out of reach. `--qn-modal-top` is the offset the box is animated to, set on
+ * `.modal-content` from `View._showEditor()`; twice it leaves the same gap
+ * below as above, and the gap is where the colour picker unfolds. `dvh` is the
+ * one that is right on a phone, where the toolbar of the browser comes and
+ * goes; the `vh` line above it is for whoever does not have it, and a browser
+ * that has neither drops `max-height` altogether and falls back to scrolling
+ * the overlay.
+ *
+ * Not `.note-body`: the mosaic of attachments is in `.note-header`, above it,
+ * and with seven files or more it grows in rows of three. Scrolling the whole
+ * note is what reaches both, and the toolbars stay put — see the `sticky`
+ * next to `.note-editable-options` below. */
 .note-active {
 	z-index: 10;
 	height: 100%;
 	width: 100%;
+	max-height: calc(100vh - 2 * var(--qn-modal-top, 150px));
+	max-height: calc(100dvh - 2 * var(--qn-modal-top, 150px));
+	overflow-y: auto;
 }
 
 .save-button #unshare-button {
@@ -396,7 +416,14 @@ Button.circle-toolbar {
 	top: 0;
 	width: 100%; /* Full width */
 	height: 100%; /* Full height */
-	overflow: visible; /* Match NC33 .modal-mask (no scroll restriction) */
+	/* Last resort, and it should never be reached: the note bounds itself to
+	   the viewport and scrolls on its own (see .note-active). This is here for
+	   the case where it cannot — no `calc()`, no `dvh`, a window shorter than
+	   the toolbars — because the alternative is content nobody can reach, which
+	   is what `overflow: visible` gave from 1.0 on. It is not what traps the
+	   overlay under the header either; that is the stacking context of
+	   #content, and it is dealt with at the end of this file. */
+	overflow: auto;
 	background-color: rgba(0,0,0,0.5);
 }
 
@@ -437,10 +464,18 @@ div[contenteditable='true'] {
 	border: none;
 }
 
+/* Held at the bottom of the note while it scrolls, so Cancel, Save and Close
+   are always where they were — the point of bounding the editor at all.
+   `background-color: inherit` is what hides the text passing underneath: the
+   colour of a note is an inline style on `.quicknote`, so the bar takes
+   whatever colour *this* note is without anything having to tell it. */
 .note-editable-options,
 .note-noneditable-options {
+	position: sticky;
+	bottom: 0;
 	padding: 8px;
 	padding-top: 0px;
+	background-color: inherit;
 }
 
 #note-share-options {

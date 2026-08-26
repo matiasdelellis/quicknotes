@@ -1,4 +1,22 @@
 # Changelog
+## [1.0.2] unreleased
+
+**Long notes are editable again.** The editor no longer grows off the bottom of
+the screen: it keeps within the window and the note itself scrolls, with the
+Cancel, Save and Close buttons held at its bottom edge. A note of a few
+hundred lines had half of its text — and the Save button with it — somewhere
+below the screen, with nothing to scroll.
+
+In detail:
+
+- Bound the editor to the window and scroll the note inside it. The overlay of
+  the editor is fixed to the viewport, so a note taller than the screen simply
+  ran past the bottom of it and there was nothing, anywhere, that scrolled: a
+  regression of 1.0, where the overlay lost the `overflow: auto` it had had
+  since the editor was written. The toolbars are held at the bottom of the note
+  while it scrolls, so the buttons are always where they were, and the format
+  toolbar follows the text it belongs to.
+
 ## [1.0.1] 2026-08-25
 
 **Search finds what the board finds.** The unified search of Nextcloud now

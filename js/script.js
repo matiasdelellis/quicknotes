@@ -713,6 +713,20 @@ View.prototype = {
             event.stopPropagation();
         });
 
+        // The note being edited scrolls (see .note-active in css/style.css) and
+        // the format toolbar has no idea: MediumEditor puts it in the body and
+        // places it once, from the rectangle of the selection, and only looks
+        // again on a *window* scroll — which this is not. Left alone it stayed
+        // where it was while the selected text moved away from under it.
+        // checkSelection() is exactly what it does on that window scroll: place
+        // it again, or take it away. Bound on the element and not delegated,
+        // because scroll does not bubble.
+        self._$modal.find('.note-active').on('scroll', function () {
+            if (self._editor != undefined) {
+                self._editor.checkSelection();
+            }
+        });
+
         // A wikilink inside the editor jumps to the linked note. It has to be
         // intercepted before the browser follows the href — the point is to
         // switch notes inside the app, not to load the page again.
@@ -1679,6 +1693,15 @@ View.prototype = {
             modalWidth = windowWidth;
             modalTop = 50;
         }
+
+        /* How tall the note is allowed to grow before it scrolls instead of
+         * running off the bottom of the screen. Only this knows where the box
+         * is going, and css does the arithmetic from there (.note-active) —
+         * a custom property and not a max-height in pixels so it follows a
+         * window that is resized while the note is open, which nothing here
+         * listens for. */
+        modal[0].style.setProperty('--qn-modal-top', modalTop + 'px');
+
         var noteLeft = note.offset().left;
         var noteTop = note.offset().top;
         var modalLeft = (windowWidth / 2 - modalWidth / 2);
